@@ -3,6 +3,8 @@ package likelion.sns.controller;
 import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.join.UserJoinResponseDto;
+import likelion.sns.domain.dto.login.UserLoginRequestDto;
+import likelion.sns.domain.dto.login.UserLoginResponseDto;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,4 +24,8 @@ public class UserController {
         return Response.success(user);
     }
 
+    @PostMapping("/login")
+    public UserLoginResponseDto login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
+        return userService.loginUser(userLoginRequestDto);
+    }
 }
