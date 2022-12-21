@@ -9,6 +9,10 @@ public class ErrorDto {
 
     public ErrorDto(SNSAppException e) {
         this.errorCode = e.getErrorCode().toString();
-        this.message = e.getErrorCode().getMessage();
+        if (e.getMessage() == null) {
+            this.message = e.getErrorCode().getMessage();
+        } else {
+            this.message = e.getMessage();
+        }
     }
 }
