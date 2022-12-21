@@ -8,6 +8,7 @@ import likelion.sns.domain.dto.read.PostListDto;
 import likelion.sns.domain.dto.write.PostWriteResponseDto;
 import likelion.sns.domain.dto.write.PostWriteRequestDto;
 import likelion.sns.domain.entity.Post;
+import likelion.sns.domain.entity.User;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,13 @@ public class PostService {
         return new PostDetailDto(foundPost);
     }
 
+    @Transactional
+    public PostWriteResponseDto writePost(PostWriteRequestDto postWriteRequestDto, String userName) {
+        User user = userRepository.findByUserName(userName).get();
 
+        Post post = new Post(postWriteRequestDto.getTitle(), postWriteRequestDto.getBody(), user);
+
+        return new PostWriteResponseDto(postRepository.save(post));
+
+    }
 }

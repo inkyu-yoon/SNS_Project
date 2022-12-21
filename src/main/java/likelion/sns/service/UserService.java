@@ -8,6 +8,7 @@ import likelion.sns.domain.dto.join.UserJoinResponseDto;
 import likelion.sns.domain.dto.login.UserLoginRequestDto;
 import likelion.sns.domain.dto.login.UserLoginResponseDto;
 import likelion.sns.domain.entity.User;
+import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,10 @@ public class UserService {
         // 로그인에 성공할 시, token을 create 하고 반환
         return new UserLoginResponseDto(JwtTokenUtil.createToken(inputUsername, secretKey));
     }
+
+    public UserRole findRoleByUserName(String userName) {
+        return userRepository.findByUserName(userName).get().getRole();
+    }
+
 
 }
