@@ -17,7 +17,7 @@ public class BaseEntity {
 
     @CreatedDate
     @Column(updatable = false)
-    private Timestamp registeredAt;
+    private Timestamp createdAt;
 
     @LastModifiedDate
     private Timestamp updatedAt;
