@@ -97,8 +97,10 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.jwt").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.jwt").value(token));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.jwt").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.jwt").value(token));
 
     }
 
