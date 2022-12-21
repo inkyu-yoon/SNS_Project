@@ -15,10 +15,5 @@ public class ExceptionManager {
                 .body(Response.error(new ErrorDto(e)));
     }
 
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<?> SignatureExceptionHandler(SNSAppException e){
-        return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus())
-                .body(Response.error(ErrorCode.INVALID_TOKEN));
-    }
 }
 
