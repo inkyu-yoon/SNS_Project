@@ -10,4 +10,8 @@ public class SNSAppException extends RuntimeException{
     private ErrorCode errorCode;
     private String message;
 
+    public SNSAppException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
+    }
+
 }

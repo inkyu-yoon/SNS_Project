@@ -1,5 +1,6 @@
 package likelion.sns.Exception;
 
+import io.jsonwebtoken.SignatureException;
 import likelion.sns.domain.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,4 +14,11 @@ public class ExceptionManager {
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(Response.error(new ErrorDto(e)));
     }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<?> SignatureExceptionHandler(SNSAppException e){
+        return ResponseEntity.status(ErrorCode.INVALID_TOKEN.getHttpStatus())
+                .body(Response.error(ErrorCode.INVALID_TOKEN));
+    }
 }
+

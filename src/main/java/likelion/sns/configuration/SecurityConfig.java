@@ -1,6 +1,8 @@
 package likelion.sns.configuration;
 
 
+import likelion.sns.jwt.ExceptionHandlerFilter;
+import likelion.sns.jwt.JwtTokenFilter;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,8 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtTokenFilter.class)
                 .build();
     }
 }
