@@ -59,18 +59,12 @@ public class PostService {
         //포스트가 존재하지 않음
         Post foundPost = postRepository.findById(postId).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
 
-        //작성자가 없음
-        if (foundPost.getUser() == null) {
-            throw new SNSAppException(ErrorCode.USERNAME_NOT_FOUND,"작성자가 존재하지 않습니다.");
-        }
 
-        log.info("role : {} ",requestUser.getRole().toString());
-
-        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
         User foundUser = foundPost.getUser();
 
-        if (!requestUser.getRole().toString().equals(UserRole.ADMIN.toString()) && !foundUser.getUserName().equals(requestUserName)) {
-            throw new SNSAppException(ErrorCode.INVALID_PERMISSION,"작성자와 수정 요청자가 일치하지 않습니다.");
+        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
+        if (!requestUser.getRole().equals(UserRole.ADMIN) && !foundUser.getUserName().equals(requestUserName)) {
+            throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 
         String newTitle = postModifyRequestDto.getTitle();
