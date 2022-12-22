@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 public class PostListDto {
     private Long id;
     private String title;
+    private String body;
     private String userName;
     private String createdAt;
     private String lastModifiedAt;
@@ -19,6 +20,7 @@ public class PostListDto {
     public PostListDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
+        this.body = post.getBody();
         this.userName = post.getUser().getUserName();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         if (post.getModifiedAt() != null) {
