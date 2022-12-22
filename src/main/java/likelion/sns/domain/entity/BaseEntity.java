@@ -20,7 +20,7 @@ public class BaseEntity {
     private Timestamp createdAt;
 
     @LastModifiedDate
-    private Timestamp updatedAt;
+    private Timestamp modifiedAt;
 
     private Timestamp deletedAt;
 

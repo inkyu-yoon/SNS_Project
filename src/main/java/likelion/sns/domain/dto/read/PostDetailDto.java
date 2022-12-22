@@ -22,12 +22,12 @@ public class PostDetailDto {
         this.title = post.getTitle();
         this.body = post.getBody();
         this.userName = post.getUser().getUserName();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        if (post.getUpdatedAt() != null) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        if (post.getModifiedAt() != null) {
             this.createdAt = sdf.format(post.getCreatedAt());
         }
-        if (post.getUpdatedAt() != null) {
-            this.lastModifiedAt = sdf.format(post.getUpdatedAt());
+        if (post.getModifiedAt() != null) {
+            this.lastModifiedAt = sdf.format(post.getModifiedAt());
         }
     }
 }
