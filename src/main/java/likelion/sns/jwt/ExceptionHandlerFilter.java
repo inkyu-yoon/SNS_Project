@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
     @Override
@@ -33,6 +34,9 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (JwtException | IllegalArgumentException e) {
             //유효하지 않은 토큰
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
+            //사용자 찾을 수 없음
+        } catch (NoSuchElementException e){
+            setErrorResponse(response, ErrorCode.USERNAME_NOT_FOUND);
         }
     }
 
