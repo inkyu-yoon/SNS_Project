@@ -3,6 +3,8 @@ package likelion.sns.controller;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.Response;
+import likelion.sns.domain.dto.modify.PostModifyRequestDto;
+import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
@@ -46,5 +48,19 @@ public class PostController {
         PostWriteResponseDto postWriteResponseDto = postService.writePost(postWriteRequestDto, userName);
         return Response.success(postWriteResponseDto);
 
+    }
+
+    @PutMapping("/{postId}")
+    public Response modify(@PathVariable(name = "postId") Long postId, @RequestBody PostModifyRequestDto postModifyRequestDto,Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        String userName = authentication.getName();
+
+        postService.modifyPost(postModifyRequestDto, postId,userName);
+
+        return Response.success(new PostModifyResponseDto("포스트 수정 완료", postId));
     }
 }

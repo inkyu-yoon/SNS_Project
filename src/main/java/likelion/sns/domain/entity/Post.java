@@ -29,4 +29,9 @@ public class Post extends BaseEntity{
         this.body = body;
         this.user = user;
     }
+
+    public void modifyPost(String title, String body) {
+        this.title = title;
+        this.body = body;
+    }
 }
