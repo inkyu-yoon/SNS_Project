@@ -17,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -29,7 +31,7 @@ public class UserService {
     private String secretKey;
 
     @Transactional
-    public UserJoinResponseDto createUser(UserJoinRequestDto joinRequest) {
+    public UserJoinResponseDto createUser(UserJoinRequestDto joinRequest) throws SQLException  {
         //만약 db에 가입 요청한 아이디가 이미 존재할 시, 에러를 발생시킴
         userRepository.findByUserName(joinRequest.getUserName()).ifPresent(user -> {
             throw new SNSAppException(ErrorCode.DUPLICATED_USER_NAME, joinRequest.getUserName()+"는(은) 이미 존재합니다.");
@@ -44,7 +46,7 @@ public class UserService {
         return new UserJoinResponseDto(saved);
     }
 
-    public UserLoginResponseDto loginUser(UserLoginRequestDto loginRequest) {
+    public UserLoginResponseDto loginUser(UserLoginRequestDto loginRequest) throws SQLException {
         String inputUsername = loginRequest.getUserName();
         String inputPassword = loginRequest.getPassword();
 
