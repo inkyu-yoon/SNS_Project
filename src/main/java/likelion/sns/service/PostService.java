@@ -36,7 +36,7 @@ public class PostService {
 
     @Transactional
     public PostWriteResponseDto writePost(PostWriteRequestDto postWriteRequestDto, String userName) {
-        User user = userRepository.findByUserName(userName).get();
+        User user = userRepository.findByUserName(userName).orElseThrow(()->new SNSAppException(ErrorCode.USERNAME_NOT_FOUND,userName+"에 해당하는 회원을 찾을 수 없습니다."));
 
         Post post = new Post(postWriteRequestDto.getTitle(), postWriteRequestDto.getBody(), user);
 
