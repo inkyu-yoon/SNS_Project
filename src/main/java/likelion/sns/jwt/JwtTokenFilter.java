@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.domain.entity.UserRole;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 권한을 줄지 안줄지 결정하는 메서드
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority(userService.findRoleByUserName(userName).name())));
-
         //"USER" 라는 권한을 부여,
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

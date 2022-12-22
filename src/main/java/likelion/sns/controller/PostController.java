@@ -38,12 +38,10 @@ public class PostController {
 
     @PostMapping
     public Response write(@RequestBody PostWriteRequestDto postWriteRequestDto, Authentication authentication) {
-        if (authentication == null) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
         }
-        if (!authentication.isAuthenticated()) {
-            throw new SNSAppException(ErrorCode.INVALID_TOKEN);
-        }
+
         String userName = authentication.getName();
         PostWriteResponseDto postWriteResponseDto = postService.writePost(postWriteRequestDto, userName);
         return Response.success(postWriteResponseDto);
