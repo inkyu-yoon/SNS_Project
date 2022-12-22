@@ -3,7 +3,7 @@ package likelion.sns.controller;
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
-import likelion.sns.configuration.SecurityConfig;
+import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
 import likelion.sns.domain.dto.write.PostWriteRequestDto;
@@ -27,8 +27,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +36,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,17 +63,17 @@ class PostControllerTest {
     void postListTest() throws Exception {
         // new post 가 앞에 배치되어야 한다.
         Timestamp oldPost = new Timestamp(System.currentTimeMillis());
-        Timestamp newPost = new Timestamp(System.currentTimeMillis()+100);
+        Timestamp newPost = new Timestamp(System.currentTimeMillis() + 100);
 
         List<PostListDto> posts = new ArrayList<>();
-        PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "윤인규", oldPost);
-        PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "윤인규", newPost);
+        PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글","내용1", "윤인규", oldPost.toString(), oldPost.toString());
+        PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글","내용2", "윤인규", newPost.toString(),newPost.toString());
         posts.add(postListDtoOld);
         posts.add(postListDtoNew);
 
 
         //createdAt 을 기준으로 내림차순 으로 정렬한다.
-        Collections.sort(posts,(a,b)->{
+        Collections.sort(posts, (a, b) -> {
             return b.getCreatedAt().compareTo(a.getCreatedAt());
         });
 
@@ -154,7 +153,7 @@ class PostControllerTest {
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(),new JwtTokenFilter(userService, secretKey),new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
         //토큰을 담지 않고 요청을 보냄
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
@@ -184,16 +183,16 @@ class PostControllerTest {
         String secretKey = "secret";
 
         //토큰 정보가 잘못됨
-        String token = JwtTokenUtil.createToken("inkyu",secretKey);
+        String token = JwtTokenUtil.createToken("inkyu", secretKey);
         token = token.replace("A", "C");
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(),new JwtTokenFilter(userService, secretKey),new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
-                        .header(HttpHeaders.AUTHORIZATION,"Bearer "+token)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -203,5 +202,115 @@ class PostControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("Token is expired or unauthorized."));
 
+    }
+
+
+    @Test
+    @DisplayName("수정 성공")
+    @WithMockUser
+    void modifySuccess() throws Exception {
+        Long postId = 1L;
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+
+        Gson gson = new Gson();
+        String content = gson.toJson(postModifyResponseDto);
+
+        //UsernamePasswordAuthenticationToken 권한 인증 상황
+        //WithMockCustomerUser 어노테이션으로 Jwt 토큰을 인증 받았음을 가정
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("포스트 수정 완료"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId));
+    }
+
+    @Test
+    @DisplayName("수정 에러 (인증 실패 시)")
+    void modifyErrorUnAuth() throws Exception {
+        Long postId = 1L;
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+
+        Gson gson = new Gson();
+        String content = gson.toJson(postModifyResponseDto);
+        String secretKey = "secret";
+
+
+        //정의한 필터를 거치게끔 설정
+        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+
+        //토큰 제공하지 않았을 때, 에러 발생해야함
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+    }
+
+    @Test
+    @DisplayName("수정 에러 (토큰 검증은 통과했지만 수정요청자와 작성자 불일치)")
+    @WithMockUser
+    void modifyErrorInValid() throws Exception {
+        Long postId = 1L;
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+
+        Gson gson = new Gson();
+        String content = gson.toJson(postModifyResponseDto);
+
+        Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
+                .when(postService).modifyPost(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("수정 에러 (토큰 검증은 통과했지만 수정요청자와 작성자 불일치)")
+    @WithMockUser
+    void modifyErrorDBError() throws Exception {
+        Long postId = 1L;
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+
+        Gson gson = new Gson();
+        String content = gson.toJson(postModifyResponseDto);
+
+        Mockito.doThrow(new SQLException())
+                .when(postService).modifyPost(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("DB 에러"));
     }
 }

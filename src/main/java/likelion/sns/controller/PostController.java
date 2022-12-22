@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
+
 @RestController
 @RequestMapping("api/v1/posts")
 @RequiredArgsConstructor
@@ -29,17 +31,17 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("")
-    public Page<PostListDto> showPostList(Pageable pageable) {
+    public Page<PostListDto> showPostList(Pageable pageable) throws SQLException {
         return postService.getPostList(pageable);
     }
 
     @GetMapping("/{postId}")
-    public PostDetailDto showOne(@PathVariable(name = "postId") Long id) {
+    public PostDetailDto showOne(@PathVariable(name = "postId") Long id) throws SQLException {
         return postService.getPostById(id);
     }
 
     @PostMapping
-    public Response write(@RequestBody PostWriteRequestDto postWriteRequestDto, Authentication authentication) {
+    public Response write(@RequestBody PostWriteRequestDto postWriteRequestDto, Authentication authentication) throws SQLException {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
         }
@@ -51,15 +53,16 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public Response modify(@PathVariable(name = "postId") Long postId, @RequestBody PostModifyRequestDto postModifyRequestDto,Authentication authentication) {
+    public Response modify(@PathVariable(name = "postId") Long postId, @RequestBody PostModifyRequestDto postModifyRequestDto, Authentication authentication) throws SQLException {
 
+        //인증 실패
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
         }
 
-        String userName = authentication.getName();
+        String requestUserName = authentication.getName();
 
-        postService.modifyPost(postModifyRequestDto, postId,userName);
+        postService.modifyPost(postModifyRequestDto, postId, requestUserName);
 
         return Response.success(new PostModifyResponseDto("포스트 수정 완료", postId));
     }
