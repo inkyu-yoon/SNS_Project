@@ -13,15 +13,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 
-import java.util.Optional;
-
-import static java.util.Optional.*;
+import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PostServiceTest {
@@ -122,7 +118,7 @@ class PostServiceTest {
                 .when(mockUser).getUserName();
 
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(new PostModifyRequestDto("title","body"), 1L, "userName"));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(new PostModifyRequestDto("title", "body"), 1L, "userName"));
 
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("작성자와 요청자가 일치하지 않습니다.");
@@ -140,7 +136,7 @@ class PostServiceTest {
         when(postRepository.findById(any()))
                 .thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, "userName"));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost(1L, "userName"));
 
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
@@ -153,7 +149,7 @@ class PostServiceTest {
         when(userRepository.findByUserName("userName"))
                 .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, "userName"));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost(1L, "userName"));
 
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당하는 유저를 찾을 수 없습니다.");
@@ -182,7 +178,7 @@ class PostServiceTest {
         doReturn(requestName)
                 .when(mockUser).getUserName();
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, writerName));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost(1L, writerName));
 
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("작성자와 요청자가 일치하지 않습니다.");

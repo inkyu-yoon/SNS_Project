@@ -16,8 +16,6 @@ import likelion.sns.service.PostService;
 import likelion.sns.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,12 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -43,13 +36,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.lang.System.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static java.lang.System.currentTimeMillis;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PostController.class)
 class PostControllerTest {
@@ -75,8 +69,8 @@ class PostControllerTest {
         Timestamp newPost = new Timestamp(currentTimeMillis() + 100);
 
         List<PostListDto> posts = new ArrayList<>();
-        PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글","내용1", "윤인규", oldPost.toString(), oldPost.toString());
-        PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글","내용2", "윤인규", newPost.toString(),newPost.toString());
+        PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString());
+        PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString());
         posts.add(postListDtoOld);
         posts.add(postListDtoNew);
 
@@ -123,7 +117,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("게시글 작성 테스트")
-    @WithMockCustomUser
+    @WithMockUser
     void postWriteSuccess() throws Exception {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
         Mockito.when(postService.writePost(any(), any())).thenReturn(new PostWriteResponseDto("포스트 등록 완료", 1L));
@@ -162,7 +156,7 @@ class PostControllerTest {
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey)).build();
 
         //토큰을 담지 않고 요청을 보냄
         mockMvc.perform(post("/api/v1/posts")
@@ -198,7 +192,7 @@ class PostControllerTest {
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey)).build();
 
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
@@ -220,7 +214,7 @@ class PostControllerTest {
     @WithMockUser
     void modifySuccess() throws Exception {
         Long postId = 1L;
-        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", postId);
 
         Gson gson = new Gson();
         String content = gson.toJson(postModifyResponseDto);
@@ -228,7 +222,7 @@ class PostControllerTest {
         //UsernamePasswordAuthenticationToken 권한 인증 상황
         //WithMockCustomerUser 어노테이션으로 Jwt 토큰을 인증 받았음을 가정
 
-        mockMvc.perform(put("/api/v1/posts/"+postId)
+        mockMvc.perform(put("/api/v1/posts/" + postId)
                         .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -245,7 +239,7 @@ class PostControllerTest {
     @DisplayName("수정 에러 (인증 실패 시)")
     void modifyErrorUnAuth() throws Exception {
         Long postId = 1L;
-        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", postId);
 
         Gson gson = new Gson();
         String content = gson.toJson(postModifyResponseDto);
@@ -254,10 +248,10 @@ class PostControllerTest {
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey)).build();
 
         //토큰 제공하지 않았을 때, 에러 발생해야함
-        mockMvc.perform(put("/api/v1/posts/"+postId)
+        mockMvc.perform(put("/api/v1/posts/" + postId)
                         .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -275,7 +269,7 @@ class PostControllerTest {
     @WithMockUser
     void modifyErrorInValid() throws Exception {
         Long postId = 1L;
-        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", postId);
 
         Gson gson = new Gson();
         String content = gson.toJson(postModifyResponseDto);
@@ -284,7 +278,7 @@ class PostControllerTest {
                 .when(postService).modifyPost(any(), any(), any());
 
 
-        mockMvc.perform(put("/api/v1/posts/"+postId)
+        mockMvc.perform(put("/api/v1/posts/" + postId)
                         .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -302,7 +296,7 @@ class PostControllerTest {
     @WithMockUser
     void modifyErrorDBError() throws Exception {
         Long postId = 1L;
-        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용",postId);
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", postId);
 
         Gson gson = new Gson();
         String content = gson.toJson(postModifyResponseDto);
@@ -311,7 +305,7 @@ class PostControllerTest {
                 .when(postService).modifyPost(any(), any(), any());
 
 
-        mockMvc.perform(put("/api/v1/posts/"+postId)
+        mockMvc.perform(put("/api/v1/posts/" + postId)
                         .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -332,7 +326,7 @@ class PostControllerTest {
 
         Long postId = 1L;
 
-        mockMvc.perform(delete("/api/v1/posts/"+postId)
+        mockMvc.perform(delete("/api/v1/posts/" + postId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -356,9 +350,9 @@ class PostControllerTest {
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey)).build();
 
-        mockMvc.perform(delete("/api/v1/posts/"+postId)
+        mockMvc.perform(delete("/api/v1/posts/" + postId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -378,10 +372,10 @@ class PostControllerTest {
         Long postId = 1L;
 
         Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
-                .when(postService).deletePost( any(), any());
+                .when(postService).deletePost(any(), any());
 
 
-        mockMvc.perform(delete("/api/v1/posts/"+postId)
+        mockMvc.perform(delete("/api/v1/posts/" + postId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -403,7 +397,7 @@ class PostControllerTest {
                 .when(postService).deletePost(any(), any());
 
 
-        mockMvc.perform(delete("/api/v1/posts/"+postId)
+        mockMvc.perform(delete("/api/v1/posts/" + postId)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
