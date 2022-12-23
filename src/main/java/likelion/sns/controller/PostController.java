@@ -3,16 +3,14 @@ package likelion.sns.controller;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.Response;
+import likelion.sns.domain.dto.delete.PostDeleteResponseDto;
 import likelion.sns.domain.dto.modify.PostModifyRequestDto;
 import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
 import likelion.sns.domain.dto.write.PostWriteResponseDto;
-import likelion.sns.domain.entity.Post;
-import likelion.sns.repository.PostRepository;
 import likelion.sns.service.PostService;
-import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -65,5 +63,20 @@ public class PostController {
         postService.modifyPost(postModifyRequestDto, postId, requestUserName);
 
         return Response.success(new PostModifyResponseDto("포스트 수정 완료", postId));
+    }
+
+
+    @DeleteMapping("/{postId}")
+    public Response delete(@PathVariable(name = "postId") Long postId, Authentication authentication) throws SQLException {
+        //인증 실패
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
+        }
+
+        String requestUserName = authentication.getName();
+
+        postService.deletePost(postId, requestUserName);
+
+        return Response.success(new PostDeleteResponseDto("포스트 삭제 완료", postId));
     }
 }
