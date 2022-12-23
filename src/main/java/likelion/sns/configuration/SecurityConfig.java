@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
     private final UserService userService;
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -27,8 +27,11 @@ public class SecurityConfig {
                 .csrf().disable()
                 .cors().and()
                 .authorizeRequests()
-                .antMatchers("api/v1/users/join", "/api/v1/users/login").permitAll()
-                .antMatchers(HttpMethod.POST, "api/v1/**").authenticated()
+                .antMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPointHandler())
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -36,5 +39,8 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtTokenFilter.class)
                 .build();
+
     }
+
+
 }
