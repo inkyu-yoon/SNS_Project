@@ -31,12 +31,15 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             //토큰의 유효기간 만료
-            setErrorResponse(response, ErrorCode.INVALID_TOKEN);
+            log.error("만료된 토큰입니다");
+            setErrorResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException | IllegalArgumentException e) {
             //유효하지 않은 토큰
+            log.error("유효하지 않은 토큰이 입력되었습니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
-            //사용자 찾을 수 없음
         } catch (NoSuchElementException e){
+            //사용자 찾을 수 없음
+            log.error("사용자를 찾을 수 없습니다.");
             setErrorResponse(response, ErrorCode.USERNAME_NOT_FOUND);
         }
     }

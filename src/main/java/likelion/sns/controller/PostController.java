@@ -52,11 +52,6 @@ public class PostController {
 
         log.info("{}", requestDto);
 
-        //인증 실패
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
-        }
-
 
         String requestUserName = authentication.getName();
         log.info("작성 요청자 userName : {}", requestUserName);
@@ -75,12 +70,6 @@ public class PostController {
 
         log.info("{}", requestDto);
 
-        //인증 실패
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
-        }
-
-
         String requestUserName = authentication.getName();
         log.info("수정 요청자 userName : {}", requestUserName);
 
@@ -98,11 +87,6 @@ public class PostController {
      **/
     @DeleteMapping("/{postId}")
     public Response delete(@PathVariable(name = "postId") Long postId, Authentication authentication) throws SQLException {
-
-        //인증 실패
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new SNSAppException(ErrorCode.INVALID_PERMISSION);
-        }
 
         String requestUserName = authentication.getName();
         log.info("삭제 요청자 userName : {}", requestUserName);
