@@ -24,11 +24,8 @@ public class CustomAuthenticationEntryPointHandler implements AuthenticationEntr
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         String exception = (String)request.getAttribute("exception");
-        log.info("{}",request.getAuthType());
-        log.info("{}",request.getHeaderNames());
         if(exception == null) {
             setResponse(response, ErrorCode.INVALID_PERMISSION);
-
         }
     }
     private void setResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
