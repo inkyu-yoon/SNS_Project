@@ -37,7 +37,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         try {
             token = authorization.split(" ")[1];
         } catch (Exception e) {
-            log.error("token 추출에 실패했습니다.");
+            log.info("추출할 토큰이 존재하지 않습니다.");
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,6 +51,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 권한을 줄지 안줄지 결정하는 메서드
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority(userService.findRoleByUserName(userName).name())));
+
+        log.info("{}",authenticationToken);
+
         //"USER" 라는 권한을 부여,
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

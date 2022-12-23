@@ -111,7 +111,7 @@ class PostServiceTest {
         doReturn(mockUser)
                 .when(mockPost).getUser();
 
-        doReturn(UserRole.USER)
+        doReturn(UserRole.ROLE_USER)
                 .when(mockUser).getRole();
 
         doReturn("userName1")
@@ -169,7 +169,7 @@ class PostServiceTest {
 
         doReturn(mockUser)
                 .when(mockPost).getUser();
-        doReturn(UserRole.USER)
+        doReturn(UserRole.ROLE_USER)
                 .when(mockUser).getRole();
 
         String requestName = "request";

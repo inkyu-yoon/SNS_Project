@@ -2,7 +2,9 @@ package likelion.sns.controller;
 
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ErrorDto;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
@@ -20,16 +22,25 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -45,7 +56,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PostController.class)
+@WebMvcTest(value = PostController.class)
 class PostControllerTest {
 
     @Autowired
@@ -142,34 +153,34 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("토큰 없이 요청 시 게시글 작성 에러 테스트")
+    @DisplayName("포스트 작성 에러 (인증 실패)")
+    @WithAnonymousUser
     void postWriteErrorNonToken() throws Exception {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
 
-        Mockito.when(postService.writePost(any(), any())).
-                thenThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION));
+        Mockito.when(postService.writePost(any(), any()))
+                .thenThrow(new SNSAppException(ErrorCode.INVALID_TOKEN));
 
+        Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_USER);
 
         Gson gson = new Gson();
         String content = gson.toJson(postWriteRequestDto);
-        String secretKey = "secret";
 
         //정의한 필터를 거치게끔 설정
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
-                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey)).build();
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, "secret")).build();
 
-        //토큰을 담지 않고 요청을 보냄
         mockMvc.perform(post("/api/v1/posts")
                         .with(csrf())
+                        .header(HttpHeaders.AUTHORIZATION,"not Bearer Token")
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
-                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
-
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
+                .andExpect(jsonPath("$.result.message").value("유효하지 않은 토큰입니다."));
     }
 
     @Test
@@ -180,7 +191,7 @@ class PostControllerTest {
         Mockito.when(postService.writePost(any(), any()))
                 .thenThrow(new SNSAppException(ErrorCode.INVALID_TOKEN));
 
-        Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.USER);
+        Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_USER);
 
         Gson gson = new Gson();
         String content = gson.toJson(postWriteRequestDto);
@@ -204,7 +215,7 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
                 .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
-                .andExpect(jsonPath("$.result.message").value("Token is expired or unauthorized."));
+                .andExpect(jsonPath("$.result.message").value("유효하지 않은 토큰입니다."));
 
     }
 
@@ -236,7 +247,8 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("수정 에러 (인증 실패 시)")
+    @DisplayName("수정 에러 인증실패 ")
+    @WithAnonymousUser
     void modifyErrorUnAuth() throws Exception {
         Long postId = 1L;
         PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", postId);
@@ -253,6 +265,7 @@ class PostControllerTest {
         //토큰 제공하지 않았을 때, 에러 발생해야함
         mockMvc.perform(put("/api/v1/posts/" + postId)
                         .with(csrf())
+                        .header(HttpHeaders.AUTHORIZATION,"not Bearer Token")
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -260,8 +273,8 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.resultCode").exists())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
-                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
+                .andExpect(jsonPath("$.result.message").value("유효하지 않은 토큰입니다."));
     }
 
     @Test
@@ -354,14 +367,15 @@ class PostControllerTest {
 
         mockMvc.perform(delete("/api/v1/posts/" + postId)
                         .with(csrf())
+                        .header(HttpHeaders.AUTHORIZATION,"not Bearer Token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").exists())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
-                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
+                .andExpect(jsonPath("$.result.message").value("유효하지 않은 토큰입니다."));
     }
 
     @Test
