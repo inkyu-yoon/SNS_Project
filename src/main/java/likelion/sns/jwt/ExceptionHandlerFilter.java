@@ -9,6 +9,7 @@ import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -37,7 +38,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             //유효하지 않은 토큰
             log.error("유효하지 않은 토큰이 입력되었습니다.");
             setErrorResponse(response, ErrorCode.INVALID_TOKEN);
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             //사용자 찾을 수 없음
             log.error("사용자를 찾을 수 없습니다.");
             setErrorResponse(response, ErrorCode.USERNAME_NOT_FOUND);

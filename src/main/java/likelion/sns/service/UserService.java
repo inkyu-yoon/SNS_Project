@@ -3,6 +3,8 @@ package likelion.sns.service;
 
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.domain.dto.changeRole.UserRoleChangeRequestDto;
+import likelion.sns.domain.dto.changeRole.UserRoleChangeResponseDto;
 import likelion.sns.domain.dto.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.join.UserJoinResponseDto;
 import likelion.sns.domain.dto.login.UserLoginRequestDto;
@@ -12,6 +14,7 @@ import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.sql.SQLException;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -59,6 +63,7 @@ public class UserService {
             throw new SNSAppException(ErrorCode.INVALID_PASSWORD, "잘못된 비밀번호 입니다");
         }
 
+        log.info("로그인한 유저의 등급은 {} 입니다.",found.getRole());
         // 로그인에 성공할 시, token을 create 하고 반환
         return new UserLoginResponseDto(JwtTokenUtil.createToken(inputUsername, secretKey));
     }
@@ -67,4 +72,16 @@ public class UserService {
         return userRepository.findByUserName(userName).get().getRole();
     }
 
+    @Transactional
+    public void changeRole(Long userId, UserRoleChangeRequestDto requestDto) {
+
+        String requestRole = requestDto.getRole();
+
+        User found = userRepository.findById(userId)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+
+        log.info("{}", found);
+
+        found.changeRole(requestRole);
+    }
 }

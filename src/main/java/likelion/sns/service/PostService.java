@@ -72,7 +72,7 @@ public class PostService {
         log.info("게시글 작성자 userName = {}", userName);
 
         //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
-        if (!requestUserRole.equals(UserRole.ADMIN) && !userName.equals(requestUserName)) {
+        if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !userName.equals(requestUserName)) {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 
@@ -101,7 +101,7 @@ public class PostService {
         log.info("게시글 작성자 userName = {}", userName);
 
         //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
-        if (!requestUserRole.equals(UserRole.ADMIN) && !userName.equals(requestUserName)) {
+        if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !userName.equals(requestUserName)) {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 

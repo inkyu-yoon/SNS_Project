@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(name = "user_name",unique = true)
+    @Column(name = "user_name", unique = true)
     private String userName;
 
     @OneToMany(mappedBy = "user")
@@ -32,6 +32,14 @@ public class User extends BaseEntity {
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
-        this.role = UserRole.USER;
+        this.role = UserRole.ROLE_USER;
+    }
+
+    public void changeRole(String requestRole) {
+        if (requestRole.equalsIgnoreCase("admin")) {
+            this.role = UserRole.ROLE_ADMIN;
+        } else if (requestRole.equalsIgnoreCase("user")) {
+            this.role = UserRole.ROLE_USER;
+        }
     }
 }
