@@ -3,6 +3,7 @@ package likelion.sns.controller;
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.domain.dto.delete.PostDeleteResponseDto;
 import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -288,7 +290,7 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("수정 에러 (토큰 검증은 통과했지만 수정요청자와 작성자 불일치)")
+    @DisplayName("수정 에러 (DB 에러)")
     @WithMockUser
     void modifyErrorDBError() throws Exception {
         Long postId = 1L;
@@ -304,6 +306,97 @@ class PostControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(content)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("DB 에러"));
+    }
+
+
+    @Test
+    @DisplayName("포스트 삭제 성공")
+    @WithMockUser
+    void deleteSuccess() throws Exception {
+
+        Long postId = 1L;
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("포스트 삭제 완료"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId));
+    }
+
+    @Test
+    @DisplayName("포스트 삭제 에러 (인증 실패)")
+    @WithAnonymousUser
+    void deleteError() throws Exception {
+
+        Long postId = 1L;
+
+        String secretKey = "secret";
+
+
+        //정의한 필터를 거치게끔 설정
+        mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
+                .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+    }
+
+    @Test
+    @DisplayName("포스트 삭제 에러 (작성자 불일치)")
+    @WithMockUser
+    void deleteError2() throws Exception {
+
+        Long postId = 1L;
+
+        Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
+                .when(postService).deletePost( ArgumentMatchers.any(), ArgumentMatchers.any());
+
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("수정 에러 (DB 에러)")
+    @WithMockUser
+    void deleteErrorDBE() throws Exception {
+        Long postId = 1L;
+
+        Mockito.doThrow(new SQLException())
+                .when(postService).deletePost(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
