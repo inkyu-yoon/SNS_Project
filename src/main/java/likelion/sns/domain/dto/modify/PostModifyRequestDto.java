@@ -3,11 +3,12 @@ package likelion.sns.domain.dto.modify;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@ToString(of={"title","body"})
 public class PostModifyRequestDto {
     private String title;
     private String body;

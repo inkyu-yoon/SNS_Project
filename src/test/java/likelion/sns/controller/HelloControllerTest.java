@@ -9,9 +9,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
 class HelloControllerTest {
@@ -28,9 +31,9 @@ class HelloControllerTest {
     @DisplayName("Hello Controller GET Mapping 테스트")
     @WithMockUser
     void helloTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/hello"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("hello"));
+        mockMvc.perform(get("/api/v1/hello"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("hello"));
     }
 }

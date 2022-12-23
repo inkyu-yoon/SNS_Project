@@ -7,7 +7,6 @@ import likelion.sns.domain.dto.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.join.UserJoinResponseDto;
 import likelion.sns.domain.dto.login.UserLoginRequestDto;
 import likelion.sns.domain.dto.login.UserLoginResponseDto;
-import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
@@ -39,21 +44,22 @@ class UserControllerTest {
     void join() throws Exception {
         UserJoinRequestDto user = new UserJoinRequestDto("윤인규", "password");
 
-        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenReturn(new UserJoinResponseDto(1L, "윤인규"));
+        Mockito.when(userService.createUser(any()))
+                .thenReturn(new UserJoinResponseDto(1L, "윤인규"));
 
         Gson gson = new Gson();
         String content = gson.toJson(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/join")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/users/join")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.userId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.userName").value("윤인규"));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.userId").value(1))
+                .andExpect(jsonPath("$.result.userName").value("윤인규"));
     }
 
     @Test
@@ -62,21 +68,22 @@ class UserControllerTest {
     void joinError() throws Exception {
         UserJoinRequestDto user = new UserJoinRequestDto("윤인규", "password");
 
-        Mockito.when(userService.createUser(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.DUPLICATED_USER_NAME, user.getUserName() + "는(은) 이미 존재합니다."));
+        Mockito.when(userService.createUser(any()))
+                .thenThrow(new SNSAppException(ErrorCode.DUPLICATED_USER_NAME, user.getUserName() + "는(은) 이미 존재합니다."));
 
         Gson gson = new Gson();
         String content = gson.toJson(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/join")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/users/join")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("DUPLICATED_USER_NAME"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("윤인규는(은) 이미 존재합니다."));
+                .andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("DUPLICATED_USER_NAME"))
+                .andExpect(jsonPath("$.result.message").value("윤인규는(은) 이미 존재합니다."));
     }
 
     @Test
@@ -87,20 +94,21 @@ class UserControllerTest {
 
         String token = "randomToken";
 
-        Mockito.when(userService.loginUser(ArgumentMatchers.any())).thenReturn(new UserLoginResponseDto(token));
+        Mockito.when(userService.loginUser(any()))
+                .thenReturn(new UserLoginResponseDto(token));
 
         Gson gson = new Gson();
         String content = gson.toJson(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/login")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.jwt").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.jwt").value(token));
+                .andDo(print())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result.jwt").exists())
+                .andExpect(jsonPath("$.result.jwt").value(token));
 
     }
 
@@ -111,21 +119,22 @@ class UserControllerTest {
     void LoginNotFound() throws Exception {
         UserLoginRequestDto user = new UserLoginRequestDto("윤인규", "1234");
 
-        Mockito.when(userService.loginUser(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, user.getUserName() + "에 해당하는 회원을 찾을 수 없습니다."));
+        Mockito.when(userService.loginUser(any()))
+                .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, user.getUserName() + "에 해당하는 회원을 찾을 수 없습니다."));
 
         Gson gson = new Gson();
         String content = gson.toJson(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/login")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("USERNAME_NOT_FOUND"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("윤인규에 해당하는 회원을 찾을 수 없습니다."));
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("USERNAME_NOT_FOUND"))
+                .andExpect(jsonPath("$.result.message").value("윤인규에 해당하는 회원을 찾을 수 없습니다."));
 
     }
 
@@ -135,21 +144,22 @@ class UserControllerTest {
     void LoginInValid() throws Exception {
         UserLoginRequestDto user = new UserLoginRequestDto("윤인규", "1234");
 
-        Mockito.when(userService.loginUser(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.INVALID_PASSWORD, "잘못된 비밀번호 입니다"));
+        Mockito.when(userService.loginUser(any()))
+                .thenThrow(new SNSAppException(ErrorCode.INVALID_PASSWORD, "잘못된 비밀번호 입니다"));
 
         Gson gson = new Gson();
         String content = gson.toJson(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/login")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/users/login")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PASSWORD"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("잘못된 비밀번호 입니다"));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PASSWORD"))
+                .andExpect(jsonPath("$.result.message").value("잘못된 비밀번호 입니다"));
 
     }
 }

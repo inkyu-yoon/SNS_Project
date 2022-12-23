@@ -19,14 +19,17 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
+import static java.util.Optional.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 class PostServiceTest {
 
     PostService postService;
 
-    PostRepository postRepository = Mockito.mock(PostRepository.class);
-    UserRepository userRepository = Mockito.mock(UserRepository.class);
+    PostRepository postRepository = mock(PostRepository.class);
+    UserRepository userRepository = mock(UserRepository.class);
 
 
     @BeforeEach
@@ -38,11 +41,14 @@ class PostServiceTest {
     @DisplayName("포스트 등록 성공")
     void postWriteSuccess() {
 
-        Post mockPost = Mockito.mock(Post.class);
-        User mockUser = Mockito.mock(User.class);
+        Post mockPost = mock(Post.class);
+        User mockUser = mock(User.class);
 
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenReturn(Optional.of(mockUser));
-        Mockito.when(postRepository.save(ArgumentMatchers.any())).thenReturn(mockPost);
+        when(userRepository.findByUserName(any()))
+                .thenReturn(of(mockUser));
+
+        when(postRepository.save(any()))
+                .thenReturn(mockPost);
 
         Assertions.assertDoesNotThrow(() -> postService.writePost(new PostWriteRequestDto("title", "body"), "userName"));
     }
@@ -52,9 +58,11 @@ class PostServiceTest {
     void postWriteError() {
 
         //db에서 회원이 없다면 SNSAppException을 일으킬 것
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        when(userRepository.findByUserName(any()))
+                .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.writePost(ArgumentMatchers.any(), "userName"));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.writePost(any(), "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당하는 유저를 찾을 수 없습니다.");
     }
@@ -63,12 +71,16 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (포스트가 존재하지 않음)")
     void postModifyError1() {
 
-        User mockUser = Mockito.mock(User.class);
+        User mockUser = mock(User.class);
 
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenReturn(Optional.of(mockUser));
-        Mockito.when(postRepository.findById(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
+        when(userRepository.findByUserName(any()))
+                .thenReturn(of(mockUser));
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(ArgumentMatchers.any(), 1L, "userName"));
+        when(postRepository.findById(any()))
+                .thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
+
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(any(), 1L, "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
     }
@@ -77,9 +89,11 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (유저가 존재하지 않음)")
     void postModifyError2() {
 
-        Mockito.when(userRepository.findByUserName("userName")).thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        when(userRepository.findByUserName("userName"))
+                .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
-        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(ArgumentMatchers.any(), 1L, "userName"));
+        SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(any(), 1L, "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당하는 유저를 찾을 수 없습니다.");
     }
@@ -88,18 +102,28 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (요청한 유저와 작성자가 일치하지 않음)")
     void postModifyError3() {
 
-        User mockUser = Mockito.mock(User.class);
-        Post mockPost = Mockito.mock(Post.class);
-        //db에서 포스트가 없다면 SNSAppException을 일으킬 것
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenReturn(Optional.of(mockUser));
-        Mockito.when(postRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(mockPost));
+        User mockUser = mock(User.class);
+        Post mockPost = mock(Post.class);
 
-        Mockito.doReturn(mockUser).when(mockPost).getUser();
-        Mockito.doReturn(UserRole.USER).when(mockUser).getRole();
-        Mockito.doReturn("userName1").when(mockUser).getUserName();
+
+        when(userRepository.findByUserName(any()))
+                .thenReturn(of(mockUser));
+
+        when(postRepository.findById(any()))
+                .thenReturn(of(mockPost));
+
+        doReturn(mockUser)
+                .when(mockPost).getUser();
+
+        doReturn(UserRole.USER)
+                .when(mockUser).getRole();
+
+        doReturn("userName1")
+                .when(mockUser).getUserName();
 
 
         SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(new PostModifyRequestDto("title","body"), 1L, "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("작성자와 요청자가 일치하지 않습니다.");
     }
@@ -108,12 +132,16 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (포스트가 존재하지 않음)")
     void postDeleteError1() {
 
-        User mockUser = Mockito.mock(User.class);
+        User mockUser = mock(User.class);
 
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenReturn(Optional.of(mockUser));
-        Mockito.when(postRepository.findById(ArgumentMatchers.any())).thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
+        when(userRepository.findByUserName(any()))
+                .thenReturn(of(mockUser));
+
+        when(postRepository.findById(any()))
+                .thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
         SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당 포스트가 없습니다.");
     }
@@ -122,9 +150,11 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (유저가 존재하지 않음)")
     void postDeleteError2() {
 
-        Mockito.when(userRepository.findByUserName("userName")).thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        when(userRepository.findByUserName("userName"))
+                .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
         SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, "userName"));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("해당하는 유저를 찾을 수 없습니다.");
     }
@@ -133,21 +163,27 @@ class PostServiceTest {
     @DisplayName("포스트 수정 에러 (요청한 유저와 작성자가 일치하지 않음)")
     void postDeleteError3() {
 
-        User mockUser = Mockito.mock(User.class);
-        Post mockPost = Mockito.mock(Post.class);
+        User mockUser = mock(User.class);
+        Post mockPost = mock(Post.class);
 
-        //db에서 포스트가 없다면 SNSAppException을 일으킬 것
-        Mockito.when(userRepository.findByUserName(ArgumentMatchers.any())).thenReturn(Optional.of(mockUser));
-        Mockito.when(postRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(mockPost));
+        when(userRepository.findByUserName(any()))
+                .thenReturn(of(mockUser));
+        when(postRepository.findById(any()))
+                .thenReturn(of(mockPost));
 
-        Mockito.doReturn(mockUser).when(mockPost).getUser();
-        Mockito.doReturn(UserRole.USER).when(mockUser).getRole();
+        doReturn(mockUser)
+                .when(mockPost).getUser();
+        doReturn(UserRole.USER)
+                .when(mockUser).getRole();
+
         String requestName = "request";
         String writerName = "writer";
 
-        Mockito.doReturn(requestName).when(mockUser).getUserName();
+        doReturn(requestName)
+                .when(mockUser).getUserName();
 
         SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.deletePost( 1L, writerName));
+
         assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("작성자와 요청자가 일치하지 않습니다.");
     }

@@ -1,6 +1,5 @@
 package likelion.sns.Exception;
 
-import io.jsonwebtoken.SignatureException;
 import likelion.sns.domain.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

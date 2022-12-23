@@ -3,7 +3,6 @@ package likelion.sns.controller;
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
-import likelion.sns.domain.dto.delete.PostDeleteResponseDto;
 import likelion.sns.domain.dto.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
@@ -44,6 +43,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.System.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @WebMvcTest(PostController.class)
 class PostControllerTest {
 
@@ -64,8 +71,8 @@ class PostControllerTest {
     @WithMockUser
     void postListTest() throws Exception {
         // new post 가 앞에 배치되어야 한다.
-        Timestamp oldPost = new Timestamp(System.currentTimeMillis());
-        Timestamp newPost = new Timestamp(System.currentTimeMillis() + 100);
+        Timestamp oldPost = new Timestamp(currentTimeMillis());
+        Timestamp newPost = new Timestamp(currentTimeMillis() + 100);
 
         List<PostListDto> posts = new ArrayList<>();
         PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글","내용1", "윤인규", oldPost.toString(), oldPost.toString());
@@ -82,14 +89,14 @@ class PostControllerTest {
         // Page를 구성한다.
         Page<PostListDto> postPage = new PageImpl<>(posts);
 
-        BDDMockito.given(postService.getPostList(ArgumentMatchers.any())).willReturn(postPage);
+        given(postService.getPostList(any())).willReturn(postPage);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value(2))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[1].id").value(1));
+        mockMvc.perform(get("/api/v1/posts"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.content[0].id").value(2))
+                .andExpect(jsonPath("$.content[1].id").value(1));
 
     }
 
@@ -101,16 +108,16 @@ class PostControllerTest {
         Long id = 1L;
         PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33");
 
-        BDDMockito.given(postService.getPostById(ArgumentMatchers.any())).willReturn(post);
+        given(postService.getPostById(any())).willReturn(post);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + id))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(id))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.body").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userName").exists());
+        mockMvc.perform(get("/api/v1/posts/" + id))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.title").exists())
+                .andExpect(jsonPath("$.body").exists())
+                .andExpect(jsonPath("$.userName").exists());
 
     }
 
@@ -119,7 +126,7 @@ class PostControllerTest {
     @WithMockCustomUser
     void postWriteSuccess() throws Exception {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
-        Mockito.when(postService.writePost(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(new PostWriteResponseDto("포스트 등록 완료", 1L));
+        Mockito.when(postService.writePost(any(), any())).thenReturn(new PostWriteResponseDto("포스트 등록 완료", 1L));
 
         Gson gson = new Gson();
         String content = gson.toJson(postWriteRequestDto);
@@ -127,17 +134,17 @@ class PostControllerTest {
         //UsernamePasswordAuthenticationToken 권한 인증 상황
         //WithMockCustomerUser 어노테이션으로 Jwt 토큰을 인증 받았음을 가정
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/posts")
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("포스트 등록 완료"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(1));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.message").value("포스트 등록 완료"))
+                .andExpect(jsonPath("$.result.postId").value(1));
     }
 
     @Test
@@ -145,7 +152,7 @@ class PostControllerTest {
     void postWriteErrorNonToken() throws Exception {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
 
-        Mockito.when(postService.writePost(ArgumentMatchers.any(), ArgumentMatchers.any())).
+        Mockito.when(postService.writePost(any(), any())).
                 thenThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION));
 
 
@@ -158,16 +165,16 @@ class PostControllerTest {
                 .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
         //토큰을 담지 않고 요청을 보냄
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/posts")
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
 
     }
 
@@ -175,10 +182,11 @@ class PostControllerTest {
     @DisplayName("토큰 유효하지 않을 시 게시글 작성 에러 테스트")
     void postWriteErrorInvalidToken() throws Exception {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
-        Mockito.when(postService.writePost(ArgumentMatchers.any(), ArgumentMatchers.any()))
+
+        Mockito.when(postService.writePost(any(), any()))
                 .thenThrow(new SNSAppException(ErrorCode.INVALID_TOKEN));
 
-        Mockito.when(userService.findRoleByUserName(ArgumentMatchers.any())).thenReturn(UserRole.USER);
+        Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.USER);
 
         Gson gson = new Gson();
         String content = gson.toJson(postWriteRequestDto);
@@ -192,17 +200,17 @@ class PostControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/api/v1/posts")
+                        .with(csrf())
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("Token is expired or unauthorized."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_TOKEN"))
+                .andExpect(jsonPath("$.result.message").value("Token is expired or unauthorized."));
 
     }
 
@@ -220,17 +228,17 @@ class PostControllerTest {
         //UsernamePasswordAuthenticationToken 권한 인증 상황
         //WithMockCustomerUser 어노테이션으로 Jwt 토큰을 인증 받았음을 가정
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(put("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("포스트 수정 완료"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.message").value("포스트 수정 완료"))
+                .andExpect(jsonPath("$.result.postId").value(postId));
     }
 
     @Test
@@ -249,17 +257,17 @@ class PostControllerTest {
                 .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
         //토큰 제공하지 않았을 때, 에러 발생해야함
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(put("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
     }
 
     @Test
@@ -273,20 +281,20 @@ class PostControllerTest {
         String content = gson.toJson(postModifyResponseDto);
 
         Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
-                .when(postService).modifyPost(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+                .when(postService).modifyPost(any(), any(), any());
 
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(put("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
     }
 
     @Test
@@ -300,20 +308,20 @@ class PostControllerTest {
         String content = gson.toJson(postModifyResponseDto);
 
         Mockito.doThrow(new SQLException())
-                .when(postService).modifyPost(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any());
+                .when(postService).modifyPost(any(), any(), any());
 
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(put("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("DB 에러"));
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
+                .andExpect(jsonPath("$.result.message").value("DB 에러"));
     }
 
 
@@ -324,16 +332,16 @@ class PostControllerTest {
 
         Long postId = 1L;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(delete("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("포스트 삭제 완료"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.message").value("포스트 삭제 완료"))
+                .andExpect(jsonPath("$.result.postId").value(postId));
     }
 
     @Test
@@ -350,16 +358,16 @@ class PostControllerTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac)
                 .addFilters(new ExceptionHandlerFilter(), new JwtTokenFilter(userService, secretKey), new UsernamePasswordAuthenticationFilter()).build();
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(delete("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.message").value("사용자가 권한이 없습니다."));
     }
 
     @Test
@@ -370,19 +378,19 @@ class PostControllerTest {
         Long postId = 1L;
 
         Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
-                .when(postService).deletePost( ArgumentMatchers.any(), ArgumentMatchers.any());
+                .when(postService).deletePost( any(), any());
 
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(delete("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
     }
 
     @Test
@@ -392,18 +400,18 @@ class PostControllerTest {
         Long postId = 1L;
 
         Mockito.doThrow(new SQLException())
-                .when(postService).deletePost(ArgumentMatchers.any(), ArgumentMatchers.any());
+                .when(postService).deletePost(any(), any());
 
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/"+postId)
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(delete("/api/v1/posts/"+postId)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("DB 에러"));
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.resultCode").exists())
+                .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
+                .andExpect(jsonPath("$.result.message").value("DB 에러"));
     }
 }

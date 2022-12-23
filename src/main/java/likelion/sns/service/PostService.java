@@ -41,51 +41,67 @@ public class PostService {
     }
 
     @Transactional
-    public PostWriteResponseDto writePost(PostWriteRequestDto postWriteRequestDto, String userName) throws SQLException {
-        User user = userRepository.findByUserName(userName).orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, userName + "에 해당하는 회원을 찾을 수 없습니다."));
+    public PostWriteResponseDto writePost(PostWriteRequestDto requestDto, String requestUserName) throws SQLException {
 
-        Post post = new Post(postWriteRequestDto.getTitle(), postWriteRequestDto.getBody(), user);
+        User requestUser = userRepository.findByUserName(requestUserName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+
+        Post post = new Post(requestDto.getTitle(), requestDto.getBody(), requestUser);
 
         return new PostWriteResponseDto(postRepository.save(post));
 
     }
 
     @Transactional
-    public void modifyPost(PostModifyRequestDto postModifyRequestDto, Long postId, String requestUserName) throws SQLException {
+    public void modifyPost(PostModifyRequestDto requestDto, Long postId, String requestUserName) throws SQLException {
 
         //유저가 존재하지 않음
-        User requestUser = userRepository.findByUserName(requestUserName).orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+        User requestUser = userRepository.findByUserName(requestUserName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
 
         //포스트가 존재하지 않음
-        Post foundPost = postRepository.findById(postId).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
 
 
         User foundUser = foundPost.getUser();
 
+        UserRole requestUserRole = requestUser.getRole();
+        String userName = foundUser.getUserName();
+        log.info("게시글 수정 요청자 ROLE = {}", requestUserRole);
+        log.info("게시글 작성자 userName = {}", userName);
+
         //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
-        if (!requestUser.getRole().equals(UserRole.ADMIN) && !foundUser.getUserName().equals(requestUserName)) {
+        if (!requestUserRole.equals(UserRole.ADMIN) && !userName.equals(requestUserName)) {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 
-        String newTitle = postModifyRequestDto.getTitle();
-        String newBody = postModifyRequestDto.getBody();
+        String newTitle = requestDto.getTitle();
+        String newBody = requestDto.getBody();
+        log.info("게시글 수정 요청 제목 = {} , 내용 = {}", newTitle,newBody);
 
         foundPost.modifyPost(newTitle, newBody);
-
     }
 
     @Transactional
-    public void deletePost( Long postId, String requestUserName) throws SQLException {
+    public void deletePost(Long postId, String requestUserName) throws SQLException {
         //유저가 존재하지 않음
-        User requestUser = userRepository.findByUserName(requestUserName).orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+        User requestUser = userRepository.findByUserName(requestUserName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
 
         //포스트가 존재하지 않음
-        Post foundPost = postRepository.findById(postId).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
 
         User foundUser = foundPost.getUser();
 
+        UserRole requestUserRole = requestUser.getRole();
+        String userName = foundUser.getUserName();
+        log.info("게시글 삭제 요청자 ROLE = {}", requestUserRole);
+        log.info("게시글 작성자 userName = {}", userName);
+
         //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
-        if (!requestUser.getRole().equals(UserRole.ADMIN) && !foundUser.getUserName().equals(requestUserName)) {
+        if (!requestUserRole.equals(UserRole.ADMIN) && !userName.equals(requestUserName)) {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 

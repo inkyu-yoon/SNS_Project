@@ -7,7 +7,6 @@ import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.ErrorDto;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.Response;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 

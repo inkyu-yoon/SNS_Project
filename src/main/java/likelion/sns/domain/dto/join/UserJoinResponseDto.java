@@ -3,9 +3,11 @@ package likelion.sns.domain.dto.join;
 import likelion.sns.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Getter
+@ToString(of={"userId","userName"})
 public class UserJoinResponseDto {
     private Long userId;
     private String userName;

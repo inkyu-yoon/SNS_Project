@@ -2,9 +2,6 @@ package likelion.sns.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import likelion.sns.Exception.ErrorCode;
-import likelion.sns.Exception.SNSAppException;
-import likelion.sns.domain.entity.UserRole;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;

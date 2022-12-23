@@ -3,12 +3,13 @@ package likelion.sns.domain.dto.read;
 import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 @Getter
 @AllArgsConstructor
+@ToString(of={"id","title","body","userName","createdAt","lastModifiedAt"})
 public class PostListDto {
     private Long id;
     private String title;
