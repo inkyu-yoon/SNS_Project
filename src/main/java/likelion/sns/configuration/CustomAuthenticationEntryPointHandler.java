@@ -35,7 +35,7 @@ public class CustomAuthenticationEntryPointHandler implements AuthenticationEntr
 
         Gson gson = new Gson();
         response.setStatus(errorCode.getHttpStatus().value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType("application/json;charset=UTF-8");
         try {
             response.getWriter().write(gson.toJson(Response.error(new ErrorDto(new SNSAppException(errorCode)))));
         } catch (IOException e) {
