@@ -3,6 +3,7 @@ package likelion.sns.controller;
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.controller.restController.UserRestController;
 import likelion.sns.domain.dto.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.join.UserJoinResponseDto;
 import likelion.sns.domain.dto.login.UserLoginRequestDto;
@@ -25,8 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-class UserControllerTest {
+@WebMvcTest(UserRestController.class)
+class UserRestControllerTest {
 
     @Autowired
     MockMvc mockMvc;

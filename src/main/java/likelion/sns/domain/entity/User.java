@@ -18,12 +18,13 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(name = "user_name", unique = true)
+    @Column(name = "user_name", unique = true,nullable = false)
     private String userName;
 
     @OneToMany(mappedBy = "user")

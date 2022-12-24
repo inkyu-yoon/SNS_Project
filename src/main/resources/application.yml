@@ -16,3 +16,7 @@ logging:
 jwt:
   token:
     secret: hihello
+server:
+  servlet:
+    encoding:
+      force-response: true #? ?? ?? ?? ??
