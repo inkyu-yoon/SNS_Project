@@ -34,4 +34,9 @@ public class PostController {
         return "posts/list";
     }
 
+    @GetMapping("/write")
+    public String writePost () {
+        return "posts/write";
+    }
+
 }
