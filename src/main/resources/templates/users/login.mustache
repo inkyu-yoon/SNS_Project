@@ -1,9 +1,5 @@
 {{>layouts/header}}
-<br>
-<br>
-<br>
-<br>
-<br>
+
 
 
 <form class="container">
@@ -74,18 +70,20 @@
 
             // 데이터 생성 요청을 보냄
             // fetch(URL, HTTP_REQUEST)
-            fetch('/api/v1/users/login', {
-                method: 'POST', // POST 방식으로, HTTP 요청.
-                body: JSON.stringify(data), // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+            axios.post("/api/v1/users/login",
+               JSON.stringify(data),{ // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
                 headers: {
                     'Content-Type': 'application/json' //json 타입인 것을 설정한다.
                 }
-            }).then((response) => response.json())
-                    .then((json) => {
-                        alert(json.resultCode);
-                        localStorage.setItem("token",json.result["jwt"]);
-                        window.location.href = '/'; // 해당 URL로 브라우저를 새로고침!
-                    });
+            }
+            ).then((response)=>{
+                    localStorage.setItem("token", response.data.result["jwt"]);
+                    alert("로그인이 완료되었습니다.");
+                    window.location.href = '/';
+            }).catch((error)=>{
+                alert("로그인에 문제가 발생했습니다.");
+
+            });
         }
     };
     // 객체 초기화
