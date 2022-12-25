@@ -46,13 +46,12 @@
                 body: document.querySelector('#input-body').value,
             };
             console.log(data);
-            var blank_pattern = /[\s]/g;
 
-            if (blank_pattern.test(data.title) == true) {
+            if (data.title == null || data.title == "") {
                 alert('제목이 비어있습니다. 입력해주세요.');
                 return;
             }
-            if (blank_pattern.test(data.password) == true) {
+            if (data.body == null|| data.body == "") {
                 alert('내용이 비어있습니다. 입력해주세요.');
                 return;
             }
