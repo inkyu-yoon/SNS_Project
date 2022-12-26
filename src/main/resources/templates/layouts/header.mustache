@@ -9,6 +9,63 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
+<div class="rain"></div>
+
+<style>
+
+    .rain{
+        width:8px;
+        height:8px;
+        border-radius:50%;
+        background-color:aqua;
+        position:absolute;
+        top:-8px;
+    }
+
+    @keyframes fall{
+        from{
+        }
+        to{
+            transform:translateY(90vh);
+            opacity:0;
+        }
+
+    }
+</style>
+
+<script>
+    const body=document.querySelector("body");
+
+    const MIN_DURATION=10;
+
+    function makeRain(){
+        const rainEffect = document.createElement("div");
+        const delay=Math.random()*10;
+        const initialOpacity=Math.random();
+        const duration=Math.random()*20+MIN_DURATION;
+
+        rainEffect.classList.add("rain");
+        rainEffect.style.left=`${Math.random()*window.screen.width}px`;
+        rainEffect.style.animationDelay=`${delay}s`;
+        rainEffect.style.opacity=initialOpacity;
+        rainEffect.style.animation=`fall ${duration}s linear`;
+
+
+        body.appendChild(rainEffect);
+
+        setTimeout(()=>{
+            body.removeChild(rainEffect);
+            makeRain();
+        },(duration+delay)*1000);
+
+    }
+
+    makeRain();
+    for(let index=0;index<50;index++){
+        setTimeout(makeRain,500*index);
+    }
+</script>
+<body></body>
 <br>
 <br>
 <br>

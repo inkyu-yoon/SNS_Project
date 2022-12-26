@@ -32,7 +32,7 @@ public class UserController {
     }
 
     /**
-     회원 로그인 화면
+     회원 로그아웃 화면
      **/
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
