@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 
 @RestController
@@ -36,11 +38,17 @@ public class UserRestController {
      회원 로그인
      **/
     @PostMapping("/login")
-    public Response login(@RequestBody UserLoginRequestDto requestDto) throws SQLException {
+    public Response login(@RequestBody UserLoginRequestDto requestDto, HttpServletRequest request) throws SQLException {
         log.info("{}",requestDto);
 
         UserLoginResponseDto responseDto = userService.loginUser(requestDto);
         log.info("{}",responseDto);
+
+        if (responseDto.getJwt() != null) {
+            HttpSession session = request.getSession(true);
+            session.setAttribute("userName",requestDto.getUserName());
+
+        }
 
         return Response.success(responseDto);
     }

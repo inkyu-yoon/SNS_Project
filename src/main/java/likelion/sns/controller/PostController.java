@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,12 +25,15 @@ public class PostController {
     private final PostService postService;
 
     /**
-     게시글 리스트 (페이지)
+     * 게시글 리스트 (페이지)
      **/
     @GetMapping("")
-    public String searchList (Model model, Pageable pageable) throws SQLException {
+    public String searchList(Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         Page<PostListDto> posts = postService.getPostList(pageable);
-
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("userName") != null) {
+            model.addAttribute("loginUserName", session.getAttribute("userName"));
+        }
         model.addAttribute("posts", posts);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());
@@ -36,28 +41,28 @@ public class PostController {
     }
 
     /**
-     게시글 상세 페이지
+     * 게시글 상세 페이지
      **/
     @GetMapping("/{postId}")
-    public String showDetail(@PathVariable(name = "postId") Long postId,Model model) throws SQLException {
+    public String showDetail(@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
         return "posts/details";
     }
 
     /**
-     게시글 작성
+     * 게시글 작성
      **/
     @GetMapping("/write")
-    public String writePost () {
+    public String writePost() {
         return "posts/write";
     }
 
     /**
-     게시글 수정
+     * 게시글 수정
      **/
     @GetMapping("/modify/{postId}")
-    public String modifyPost (@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
+    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
         return "posts/modify";
