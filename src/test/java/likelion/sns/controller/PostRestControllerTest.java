@@ -101,7 +101,7 @@ class PostRestControllerTest {
     void postDetailTest() throws Exception {
 
         Long id = 1L;
-        PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33");
+        PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33",null);
 
         given(postService.getPostById(any())).willReturn(post);
 

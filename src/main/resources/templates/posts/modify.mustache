@@ -1,23 +1,26 @@
 {{>layouts/header}}
-<form class="container">
-    <div class="form-group" align="center">
-        <h2><strong>제목</strong></h2>
-        <input name="title" type="text" class="form-control" id="input-title" placeholder="제목을 입력하세요">
-    </div>
-    <br>
-    <br>
-    <br>
+{{#post}}
+    <form class="container">
 
-    <div class="form-group" align="center">
-      <h2><strong>내용</strong></h2>
-        <input name="body" class="form-control" id="input-body" placeholder="내용을 입력하세요">
-    </div>
-    <br>
-    <div align="center">
-        <button type="button" class="btn btn-primary" id="post-write-btn">게시글 작성</button>
+        <input type="hidden" name="id" value="{{id}}" id="input-postId"/>
+        <div class="mb-3">
+            <label class="form-label">게시글 제목</label>
 
-    </div>
-</form>
+            <textarea class="form-control" rows="1" name="title" id="input-title">{{title}}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">게시글 내용</label>
+            <textarea class="form-control" rows="10" name="body" id="input-body">{{body}}</textarea>
+
+        </div>
+
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button type="button" class="btn btn-primary" id="post-modify-btn">수정</button>
+        </div>
+
+    </form>
+{{/post}}
 
 
 <Script>
@@ -30,16 +33,17 @@
 
             // 버튼 클릭 시 createBtn 이 생성됨
             // querySelector 는 id를 기준으로 값을 가져온다.
-            const createBtn = document.querySelector('#post-write-btn');
+            const createBtn = document.querySelector('#post-modify-btn');
 
             // 생성 버튼 클릭 시, 동작 할 메소드를 연결
             createBtn.addEventListener('click', _this.create);
         },
 
 
-        create: function () {
+        create: async function () {
             // form 데이터를 JSON으로 만듬
 
+            let postId = document.querySelector(`#input-postId`).value;
             // data 객체를 만든다. 일종의 dto 객체 형식으로 만드는 것과 비슷한 느낌이다.
             let data = {
                 title: document.querySelector('#input-title').value.trim(),
@@ -51,13 +55,12 @@
                 alert('제목이 비어있습니다. 입력해주세요.');
                 return;
             }
-            if (data.body == null|| data.body == "") {
+            if (data.body == null || data.body == "") {
                 alert('내용이 비어있습니다. 입력해주세요.');
                 return;
             }
-
             // 데이터 생성 요청을 보냄
-            axios.post("/api/v1/posts",
+            const response = await axios.put("/api/v1/posts/" + postId,
                     JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
                         headers: {
                             'Content-Type': 'application/json',
@@ -65,11 +68,18 @@
                         }
                     }
             ).then((response) => {
-                alert("게시글 작성이 완료되었습니다.");
-                window.location.href = '/posts';
-            }).catch((error) => {
-                alert("게시글 작성에 문제가 발생했습니다.");
+                        console.log(response);
+                        window.location.href = '/posts/' + postId;
+                    }
+            ).catch((error) => {
+                console.log(error.response.status);
+                if (error.response.status == 401) {
+                    alert("작성자와 수정자가 일치하지 않습니다.");
+                    window.location.href = '/posts/';
+                }
             });
+
+            console.log(response);
         }
     };
     // 객체 초기화

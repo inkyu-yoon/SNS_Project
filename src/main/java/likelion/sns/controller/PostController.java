@@ -1,5 +1,6 @@
 package likelion.sns.controller;
 
+import likelion.sns.domain.dto.read.PostDetailDto;
 import likelion.sns.domain.dto.read.PostListDto;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -24,6 +22,9 @@ public class PostController {
 
     private final PostService postService;
 
+    /**
+     게시글 리스트 (페이지)
+     **/
     @GetMapping("")
     public String searchList (Model model, Pageable pageable) throws SQLException {
         Page<PostListDto> posts = postService.getPostList(pageable);
@@ -34,9 +35,33 @@ public class PostController {
         return "posts/list";
     }
 
+    /**
+     게시글 상세 페이지
+     **/
+    @GetMapping("/{postId}")
+    public String showDetail(@PathVariable(name = "postId") Long postId,Model model) throws SQLException {
+        PostDetailDto post = postService.getPostById(postId);
+        model.addAttribute("post", post);
+        return "posts/details";
+    }
+
+    /**
+     게시글 작성
+     **/
     @GetMapping("/write")
     public String writePost () {
         return "posts/write";
     }
+
+    /**
+     게시글 수정
+     **/
+    @GetMapping("/modify/{postId}")
+    public String modifyPost (@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
+        PostDetailDto post = postService.getPostById(postId);
+        model.addAttribute("post", post);
+        return "posts/modify";
+    }
+
 
 }

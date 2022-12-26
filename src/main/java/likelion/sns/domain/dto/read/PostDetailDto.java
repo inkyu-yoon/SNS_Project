@@ -1,6 +1,7 @@
 package likelion.sns.domain.dto.read;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,9 @@ public class PostDetailDto {
     private String createdAt;
     private String lastModifiedAt;
 
+    @JsonIgnore
+    private String isModified;
+
     public PostDetailDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
@@ -30,6 +34,9 @@ public class PostDetailDto {
         }
         if (post.getModifiedAt() != null) {
             this.lastModifiedAt = sdf.format(post.getModifiedAt());
+        }
+        if (!createdAt.equals(lastModifiedAt)) {
+            this.isModified = "(수정됨)";
         }
     }
 }
