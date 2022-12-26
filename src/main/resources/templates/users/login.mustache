@@ -1,6 +1,10 @@
 {{>layouts/header}}
 
+<div align="center">
+    <H1>로그인 화면 입니다.</H1>
 
+</div>
+<br>
 
 <form class="container">
     <div class="form-group" align="center">
@@ -12,7 +16,7 @@
     <br>
 
     <div class="form-group" align="center">
-    <h2><strong>비밀번호</strong></h2>
+        <h2><strong>비밀번호</strong></h2>
         <input name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요">
     </div>
     <br>
@@ -57,30 +61,34 @@
                 userName: document.querySelector('#input-userName').value.trim(),
                 password: document.querySelector('#input-password').value.trim(),
             };
-            var blank_pattern = /[\s]/g;
-
-            if (blank_pattern.test(data.userName) == true) {
-                alert('회원명에 공백이 입력되었습니다. 다시 입력해주세요');
+            console.log(data);
+            if (data.userName == '') {
+                alert('회원명을 입력해주세요');
                 return;
             }
-            if (blank_pattern.test(data.password) == true) {
-                alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
+            if (data.password == '') {
+                alert('비밀번호를 입력해주세요');
                 return;
             }
 
             // 데이터 생성 요청을 보냄
             axios.post("/api/v1/users/login",
-               JSON.stringify(data),{ // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
-                headers: {
-                    'Content-Type': 'application/json' //json 타입인 것을 설정한다.
+                    JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+                        headers: {
+                            'Content-Type': 'application/json' //json 타입인 것을 설정한다.
+                        }
+                    }
+            ).then((response) => {
+                localStorage.setItem("token", response.data.result["jwt"]);
+                alert("로그인이 완료되었습니다.");
+                window.location.href = '/';
+            }).catch((error) => {
+                console.log(error.response.data.result["errorCode"])
+                if (error.response.data.result["errorCode"] == "USERNAME_NOT_FOUND") {
+                    alert("가입된 회원이 아닙니다. 회원가입 후 로그인 해주세요");
+                }else if(error.response.data.result["errorCode"]=="INVALID_PASSWORD"){
+                    alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요");
                 }
-            }
-            ).then((response)=>{
-                    localStorage.setItem("token", response.data.result["jwt"]);
-                    alert("로그인이 완료되었습니다.");
-                    window.location.href = '/';
-            }).catch((error)=>{
-                alert("로그인에 문제가 발생했습니다.");
 
             });
         }

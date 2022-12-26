@@ -73,10 +73,15 @@
                     }
             ).catch((error) => {
                 console.log(error.response.status);
-                if (error.response.status == 401) {
-                    alert("작성자와 수정자가 일치하지 않습니다.");
-                    window.location.href = '/posts/';
+                if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
+                    alert("토큰이 만료되었으니 다시 로그인 해주세요");
+                    // window.location.href = '/posts/';
+                }else if(error.response.data.result["errorCode"] =="USER_NOT_MATCH"){
+                    alert("본인이 작성한 게시글만 수정할 수 있습니다.");
+                }else if(error.response.data.result["errorCode"] =="INVALID_TOKEN"){
+                    alert("로그인 후 이용해주세요");
                 }
+                    window.location.href = '/posts/';
             });
 
             console.log(response);
