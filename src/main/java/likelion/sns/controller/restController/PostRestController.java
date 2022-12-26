@@ -30,16 +30,16 @@ public class PostRestController {
      포스트 리스트 조회 (최신 글 순서로 정렬)
      **/
     @GetMapping("")
-    public Page<PostListDto> showPostList(Pageable pageable) throws SQLException {
-        return postService.getPostList(pageable);
+    public Response showPostList(Pageable pageable) throws SQLException {
+        return Response.success(postService.getPostList(pageable));
     }
 
     /**
      포스트 단건 상세 조회
      **/
     @GetMapping("/{postId}")
-    public PostDetailDto showOne(@PathVariable(name = "postId") Long id) throws SQLException {
-        return postService.getPostById(id);
+    public Response showOne(@PathVariable(name = "postId") Long id) throws SQLException {
+        return Response.success(postService.getPostById(id));
     }
 
     /**
