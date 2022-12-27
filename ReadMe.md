@@ -130,7 +130,7 @@ dependencies {
 
 ### 1. 회원 가입 (POST) : /api/v1/users/join
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -144,7 +144,7 @@ dependencies {
 
 ### 2. 회원 로그인 (POST) : /api/v1/users/login
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -159,7 +159,7 @@ dependencies {
 
 권한이 `ADMIN` 인 회원만 가능.
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -173,7 +173,7 @@ dependencies {
 
 ### 4. 게시글 조회 (GET) : /api/v1/posts
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -209,7 +209,7 @@ dependencies {
 
 ### 5. 게시글 상세 조회 (GET) :  /api/v1/posts/{postId}
 
-```
+```json
 {
 	"resultCode":"SUCCESS",
 	"result":{
@@ -227,7 +227,7 @@ dependencies {
 
 ### 6. 게시글 작성 (POST) : /api/v1/posts
 
-```
+```json
 {
 	"resultCode":"SUCCESS",
 	"result":{
@@ -241,7 +241,7 @@ dependencies {
 
 ### 7. 게시글 수정 (PUT) : /api/v1/posts/{postId}
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -255,7 +255,7 @@ dependencies {
 
 ### 8. 게시글 삭제 (DELETE) : /api/v1/posts/{postId}
 
-```
+```json
 {
     "resultCode": "SUCCESS",
     "result": {
@@ -292,7 +292,7 @@ dependencies {
 
 에러 발생 시, 예시
 
-```
+```json
 {
   "resultCode":"ERROR",
   "result":{
