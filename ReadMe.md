@@ -4,6 +4,8 @@
 
 ## SNS 웹 페이지 구현 프로젝트
 
+<br>
+
 회원 가입 후 게시글 작성 · 조회 · 수정 · 삭제 · 댓글 · 좋아요 버튼 등을 할 수 있는 SNS 웹 페이지 구현
 
 <br>
@@ -12,7 +14,25 @@
 
 <br>
 
+## ERD
+
+<br>
+
+<p align = "center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8erd.svg" alt="프로젝트erd" style="zoom:110%;" />
+</p>
+
+<br>
+
+---
+
+<br>
+
+
+
 ## 체크리스트
+
+<br>
 
 - [x] Swagger  기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
 - [x] GitLab CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
@@ -40,7 +60,11 @@
 
 <br>
 
+
+
 ## EndPoint
+
+<br>
 
 | METHOD | URL                                | Description                             | input                                      |
 | ------ | ---------------------------------- | --------------------------------------- | ------------------------------------------ |
@@ -57,7 +81,11 @@
 
 ## Endpoint Return Example
 
+<br>
+
 ### 1. 회원 가입 (POST) : /api/v1/users/join
+
+<br>
 
 ```
 {
@@ -73,6 +101,8 @@
 
 ### 2. 회원 로그인 (POST) : /api/v1/users/login
 
+<br>
+
 ```
 {
     "resultCode": "SUCCESS",
@@ -85,6 +115,8 @@
 <br>
 
 ### 3. 회원 권한 변경 (POST) : /api/v1/users/{userId}/role/change
+
+<br>
 
 권한이 `ADMIN` 인 회원만 가능.
 
@@ -101,6 +133,8 @@
 <br>
 
 ### 4. 게시글 조회 (GET) : /api/v1/posts
+
+<br>
 
 ```
 {
@@ -138,6 +172,9 @@
 
 ### 5. 게시글 상세 조회 (GET) :  /api/v1/posts/{postId}
 
+<br>
+
+
 ```
 {
 	"resultCode":"SUCCESS",
@@ -156,6 +193,9 @@
 
 ### 6. 게시글 작성 (POST) : /api/v1/posts
 
+<br>
+
+
 ```
 {
 	"resultCode":"SUCCESS",
@@ -170,6 +210,8 @@
 
 ### 7. 게시글 수정 (PUT) : /api/v1/posts/{postId}
 
+<br>
+
 ```
 {
     "resultCode": "SUCCESS",
@@ -183,6 +225,9 @@
 <br>
 
 ### 8. 게시글 삭제 (DELETE) : /api/v1/posts/{postId}
+
+<br>
+
 
 ```
 {
@@ -203,6 +248,9 @@
 <br>
 
 ## Error Info
+
+<br>
+
 
 | Status Code | Error Message        | When                                                         |
 | ----------- | -------------------- | ------------------------------------------------------------ |
@@ -234,4 +282,7 @@
 
 
 ## 특이사항
+
+<br>
+
 
