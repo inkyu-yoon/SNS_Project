@@ -84,6 +84,8 @@ dependencies {
 ## 체크리스트
 
 - [x] Swagger  기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
+  - swagger 주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
+
 - [x] GitLab CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
     - GitLab Project가 업데이트 되었는지 확인하고 업데이트되어 있는 경우, 현재 컨테이너 제거 후 재 실행할 수 있도록 deploy.sh 작성
     - 미리 작성된 Dockerfile을 통해 build
@@ -91,15 +93,17 @@ dependencies {
 
 - [x] User 회원가입 및 로그인 기능 구현
     - 회원가입 시, 아이디와 비밀번호를 입력받고, 중복된 아이디의 경우 회원가입 에러 발생
-    - 로그인 시, jwt 토큰울 발급하고 가입되어 있지 않거나 비밀번호가 일치하지 않으면 에러 발생
+    - 로그인 시, jwt 토큰을 발급하고 가입되어 있지 않거나 비밀번호가 일치하지 않으면 에러 발생
 
 - [x] Post 전체 조회 · 상세 조회 · 작성 · 수정 · 삭제 기능 구현
-    - post 전체 조회 · 상세 조회는 모든 사용자(로그인 되어 있지 않은 사용자 포함) 접근 가능
+    - post 전체 조회 · 상세 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
     - post 작성은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - post 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지 않는 경우 에러 발생
-- [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 수정 · 삭제 가능한 기능 구현
+
+- [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 수정 · 삭제할 수 있는 기능 구현
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
     - 모든 게시글 수정 및 삭제 가능 · 회원 등급 변경 가능
+
 - [x] User · Post Controller 기능 동작을 중점으로 UI 구현
     - [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?)
 
@@ -113,13 +117,13 @@ dependencies {
 
 ## EndPoint
 
-| METHOD | URL                                | Description                             | input                                      |
-| ------ | ---------------------------------- | --------------------------------------- | ------------------------------------------ |
-| POST   | /api/v1/users/join                 | 회원가입                                | {"username": "string","password":"string"} |
-| POST   | /api/v1/users/login                | 로그인                                  | {"username": "string","password":"string"} |
-| POST   | /api/v1/users/{userId}/role/change | 회원 등급 변경(ADMIN 등급만 가능)       | { "role": "string" }                       |
-| GET    | /api/v1/posts                      | 게시글 조회(최신글 20개 페이징 처리)    | -                                          |
-| GET    | /api/v1/posts/{postId}             | 특정 게시글 상세 조회                   | -                                          |
+| METHOD | URL                                | Description               | input                                      |
+| ------ | ---------------------------------- |---------------------------| ------------------------------------------ |
+| POST   | /api/v1/users/join                 | 회원가입                      | {"username": "string","password":"string"} |
+| POST   | /api/v1/users/login                | 로그인                       | {"username": "string","password":"string"} |
+| POST   | /api/v1/users/{userId}/role/change | 회원 등급 변경(ADMIN 등급만 가능)    | { "role": "string" }                       |
+| GET    | /api/v1/posts                      | 게시글 조회(최신 글 20개 페이징 처리)   | -                                          |
+| GET    | /api/v1/posts/{postId}             | 특정 게시글 상세 조회              | -                                          |
 | POST   | /api/v1/posts                      | 게시글 작성 (jwt 토큰 헤더에 담아 요청) | { "title": "string" , "body": "string"}    |
 | PUT    | /api/v1/posts/{postId}             | 게시글 수정 (jwt 토큰 헤더에 담아 요청) | { "title": "string" , "body": "string"}    |
 | DELETE | /api/v1/posts/{postId}             | 게시글 삭제 (jwt 토큰 헤더에 담아 요청) | -                                          |
@@ -134,8 +138,8 @@ dependencies {
 {
     "resultCode": "SUCCESS",
     "result": {
-        "userId": 5,
-        "userName": "test1"
+        "userId": 1,
+        "userName": "userName"
     }
 }
 ```
@@ -148,7 +152,7 @@ dependencies {
 {
     "resultCode": "SUCCESS",
     "result": {
-        "jwt": "eyJhbGciOiJIU",
+        "jwt": "eyJhbGciOiJIU"
     }
 }
 ```
@@ -163,8 +167,8 @@ dependencies {
 {
     "resultCode": "SUCCESS",
     "result": {
-        "userId": 6,
-        "message": "6번 아이디의 권한을 ROLE_USER로 변경하였습니다."
+        "userId": 1,
+        "message": "1번 아이디의 권한을 ROLE_USER로 변경하였습니다."
     }
 }
 ```
@@ -175,33 +179,44 @@ dependencies {
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "content": [
-            {
-                "id": 10,
-                "title": "글이 들어온다아아아",
-                "body": "글들어온다아앙",
-                "userName": "손흥민",
-                "createdAt": "2022/12/22 10:43:25",
-                "lastModifiedAt": "2022/12/22 10:43:25"
-            }
-        ],
-        "pageable": "INSTANCE",
-        "last": true,
-        "totalPages": 1,
-        "totalElements": 4,
-        "size": 4,
-        "number": 0,
-        "sort": {
-            "empty": true,
-            "sorted": false,
-            "unsorted": true
-        },
-        "first": true,
-        "numberOfElements": 4,
-        "empty": false
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "content": [
+      {
+        "id": 2,
+        "title": "hello-title",
+        "body": "hello-body",
+        "userName": "userName",
+        "createdAt": "yyyy/mm/dd hh:mm:ss",
+        "lastModifiedAt": "yyyy/mm/dd hh:mm:ss"
+      }
+    ],
+    "pageable": {
+      "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+      },
+      "offset": 0,
+      "pageNumber": 0,
+      "pageSize": 20,
+      "paged": true,
+      "unpaged": false
+    },
+    "last": false,
+    "totalPages": 1,
+    "totalElements": 1,
+    "size": 20,
+    "number": 0,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 1,
+    "empty": false
+  }
 }
 ```
 
@@ -217,8 +232,8 @@ dependencies {
 		"title" : "title1",
 		"body" : "body",
 		"userName" : "user1",
-		"createdAt" : yyyy/mm/dd hh:mm:ss,
-		"lastModifiedAt" : yyyy/mm/dd hh:mm:ss
+		"createdAt" : "yyyy/mm/dd hh:mm:ss",
+		"lastModifiedAt" : "yyyy/mm/dd hh:mm:ss"
 	}
 }
 ```
@@ -260,7 +275,7 @@ dependencies {
     "resultCode": "SUCCESS",
     "result": {
         "message": "포스트 삭제 완료",
-        "postId": 10
+        "postId": 0
     }
 }
 ```
@@ -302,7 +317,25 @@ dependencies {
 }
 ```
 
+<br>
 
+
+---
+
+<br>
 
 ## 특이사항
 
+<br>
+
+### 1. UI 구현
+
+<br>
+
+UI 를 구현할 때, form 에 입력한 정보를 POST · PUT · DELETE 요청을 Controller 에 전달하는 코드를 구현하는게 힘들었었다.
+
+javascript의 `console.log()` 메서드도 몰랐었지만, 이미 만들어둔 RestController 를 활용하기 위해 끊임없이 방법을 찾으려고 해봤고
+
+덕분에 `axios` · `localstorage` · `Session` 등에 대해서 알게 되었다.
+
+웹페이지의 디자인은 꾸미지 못해지만, 로그인 기능 · 로그아웃 기능 · 로그인한 사용자만 게시글 작성 · 수정 · 삭제 등을 구현할 수 있었다.
