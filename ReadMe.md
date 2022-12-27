@@ -1,10 +1,10 @@
 
+# 윤인규 개인 프로젝트 👨🏻‍💻
 
+<br>
 
 
 ## SNS 웹 페이지 구현 프로젝트
-
-<br>
 
 회원 가입 후 게시글 작성 · 조회 · 수정 · 삭제 · 댓글 · 좋아요 버튼 등을 할 수 있는 SNS 웹 페이지 구현
 
@@ -14,13 +14,64 @@
 
 <br>
 
-## ERD
+## 개발환경
 
 <br>
 
-<p align = "center">
+- **Java 11**
+- **Build** : Gradle 7.5.1
+- **Framework** : Springboot 2.7.5
+- **Database** : MySQL 8.0
+- **CI & CD** : GitLab
+- **Server** : AWS EC2
+- **Deploy** : Docker
+- **IDE** : IntelliJ
+
+<br>
+
+### 라이브러리
+
+```groovy
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	
+	// DB
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+
+	// template 엔진
+	implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
+	//Swagger
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+	//테스트에 사용 (객체 JSON 화)
+	implementation 'com.google.code.gson:gson:2.10'
+
+	//security 관련 라이브러리
+	implementation 'org.springframework.security:spring-security-test'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+}
+```
+
+
+
+<br>
+
+---
+
+<br>
+
+## ERD
+
 <img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8erd.svg" alt="프로젝트erd" style="zoom:110%;" />
-</p>
 
 <br>
 
@@ -31,8 +82,6 @@
 
 
 ## 체크리스트
-
-<br>
 
 - [x] Swagger  기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
 - [x] GitLab CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
@@ -64,8 +113,6 @@
 
 ## EndPoint
 
-<br>
-
 | METHOD | URL                                | Description                             | input                                      |
 | ------ | ---------------------------------- | --------------------------------------- | ------------------------------------------ |
 | POST   | /api/v1/users/join                 | 회원가입                                | {"username": "string","password":"string"} |
@@ -81,11 +128,7 @@
 
 ## Endpoint Return Example
 
-<br>
-
 ### 1. 회원 가입 (POST) : /api/v1/users/join
-
-<br>
 
 ```
 {
@@ -101,8 +144,6 @@
 
 ### 2. 회원 로그인 (POST) : /api/v1/users/login
 
-<br>
-
 ```
 {
     "resultCode": "SUCCESS",
@@ -115,8 +156,6 @@
 <br>
 
 ### 3. 회원 권한 변경 (POST) : /api/v1/users/{userId}/role/change
-
-<br>
 
 권한이 `ADMIN` 인 회원만 가능.
 
@@ -133,8 +172,6 @@
 <br>
 
 ### 4. 게시글 조회 (GET) : /api/v1/posts
-
-<br>
 
 ```
 {
@@ -172,9 +209,6 @@
 
 ### 5. 게시글 상세 조회 (GET) :  /api/v1/posts/{postId}
 
-<br>
-
-
 ```
 {
 	"resultCode":"SUCCESS",
@@ -193,9 +227,6 @@
 
 ### 6. 게시글 작성 (POST) : /api/v1/posts
 
-<br>
-
-
 ```
 {
 	"resultCode":"SUCCESS",
@@ -210,8 +241,6 @@
 
 ### 7. 게시글 수정 (PUT) : /api/v1/posts/{postId}
 
-<br>
-
 ```
 {
     "resultCode": "SUCCESS",
@@ -225,9 +254,6 @@
 <br>
 
 ### 8. 게시글 삭제 (DELETE) : /api/v1/posts/{postId}
-
-<br>
-
 
 ```
 {
@@ -248,9 +274,6 @@
 <br>
 
 ## Error Info
-
-<br>
-
 
 | Status Code | Error Message        | When                                                         |
 | ----------- | -------------------- | ------------------------------------------------------------ |
@@ -282,7 +305,4 @@
 
 
 ## 특이사항
-
-<br>
-
 
