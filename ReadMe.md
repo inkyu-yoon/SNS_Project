@@ -333,6 +333,10 @@ javascript의 `console.log()` 메서드도 몰랐었지만, 이미 만들어둔 
 
 웹페이지의 디자인은 꾸미지 못해지만, 로그인 기능 · 로그아웃 기능 · 로그인한 사용자만 게시글 작성 · 수정 · 삭제 등을 구현할 수 있었다.
 
+- [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
+
+<br>
+
 ### 2. Security Chain 관련 Exception Handling
 
 <br>
@@ -349,5 +353,5 @@ Security Chain 에서 발생하는 Exception 은 Handling하기 어려웠다.
 
 이 문제를 해결하는 과정에서 Spring Security 공식문서를 공부해봐야겠다는 생각이 들었다.
 
-- (Security Filter Exception Handling 정리)[https://inkyu-yoon.github.io/docs/Language/SpringBoot/FilterExceptionHandle]
-- (Security antMatchers Exception Handling 정리)[https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainException]
+- [Security Filter Exception Handling 정리](https://inkyu-yoon.github.io/docs/Language/SpringBoot/FilterExceptionHandle)
+- [Security antMatchers Exception Handling 정리](https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainException)
