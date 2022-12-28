@@ -332,3 +332,22 @@ javascript의 `console.log()` 메서드도 몰랐었지만, 이미 만들어둔 
 덕분에 `axios` · `localstorage` · `Session` 등에 대해서 알게 되었다.
 
 웹페이지의 디자인은 꾸미지 못해지만, 로그인 기능 · 로그아웃 기능 · 로그인한 사용자만 게시글 작성 · 수정 · 삭제 등을 구현할 수 있었다.
+
+### 2. Security Chain 관련 Exception Handling
+
+<br>
+
+Service · Controller 에서 발생하는 Exception Handling은 `@RestControllerAdvice` 로 편하게 Handling할 수 있었는데,
+
+Security Chain 에서 발생하는 Exception 은 Handling하기 어려웠다.
+
+`@RestControllerAdvice` 는 Security Chain 에서 발생하는 Exception은 처리해주지 못하기 때문에, 원하는 에러 응답을 반환하지 못했다.
+
+`AccessDeniedHandler`, `AuthenticationEntryPoint`, `ExceptionHandlerFilter` 를 구현한 뒤, 
+
+`SecurityConfig` 에 적절하게 설정을 하니, 원하는 대로 동작하게 만들 수 있었다.
+
+이 문제를 해결하는 과정에서 Spring Security 공식문서를 공부해봐야겠다는 생각이 들었다.
+
+- (Security Filter Exception Handling 정리)[https://inkyu-yoon.github.io/docs/Language/SpringBoot/FilterExceptionHandle]
+- (Security antMatchers Exception Handling 정리)[https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainException]
