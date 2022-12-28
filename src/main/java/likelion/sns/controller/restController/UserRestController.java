@@ -1,5 +1,7 @@
 package likelion.sns.controller.restController;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.changeRole.UserRoleChangeRequestDto;
 import likelion.sns.domain.dto.changeRole.UserRoleChangeResponseDto;
@@ -20,12 +22,14 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
 @Slf4j
+@Api(tags = {"User API"})
 public class UserRestController {
     private final UserService userService;
 
     /**
      회원 가입
      **/
+    @ApiOperation(value="회원 가입", notes="userName, password로 회원 데이터 저장")
     @PostMapping("/join")
     public Response join(@RequestBody UserJoinRequestDto requestDto) throws SQLException {
         UserJoinResponseDto user = userService.createUser(requestDto);
@@ -37,6 +41,7 @@ public class UserRestController {
     /**
      회원 로그인
      **/
+    @ApiOperation(value="회원 로그인", notes="userName, password로 저장된 회원 데이터가 있으면 jwt Token 반환")
     @PostMapping("/login")
     public Response login(@RequestBody UserLoginRequestDto requestDto, HttpServletRequest request) throws SQLException {
         log.info("{}",requestDto);
@@ -56,6 +61,7 @@ public class UserRestController {
     /**
      * ADMIN 회원이 일반 회원 등급을 변경하는 기능
      **/
+    @ApiOperation(value="회원 권한 변경", notes="(유효한 jwt Token 필요) 회원 권한이 ADMIN 인 사용자만 할 수 있으며, 요청할 때, role은 USER 혹은 ADMIN 만 입력가능")
     @PostMapping("/{userId}/role/change")
     public Response changeRole(@PathVariable(name = "userId") Long userId, @RequestBody UserRoleChangeRequestDto requestDto) {
         log.info("{}",requestDto);

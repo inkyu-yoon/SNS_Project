@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/posts")
 @RequiredArgsConstructor
 @Slf4j
+@ApiIgnore
 public class PostController {
 
     private final PostService postService;

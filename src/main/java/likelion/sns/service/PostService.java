@@ -31,18 +31,28 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 게시글 리스트 조회
+     */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
         return postRepository.findAllByOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
     }
 
+    /**
+     * 게시글 단건 조회
+     */
     public PostDetailDto getPostById(Long id) throws SQLException {
+        // id에 해당하는 포스트 존재하지 않을 시 예외 처리
         Post foundPost = postRepository.findById(id).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, id + "번 게시글은 존재하지 않습니다."));
         return new PostDetailDto(foundPost);
     }
 
+    /**
+     * 게시글 작성
+     */
     @Transactional
     public PostWriteResponseDto writePost(PostWriteRequestDto requestDto, String requestUserName) throws SQLException {
-
+        // 해당하는 회원이 없을 시, 예외 처리
         User requestUser = userRepository.findByUserName(requestUserName)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
 
@@ -52,6 +62,9 @@ public class PostService {
 
     }
 
+    /**
+     * 게시글 수정
+     */
     @Transactional
     public void modifyPost(PostModifyRequestDto requestDto, Long postId, String requestUserName) throws SQLException {
 
@@ -83,6 +96,9 @@ public class PostService {
         foundPost.modifyPost(newTitle, newBody);
     }
 
+    /**
+     * 게시글 삭제
+     */
     @Transactional
     public void deletePost(Long postId, String requestUserName) throws SQLException {
         //유저가 존재하지 않음
@@ -100,7 +116,7 @@ public class PostService {
         log.info("게시글 삭제 요청자 ROLE = {}", requestUserRole);
         log.info("게시글 작성자 userName = {}", userName);
 
-        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
+        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 삭제 가능함)
         if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !userName.equals(requestUserName)) {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }

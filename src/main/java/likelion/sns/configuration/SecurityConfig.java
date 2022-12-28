@@ -1,8 +1,10 @@
 package likelion.sns.configuration;
 
 
-import likelion.sns.jwt.ExceptionHandlerFilter;
-import likelion.sns.jwt.JwtTokenFilter;
+import likelion.sns.configuration.securityErrorHanling.CustomAccessDeniedHandler;
+import likelion.sns.configuration.securityErrorHanling.CustomAuthenticationEntryPointHandler;
+import likelion.sns.configuration.securityErrorHanling.ExceptionHandlerFilter;
+import likelion.sns.configuration.securityErrorHanling.JwtTokenFilter;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,5 @@ public class SecurityConfig  {
                 .build();
 
     }
-
 
 }

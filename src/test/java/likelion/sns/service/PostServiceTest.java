@@ -125,7 +125,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("포스트 수정 에러 (포스트가 존재하지 않음)")
+    @DisplayName("포스트 삭제 에러 (포스트가 존재하지 않음)")
     void postDeleteError1() {
 
         User mockUser = mock(User.class);
@@ -143,7 +143,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("포스트 수정 에러 (유저가 존재하지 않음)")
+    @DisplayName("포스트 삭제 에러 (유저가 존재하지 않음)")
     void postDeleteError2() {
 
         when(userRepository.findByUserName("userName"))
@@ -156,7 +156,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("포스트 수정 에러 (요청한 유저와 작성자가 일치하지 않음)")
+    @DisplayName("포스트 삭제 에러 (요청한 유저와 작성자가 일치하지 않음)")
     void postDeleteError3() {
 
         User mockUser = mock(User.class);

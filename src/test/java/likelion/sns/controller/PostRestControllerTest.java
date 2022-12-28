@@ -10,8 +10,8 @@ import likelion.sns.domain.dto.read.PostListDto;
 import likelion.sns.domain.dto.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.write.PostWriteResponseDto;
 import likelion.sns.domain.entity.UserRole;
-import likelion.sns.jwt.ExceptionHandlerFilter;
-import likelion.sns.jwt.JwtTokenFilter;
+import likelion.sns.configuration.securityErrorHanling.ExceptionHandlerFilter;
+import likelion.sns.configuration.securityErrorHanling.JwtTokenFilter;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.PostService;
 import likelion.sns.service.UserService;
@@ -277,7 +277,7 @@ class PostRestControllerTest {
         Gson gson = new Gson();
         String content = gson.toJson(postModifyResponseDto);
 
-        Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
+        Mockito.doThrow(new SNSAppException(ErrorCode.USER_NOT_MATCH, "작성자와 수정 요청자가 일치하지 않습니다."))
                 .when(postService).modifyPost(any(), any(), any());
 
 
@@ -290,7 +290,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.resultCode").exists())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
-                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.errorCode").value("USER_NOT_MATCH"))
                 .andExpect(jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
     }
 
@@ -375,7 +375,7 @@ class PostRestControllerTest {
 
         Long postId = 1L;
 
-        Mockito.doThrow(new SNSAppException(ErrorCode.INVALID_PERMISSION, "작성자와 수정 요청자가 일치하지 않습니다."))
+        Mockito.doThrow(new SNSAppException(ErrorCode.USER_NOT_MATCH, "작성자와 수정 요청자가 일치하지 않습니다."))
                 .when(postService).deletePost(any(), any());
 
 
@@ -387,7 +387,7 @@ class PostRestControllerTest {
                 .andExpect(jsonPath("$.resultCode").exists())
                 .andExpect(jsonPath("$.resultCode").value("ERROR"))
                 .andExpect(jsonPath("$.result").exists())
-                .andExpect(jsonPath("$.result.errorCode").value("INVALID_PERMISSION"))
+                .andExpect(jsonPath("$.result.errorCode").value("USER_NOT_MATCH"))
                 .andExpect(jsonPath("$.result.message").value("작성자와 수정 요청자가 일치하지 않습니다."));
     }
 

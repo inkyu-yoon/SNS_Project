@@ -34,6 +34,9 @@ public class UserService {
     @Value("${jwt.token.secret}")
     private String secretKey;
 
+    /**
+     * 회원 가입
+     */
     @Transactional
     public UserJoinResponseDto createUser(UserJoinRequestDto joinRequest) throws SQLException  {
 
@@ -49,6 +52,10 @@ public class UserService {
 
         return new UserJoinResponseDto(saved);
     }
+
+    /**
+     * 회원 로그인
+     */
 
     public UserLoginResponseDto loginUser(UserLoginRequestDto loginRequest) throws SQLException {
         String inputUsername = loginRequest.getUserName();
@@ -68,15 +75,27 @@ public class UserService {
         return new UserLoginResponseDto(JwtTokenUtil.createToken(inputUsername, secretKey));
     }
 
+    /**
+     * JwtTokenFilter 에서 사용하기 위해 만든 메서드
+     */
     public UserRole findRoleByUserName(String userName) {
         return userRepository.findByUserName(userName).get().getRole();
     }
 
+    /**
+     * UserRole(권한) 변경
+     */
     @Transactional
     public void changeRole(Long userId, UserRoleChangeRequestDto requestDto) {
 
         String requestRole = requestDto.getRole();
 
+        // request 로 받은 데이터가 유효한 데이터(admin 혹은 user)가 아닌 경우 에러 처리
+        if (!requestRole.equalsIgnoreCase("admin") || !requestRole.equalsIgnoreCase("user")) {
+            throw new SNSAppException(ErrorCode.BAD_REQUEST);
+        }
+
+        // UserRole(권한) 을 변경할 회원이 DB에 없는 경우 에러 처리
         User found = userRepository.findById(userId)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 

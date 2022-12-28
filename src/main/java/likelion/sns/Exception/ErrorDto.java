@@ -1,25 +1,23 @@
 package likelion.sns.Exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.sql.SQLException;
 
 @Getter
+@AllArgsConstructor
 public class ErrorDto {
     private String errorCode;
     private String message;
 
     public ErrorDto(SNSAppException e) {
         this.errorCode = e.getErrorCode().toString();
-        if (e.getMessage() == null) {
-            this.message = e.getErrorCode().getMessage();
-        } else {
-            this.message = e.getMessage();
-        }
+        this.message = e.getErrorCode().getMessage();
     }
 
     public ErrorDto(SQLException e) {
         this.errorCode = ErrorCode.DATABASE_ERROR.toString();
-       this.message= ErrorCode.DATABASE_ERROR.getMessage();
+        this.message = ErrorCode.DATABASE_ERROR.getMessage();
     }
 }

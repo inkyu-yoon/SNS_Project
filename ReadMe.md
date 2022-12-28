@@ -1,8 +1,6 @@
-
 # 윤인규 개인 프로젝트 👨🏻‍💻
 
 <br>
-
 
 ## SNS 웹 페이지 구현 프로젝트
 
@@ -33,35 +31,33 @@
 
 ```groovy
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	compileOnly 'org.projectlombok:lombok'
-	
-	// DB
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
+    // DB
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
 
-	// template 엔진
-	implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    // template 엔진
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
 
-	//Swagger
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    //Swagger
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
-	//테스트에 사용 (객체 JSON 화)
-	implementation 'com.google.code.gson:gson:2.10'
+    //테스트에 사용 (객체 JSON 화)
+    implementation 'com.google.code.gson:gson:2.10'
 
-	//security 관련 라이브러리
-	implementation 'org.springframework.security:spring-security-test'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+    //security 관련 라이브러리
+    implementation 'org.springframework.security:spring-security-test'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
 }
 ```
-
-
 
 <br>
 
@@ -79,12 +75,11 @@ dependencies {
 
 <br>
 
-
-
 ## 체크리스트
 
-- [x] Swagger  기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
-  - swagger 주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
+- [x] Swagger 기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
+    - swagger
+      주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
 
 - [x] GitLab CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
     - GitLab Project가 업데이트 되었는지 확인하고 업데이트되어 있는 경우, 현재 컨테이너 제거 후 재 실행할 수 있도록 deploy.sh 작성
@@ -98,7 +93,8 @@ dependencies {
 - [x] Post 전체 조회 · 상세 조회 · 작성 · 수정 · 삭제 기능 구현
     - post 전체 조회 · 상세 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
     - post 작성은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
-    - post 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지 않는 경우 에러 발생
+    - post 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지
+      않는 경우 에러 발생
 
 - [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 수정 · 삭제할 수 있는 기능 구현
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
@@ -113,8 +109,6 @@ dependencies {
 
 <br>
 
-
-
 ## EndPoint
 
 | METHOD | URL                                | Description               | input                                      |
@@ -128,19 +122,17 @@ dependencies {
 | PUT    | /api/v1/posts/{postId}             | 게시글 수정 (jwt 토큰 헤더에 담아 요청) | { "title": "string" , "body": "string"}    |
 | DELETE | /api/v1/posts/{postId}             | 게시글 삭제 (jwt 토큰 헤더에 담아 요청) | -                                          |
 
-
-
 ## Endpoint Return Example
 
 ### 1. 회원 가입 (POST) : /api/v1/users/join
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "userId": 1,
-        "userName": "userName"
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "userId": 1,
+    "userName": "userName"
+  }
 }
 ```
 
@@ -150,10 +142,10 @@ dependencies {
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "jwt": "eyJhbGciOiJIU"
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "jwt": "eyJhbGciOiJIU"
+  }
 }
 ```
 
@@ -165,11 +157,11 @@ dependencies {
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "userId": 1,
-        "message": "1번 아이디의 권한을 ROLE_USER로 변경하였습니다."
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "userId": 1,
+    "message": "1번 아이디의 권한을 ROLE_USER로 변경하였습니다."
+  }
 }
 ```
 
@@ -226,15 +218,15 @@ dependencies {
 
 ```json
 {
-	"resultCode":"SUCCESS",
-	"result":{
-		"id" : 1,
-		"title" : "title1",
-		"body" : "body",
-		"userName" : "user1",
-		"createdAt" : "yyyy/mm/dd hh:mm:ss",
-		"lastModifiedAt" : "yyyy/mm/dd hh:mm:ss"
-	}
+  "resultCode": "SUCCESS",
+  "result": {
+    "id": 1,
+    "title": "title1",
+    "body": "body",
+    "userName": "user1",
+    "createdAt": "yyyy/mm/dd hh:mm:ss",
+    "lastModifiedAt": "yyyy/mm/dd hh:mm:ss"
+  }
 }
 ```
 
@@ -244,11 +236,11 @@ dependencies {
 
 ```json
 {
-	"resultCode":"SUCCESS",
-	"result":{
-		"message":"포스트 등록 완료",
-		"postId":0
-	}
+  "resultCode": "SUCCESS",
+  "result": {
+    "message": "포스트 등록 완료",
+    "postId": 0
+  }
 }
 ```
 
@@ -258,11 +250,11 @@ dependencies {
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "message": "포스트 수정 완료",
-        "postId": 0
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "message": "포스트 수정 완료",
+    "postId": 0
+  }
 }
 ```
 
@@ -272,11 +264,11 @@ dependencies {
 
 ```json
 {
-    "resultCode": "SUCCESS",
-    "result": {
-        "message": "포스트 삭제 완료",
-        "postId": 0
-    }
+  "resultCode": "SUCCESS",
+  "result": {
+    "message": "포스트 삭제 완료",
+    "postId": 0
+  }
 }
 ```
 
@@ -290,17 +282,18 @@ dependencies {
 
 ## Error Info
 
-| Status Code | Error Message        | When                                                         |
-| ----------- | -------------------- | ------------------------------------------------------------ |
-| 409         | DUPLICATED_USER_NAME | 회원 가입 시 중복일 때 발생                                  |
-| 404         | USERNAME_NOT_FOUND   | DB에 저장된 회원명이 없는 경우 발생                          |
+| Status Code | Error Message        | When                                               |
+|-------------| -------------------- |----------------------------------------------------|
+| 409         | DUPLICATED_USER_NAME | 회원 가입 시 중복일 때 발생                                   |
+| 404         | USERNAME_NOT_FOUND   | DB에 저장된 회원명이 없는 경우 발생                              |
 | 404         | POST_NOT_FOUND       | 상세 조회, 삭제, 수정 요청 시, 요청한 postId에 해당하는 게시글이 없는 경우 발생 |
-| 401         | INVALID_PASSWORD     | 로그인 시 패스워드 잘못 입력한 경우 발생                     |
-| 401         | EXPIRED_TOKEN        | 만료된 토큰으로 요청할 시 발생                               |
-| 401         | INVALID_TOKEN        | jwt 토큰이 아니거나 유효하지 않은 토큰으로 요청할 시 발생    |
-| 401         | TOKEN_NOT_FOUND      | 토큰 없이, 토큰이 필요한 작업 요청 시 발생                   |
-| 401         | INVALID_PERMISSION   | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생 |
-| 401         | USER_NOT_MATCH       | 게시글 수정 · 삭제 요청 시, 요청자와 작성자가 다른 경우 발생 |
+| 401         | INVALID_PASSWORD     | 로그인 시 패스워드 잘못 입력한 경우 발생                            |
+| 401         | EXPIRED_TOKEN        | 만료된 토큰으로 요청할 시 발생                                  |
+| 401         | INVALID_TOKEN        | jwt 토큰이 아니거나 유효하지 않은 토큰으로 요청할 시 발생                 |
+| 401         | TOKEN_NOT_FOUND      | 토큰 없이, 토큰이 필요한 작업 요청 시 발생                          |
+| 401         | USER_NOT_MATCH       | 게시글 수정 · 삭제 요청 시, 요청자와 작성자가 다른 경우 발생               |
+| 403         |FORBIDDEN_REQUEST  | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생        |
+| 400         |BAD_REQUEST  | 권한을 "ADMIN" 혹은 "USER" 가 아닌 다른 문자열을 담아 요청하는 경우 발생   |
 | 500         | DATABASE_ERROR       | DB 연결이 끊어질 경우 발생                                   |
 
 <br>
@@ -309,10 +302,10 @@ dependencies {
 
 ```json
 {
-  "resultCode":"ERROR",
-  "result":{
-     "errorCode":"POST_NOT_FOUND",
-     "message":"Post not founded"
+  "resultCode": "ERROR",
+  "result": {
+    "errorCode": "POST_NOT_FOUND",
+    "message": "Post not founded"
   }
 }
 ```
