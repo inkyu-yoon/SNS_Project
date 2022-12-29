@@ -1,5 +1,8 @@
 package likelion.sns.controller;
 
+import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ExceptionManager;
+import likelion.sns.Exception.SNSAppException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +23,13 @@ public class HelloController {
 
     @GetMapping("/{num}")
     public String hello(@PathVariable(name = "num") String num) {
+        int sum = 0;
 
-        int sum = Arrays.stream(num.split("")).mapToInt(s -> Integer.valueOf(s)).sum();
+        try {
+            sum = Arrays.stream(num.split("")).mapToInt(s -> Integer.valueOf(s)).sum();
+        } catch (NumberFormatException e) {
+            throw new SNSAppException(ErrorCode.BAD_REQUEST_SUM);
+        }
 
         return String.valueOf(sum);
     }
