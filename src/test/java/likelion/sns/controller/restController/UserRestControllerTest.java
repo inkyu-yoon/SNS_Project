@@ -37,18 +37,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 class UserRestControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    WebApplicationContext wac;
+    @Autowired MockMvc mockMvc;
+    @Autowired WebApplicationContext wac;
+    @Autowired Gson gson;
 
-    @MockBean
-    UserService userService;
+    @MockBean UserService userService;
 
     UserJoinRequestDto userJoinRequestDto = new UserJoinRequestDto("윤인규", "password");
     UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto("윤인규", "1234");
-
-    Gson gson = new Gson();
 
 
     /**

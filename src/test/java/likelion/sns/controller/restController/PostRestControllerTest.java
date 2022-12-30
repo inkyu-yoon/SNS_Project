@@ -54,10 +54,10 @@ class PostRestControllerTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired WebApplicationContext wac;
+    @Autowired Gson gson;
     @MockBean PostService postService;
     @MockBean UserService userService;
     @Value("${jwt.token.secret}") String secretKey;
-    Gson gson = new Gson();
     PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
     PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", 1L);
 
