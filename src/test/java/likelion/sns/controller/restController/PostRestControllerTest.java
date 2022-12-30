@@ -50,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(value = PostRestController.class)
 @Import(SecurityConfig.class)
-@WebAppConfiguration //Controller 및 web 환경에 사용되는 빈을 자동으로 생성하여 등록한다.
 class PostRestControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -67,7 +66,7 @@ class PostRestControllerTest {
      */
 
     @BeforeEach
-    public void setUpMOckMvc() {
+    public void setUpMockMvc() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(SecurityMockMvcConfigurers.springSecurity())

@@ -56,8 +56,7 @@ class HelloControllerTest {
         void sumOfDigitTest() throws Exception {
             when(helloService.getSum(any())).thenReturn("15");
 
-            mockMvc.perform(get("/api/v1/hello/" + 12345)
-                            .with(csrf()))
+            mockMvc.perform(get("/api/v1/hello/" + 12345))
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(MockMvcResultMatchers.status().isOk());
         }
