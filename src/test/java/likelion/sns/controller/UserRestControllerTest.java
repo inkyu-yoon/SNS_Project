@@ -35,6 +35,7 @@ class UserRestControllerTest {
     @MockBean
     UserService userService;
 
+
     @Test
     @DisplayName("회원가입 (join) 성공 테스트")
     @WithMockUser

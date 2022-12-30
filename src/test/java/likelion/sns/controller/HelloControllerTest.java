@@ -4,6 +4,7 @@ import likelion.sns.service.HelloService;
 import likelion.sns.service.PostService;
 import likelion.sns.service.UserService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -35,25 +36,30 @@ class HelloControllerTest {
     @MockBean
     HelloService helloService;
 
-    @Test
-    @DisplayName("Hello Controller GET Mapping 테스트")
-    @WithMockUser
-    void helloTest() throws Exception {
-        mockMvc.perform(get("/api/v1/hello"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("hello"));
-    }
+    @Nested
+    @DisplayName("Hello Controller 테스트")
+    class HelloTest {
+        @Test
+        @DisplayName("Hello Controller GET Mapping 테스트")
+        @WithMockUser
+        void helloTest() throws Exception {
 
-    @Test
-    @DisplayName("Sum of Digit 테스트")
-    @WithMockUser
-    void sumOfDigitTest() throws Exception {
-        when(helloService.getSum(any())).thenReturn("15");
+            mockMvc.perform(get("/api/v1/hello"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("윤인규"));
+        }
 
-        mockMvc.perform(get("/api/v1/hello/"+12345)
-                .with(csrf()))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        @Test
+        @DisplayName("Sum of Digit 테스트")
+        @WithMockUser
+        void sumOfDigitTest() throws Exception {
+            when(helloService.getSum(any())).thenReturn("15");
+
+            mockMvc.perform(get("/api/v1/hello/" + 12345)
+                            .with(csrf()))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(MockMvcResultMatchers.status().isOk());
+        }
     }
 }

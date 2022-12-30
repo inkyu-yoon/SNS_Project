@@ -36,16 +36,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        String token;
 
         // [ Bearer token ] 형태로 입력될 것므로, split을 이용해서 토큰 정보만 추출
-        try {
-            token = authorization.split(" ")[1];
-        } catch (Exception e) {
-            log.info("추출할 토큰이 존재하지 않습니다.");
-            filterChain.doFilter(request, response);
-            return;
-        }
+
+        String token = authorization.split(" ")[1];
 
         // 만료된 토큰인지 확인하고, 만료되었다면 권한을 부여하지 않는다.
         if (JwtTokenFilter.isExpired(token, secretKey)) {

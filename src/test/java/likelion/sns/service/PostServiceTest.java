@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.http.HttpStatus;
 
 import static java.util.Optional.of;
@@ -101,7 +102,6 @@ class PostServiceTest {
         User mockUser = mock(User.class);
         Post mockPost = mock(Post.class);
 
-
         when(userRepository.findByUserName(any()))
                 .thenReturn(of(mockUser));
 
@@ -116,7 +116,6 @@ class PostServiceTest {
 
         doReturn("userName1")
                 .when(mockUser).getUserName();
-
 
         SNSAppException snsAppException = Assertions.assertThrows(SNSAppException.class, () -> postService.modifyPost(new PostModifyRequestDto("title", "body"), 1L, "userName"));
 
