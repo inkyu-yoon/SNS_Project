@@ -85,7 +85,9 @@
                 window.location.href = '/';
             }).catch((error)=>{
                 console.log(error.response.data.result["errorCode"])
-
+                if (error.response.data.result["errorCode"] == "DUPLICATED_USER_NAME") {
+                    alert("이미 가입된 회원입니다. 다른 회원명을 입력해주세요.");
+                }
             });
         }
     };

@@ -1,30 +1,10 @@
 {{>layouts/header}}
 
-{{#loginUserName}}
-    <div align="right">
-    <h2> {{loginUserName}} 님 로그인 중</h2>
-    </div>
 
-    <div align="center">
-        <form class="container" form action="/users/logout" method="get">
-            <br>
-            <button class="btn btn-success btn-lg" type="submit" style="width: 25%" onclick="return removeToken();">로그아웃</button>
-        </form>
-    </div>
-{{/loginUserName}}
-<br>
-
-<script>
-    function removeToken(){
-        localStorage.removeItem("token");
-        alert("로그아웃 되었습니다.");
-    }
-
-</script>
 
 <form class="container">
     <table class="table table-striped table-hover">
-        <thead class="table-dark">
+        <thead class="table-primary">
         <tr>
             <th scope="col">Id</th>
             <th scope="col">제목</th>
@@ -44,24 +24,32 @@
         {{/posts}}
         </tbody>
     </table>
+
     <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="?page={{next}}">Next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{next}}">Next</a></li>
     </ul>
 </form>
-
-<br>
-<br>
-
-<form class="container" form action="/posts/write" method="get">
-    <div class="d-grid gap-2 col-6 mx-auto">
+<form class="container justify-content-center " form action="/posts/write" method="get">
+    <div align="right">
         <button class="btn btn-primary" type="submit">게시글 작성</button>
     </div>
 </form>
 <br>
+<form class="form-inline w-100 justify-content-center ">
 
-<form class="container" form action="/" method="get">
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-primary" type="submit">홈 화면 이동</button>
+    <div class="selectBox">
+        <select name="searchCondition" class="select">
+            <option value="titleCon">제목 검색</option>
+            <option value="userNameCon">회원명 검색</option>
+        </select>
     </div>
+
+    <input class="form-control me-sm-2" type="search" placeholder="검색">
+    <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
 </form>
+<br>
+<br>
+
+
+<br>
