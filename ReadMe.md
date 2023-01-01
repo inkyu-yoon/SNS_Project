@@ -355,3 +355,40 @@ Security Chain 에서 발생하는 Exception 은 Handling하기 어려웠다.
 
 - [Security Filter Exception Handling 정리](https://inkyu-yoon.github.io/docs/Language/SpringBoot/FilterExceptionHandle)
 - [Security antMatchers Exception Handling 정리](https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainException)
+
+<br>
+
+### 3. Controller Test, `@WithMockUser` 과 `@WithAnonymousUser`사용에 대한 고찰
+
+<br>
+
+Controller Test 를 구현하면서 많은 의문점이 생겼었다.
+
+처음에 성공 테스트를 구현할 때에는, `@WithMockUser` 어노테이션을 메서드 레벨에 적용했었고, 인증이 된 상태로 테스트를 진행하도록 도와주었다.
+
+하지만, 나는 특정 HTTP 메서드에 유효한 토큰을 담아서 요청한 경우에만 성공하도록 구현했었고,
+
+`@WithMockUser` 를 사용하면 토큰을 **헤더에 담아서 요청하지 않았거나 이상한 토큰을 담아도** 테스트 결과는 언제나 성공이었다.
+
+<br>
+
+또한, 실패 테스트를 진행할 때에도, `@WithAnonymousUser` 를 사용하면, 
+
+내가 여러가지 상황을 염두해서 security chain 에서 정의한 예외처리를 확인하기 힘들었다.
+
+물론, `willThrow()` 나 `doThrow()` 와 같은 방식으로 에러 상황을 설정할 수도 있었지만,
+
+나는 TDD방식이 아닌 비즈니스 로직을 먼저 구현한 후, 리팩토링 시 리스크를 줄이기위한 목적으로 테스트 코드를 작성했기 때문에 
+
+테스트 코드에 내가 정의한 Security Chain을 적용하는게 맞다고 생각이 들었다.
+
+StackOverFlow, 스프링 시큐리티 공식 문서 등에서 적용할 방법을 열심히 찾았고 내가 의도한 대로 테스트 코드 상황을 가정할 수 있었지만, 
+
+사실, 아직도 어떤 테스트 코드가 옳은 테스트 코드인지는 헷갈린다.😥 
+
+- [Security Chain Filter 포함해서 Controller Test 하기](https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainTest)
+
+
+
+
+
