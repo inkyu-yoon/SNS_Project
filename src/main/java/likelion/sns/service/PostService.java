@@ -43,7 +43,7 @@ public class PostService {
      */
     public PostDetailDto getPostById(Long id) throws SQLException {
         // id에 해당하는 포스트 존재하지 않을 시 예외 처리
-        Post foundPost = postRepository.findById(id).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, id + "번 게시글은 존재하지 않습니다."));
+        Post foundPost = postRepository.findById(id).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
         return new PostDetailDto(foundPost);
     }
 
@@ -54,7 +54,7 @@ public class PostService {
     public PostWriteResponseDto writePost(PostWriteRequestDto requestDto, String requestUserName) throws SQLException {
         // 해당하는 회원이 없을 시, 예외 처리
         User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
         Post post = new Post(requestDto.getTitle(), requestDto.getBody(), requestUser);
 
@@ -70,11 +70,11 @@ public class PostService {
 
         //유저가 존재하지 않음
         User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
         //포스트가 존재하지 않음
         Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
 
         User foundUser = foundPost.getUser();
@@ -103,11 +103,11 @@ public class PostService {
     public void deletePost(Long postId, String requestUserName) throws SQLException {
         //유저가 존재하지 않음
         User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND, requestUserName + "에 해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
         //포스트가 존재하지 않음
         Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND, postId + "번 게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
         User foundUser = foundPost.getUser();
 
@@ -122,5 +122,20 @@ public class PostService {
         }
 
         postRepository.delete(foundPost);
+    }
+
+    /**
+     * 마이 피드 기능 (작성한 글 페이징)
+     */
+    public Page<PostListDto> getMyPosts(String requestUserName,Pageable pageable) {
+
+        // 요청한 회원이 존재하는지 확인
+        User requestUser = userRepository.findByUserName(requestUserName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+
+        Long requestUserId = requestUser.getId();
+        log.info("마이 피드 조회 요청 userId : {} ",requestUserId);
+
+        return postRepository.findByUser_IdOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
     }
 }

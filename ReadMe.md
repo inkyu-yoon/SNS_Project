@@ -90,8 +90,8 @@ dependencies {
     - 회원가입 시, 아이디와 비밀번호를 입력받고, 중복된 아이디의 경우 회원가입 에러 발생
     - 로그인 시, jwt 토큰을 발급하고 가입되어 있지 않거나 비밀번호가 일치하지 않으면 에러 발생
 
-- [x] Post 전체 조회 · 상세 조회 · 작성 · 수정 · 삭제 기능 구현
-    - post 전체 조회 · 상세 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
+- [x] Post 페이징(20개씩) 조회 · 상세 조회 · 작성 · 수정 · 삭제 기능 구현
+    - post 페이징(20개씩) 조회 · 상세 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
     - post 작성은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - post 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지
       않는 경우 에러 발생
@@ -99,6 +99,26 @@ dependencies {
 - [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 수정 · 삭제할 수 있는 기능 구현
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
     - 모든 게시글 수정 및 삭제 가능 · 회원 등급 변경 가능
+
+- [x] Comment 페이징(10개씩) 조회 · 작성 · 수정 · 삭제 기능 구현
+    - comment 페이징(10개씩) 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
+    - comment 작성은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
+    - comment 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지
+    않는 경우 에러 발생
+
+- [x] Like 입력 및 개수 조회 기능 구현
+    - Like 개수 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
+    - Like 입력은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
+    - Like 입력은 한 계정당 하나만 가능 (중복 입력 불가능)
+      
+- [x] 마이 피드(요청자가 작성한 게시글 모아보기) 기능 구현
+    - 마이피드 조회는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
+    - 10개씩 페이징되며, 최신에 작성한 게시글 순으로 조회
+
+- [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 및 댓글 수정 · 삭제할 수 있는 기능 구현
+    - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
+    - 모든 게시글 수정 및 삭제 가능 · 회원 등급 변경 가능
+
 
 - [x] User · Post Controller 기능 동작을 중점으로 UI 구현
     - [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?)
@@ -124,9 +144,10 @@ dependencies {
 | GET    | /api/v1/posts/{postId}/comments             | postId에 해당하는 게시글에 존재하는 댓글 조회(최신 댓글 10개 페이징 처리) | -                                         |
 | POST   | /api/v1/posts/{postId}/comments             | 댓글 작성 (jwt 토큰 헤더에 담아 요청)                       | { "comment": "string"}  |
 | PUT    | /api/v1/posts/{postId}/comments/{commentId} | 댓글 수정 (jwt 토큰 헤더에 담아 요청)                       | { "comment": "string"}  |
-| DELETE | /api/v1/posts/{postId}/comments/{commentId}  | 댓글 삭제 (jwt 토큰 헤더에 담아 요청)                       | -                                         |
-| GET    | /api/v1/posts/{postsId}/likes  | 좋아요 개수 조회                                      | -                                         |
-| POST   | /api/v1/posts/{postsId}/likes  | 좋아요 입력 (jwt 토큰 헤더에 담아 요청)                      | -                                         |
+| DELETE | /api/v1/posts/{postId}/comments/{commentId} | 댓글 삭제 (jwt 토큰 헤더에 담아 요청)                       | -                                         |
+| GET    | /api/v1/posts/{postsId}/likes               | 좋아요 개수 조회                                      | -                                         |
+| POST   | /api/v1/posts/{postsId}/likes               | 좋아요 입력 (jwt 토큰 헤더에 담아 요청)                      | -                                         |
+| GET    | /api/v1/posts/my                            | 요청자가 작성한 게시글 조회 (최신 글 10개 페이징 처리)              | -                                         |
 
 ## Endpoint Return Example
 
@@ -399,6 +420,61 @@ dependencies {
 {
   "resultCode":"SUCCESS",
   "result": 0
+}
+```
+
+<br>
+
+### 15. 마이 피드 (요청자가 작성한 게시글 조회) (GET) : /api/v1/posts/my
+
+```json
+{
+  "resultCode": "SUCCESS",
+  "result": {
+    "content": [
+      {
+        "id": 2,
+        "title": "title",
+        "body": "body",
+        "userName": "userName",
+        "createdAt": "yyyy/mm/dd hh:mm:ss",
+        "lastModifiedAt": "yyyy/mm/dd hh:mm:ss"
+      },
+      {
+        "id": 1,
+        "title": "title",
+        "body": "body",
+        "userName": "userName",
+        "createdAt": "yyyy/mm/dd hh:mm:ss",
+        "lastModifiedAt": "yyyy/mm/dd hh:mm:ss"
+      }
+    ],
+    "pageable": {
+      "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+      },
+      "offset": 0,
+      "pageSize": 20,
+      "pageNumber": 0,
+      "paged": true,
+      "unpaged": false
+    },
+    "last": true,
+    "totalPages": 1,
+    "totalElements": 2,
+    "size": 20,
+    "number": 0,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 2,
+    "empty": false
+  }
 }
 ```
 

@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    Page<Post> findByUser_IdOrderByCreatedAtDesc(Long userId,Pageable pageable);
 
 }

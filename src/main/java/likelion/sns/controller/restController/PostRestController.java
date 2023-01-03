@@ -6,11 +6,13 @@ import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.post.delete.PostDeleteResponseDto;
 import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
 import likelion.sns.domain.dto.post.modify.PostModifyResponseDto;
+import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -100,5 +102,20 @@ public class PostRestController {
         log.info("{}", responseDto);
 
         return Response.success(responseDto);
+    }
+
+    /**
+     * 마이 피드 (작성한 게시글 모아보기)
+     **/
+    @ApiOperation(value="마이 피드 기능 (작성한 게시글 모아보기)", notes="(유효한 jwt Token 필요) 토큰 정보로 작성한 게시글 조회")
+    @GetMapping("/my")
+    public Response myFeed(@ApiIgnore Pageable pageable,@ApiIgnore Authentication authentication) throws SQLException {
+
+        String requestUserName = authentication.getName();
+        log.info("삭제 요청자 userName : {}", requestUserName);
+
+        Page<PostListDto> myPosts = postService.getMyPosts(requestUserName, pageable);
+
+        return Response.success(myPosts);
     }
 }
