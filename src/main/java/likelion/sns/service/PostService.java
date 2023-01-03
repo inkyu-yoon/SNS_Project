@@ -35,7 +35,7 @@ public class PostService {
      * 게시글 리스트 조회
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
-        return postRepository.findAllByOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
+        return postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
     }
 
     /**
@@ -121,7 +121,8 @@ public class PostService {
             throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
         }
 
-        postRepository.delete(foundPost);
+        foundPost.deletePost();
+//        postRepository.delete(foundPost);
     }
 
     /**
@@ -136,6 +137,6 @@ public class PostService {
         Long requestUserId = requestUser.getId();
         log.info("마이 피드 조회 요청 userId : {} ",requestUserId);
 
-        return postRepository.findByUser_IdOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+        return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
     }
 }

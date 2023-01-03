@@ -22,6 +22,5 @@ public class BaseEntity {
     @LastModifiedDate
     private Timestamp modifiedAt;
 
-    private Timestamp deletedAt;
 
 }
