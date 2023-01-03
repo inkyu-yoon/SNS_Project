@@ -3,11 +3,11 @@ package likelion.sns.service;
 
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
-import likelion.sns.domain.dto.modify.PostModifyRequestDto;
-import likelion.sns.domain.dto.read.PostDetailDto;
-import likelion.sns.domain.dto.read.PostListDto;
-import likelion.sns.domain.dto.write.PostWriteRequestDto;
-import likelion.sns.domain.dto.write.PostWriteResponseDto;
+import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
+import likelion.sns.domain.dto.post.read.PostDetailDto;
+import likelion.sns.domain.dto.post.read.PostListDto;
+import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
+import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
 import likelion.sns.domain.entity.UserRole;

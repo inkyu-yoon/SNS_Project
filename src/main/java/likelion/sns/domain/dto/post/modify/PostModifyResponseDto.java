@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.modify;
+package likelion.sns.domain.dto.post.modify;
 
 import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;

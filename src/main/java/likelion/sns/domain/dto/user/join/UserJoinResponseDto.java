@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.join;
+package likelion.sns.domain.dto.user.join;
 
 import likelion.sns.domain.entity.User;
 import lombok.AllArgsConstructor;

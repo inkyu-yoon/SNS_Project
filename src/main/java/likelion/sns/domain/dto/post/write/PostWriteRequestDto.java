@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.modify;
+package likelion.sns.domain.dto.post.write;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@ToString(of={"title","body"})
-public class PostModifyRequestDto {
+@NoArgsConstructor
+@ToString(of = {"title","body"})
+public class PostWriteRequestDto {
+
     private String title;
     private String body;
 

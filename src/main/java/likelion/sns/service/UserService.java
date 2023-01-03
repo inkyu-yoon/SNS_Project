@@ -3,12 +3,11 @@ package likelion.sns.service;
 
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
-import likelion.sns.domain.dto.changeRole.UserRoleChangeRequestDto;
-import likelion.sns.domain.dto.changeRole.UserRoleChangeResponseDto;
-import likelion.sns.domain.dto.join.UserJoinRequestDto;
-import likelion.sns.domain.dto.join.UserJoinResponseDto;
-import likelion.sns.domain.dto.login.UserLoginRequestDto;
-import likelion.sns.domain.dto.login.UserLoginResponseDto;
+import likelion.sns.domain.dto.user.changeRole.UserRoleChangeRequestDto;
+import likelion.sns.domain.dto.user.join.UserJoinRequestDto;
+import likelion.sns.domain.dto.user.join.UserJoinResponseDto;
+import likelion.sns.domain.dto.user.login.UserLoginRequestDto;
+import likelion.sns.domain.dto.user.login.UserLoginResponseDto;
 import likelion.sns.domain.entity.User;
 import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;

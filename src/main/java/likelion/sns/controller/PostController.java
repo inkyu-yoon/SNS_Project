@@ -1,7 +1,7 @@
 package likelion.sns.controller;
 
-import likelion.sns.domain.dto.read.PostDetailDto;
-import likelion.sns.domain.dto.read.PostListDto;
+import likelion.sns.domain.dto.post.read.PostDetailDto;
+import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/posts")

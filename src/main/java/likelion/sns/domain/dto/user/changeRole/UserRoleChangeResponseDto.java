@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.changeRole;
+package likelion.sns.domain.dto.user.changeRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

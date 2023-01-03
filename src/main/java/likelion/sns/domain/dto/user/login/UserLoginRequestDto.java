@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.login;
+package likelion.sns.domain.dto.user.login;
 
 import likelion.sns.domain.entity.User;
 import lombok.AllArgsConstructor;

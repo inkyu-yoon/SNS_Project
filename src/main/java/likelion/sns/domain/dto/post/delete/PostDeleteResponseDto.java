@@ -1,4 +1,4 @@
-package likelion.sns.domain.dto.delete;
+package likelion.sns.domain.dto.post.delete;
 
 
 import lombok.AllArgsConstructor;
