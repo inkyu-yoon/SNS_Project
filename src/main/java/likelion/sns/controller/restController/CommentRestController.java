@@ -3,9 +3,12 @@ package likelion.sns.controller.restController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import likelion.sns.domain.Response;
+import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
+import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
-import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
+import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
+import likelion.sns.domain.dto.post.modify.PostModifyResponseDto;
 import likelion.sns.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,4 +56,26 @@ public class CommentRestController {
         return Response.success(responseDto);
     }
 
+    /**
+     * 댓글 수정 (특정 postId에 해당하는 게시글의 특정 commentId의 내용)
+     **/
+    @ApiOperation(value = "Comment 수정", notes = "(유효한 jwt Token 필요) path variable로 입력한 postId의 Post의 commentId의 내용을 수정")
+    @PutMapping("/{postId}/comments/{commentId}")
+    public Response modify(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId, @RequestBody CommentModifyRequestDto requestDto, @ApiIgnore Authentication authentication) throws SQLException {
+
+        log.info("{}", requestDto);
+
+        String requestUserName = authentication.getName();
+        log.info("댓글 수정 요청자 userName : {}", requestUserName);
+
+
+        commentService.modifyPost(requestDto, postId, commentId, requestUserName);
+
+        // 수정 날짜가, Transaction이 종료되어야 적용되므로, 수정을 끝낸 후, 가져오는 메서드를 한번더 사용.
+        CommentModifyResponseDto responseDto = commentService.getOneComment(postId, commentId, requestUserName);
+
+        log.info("{}", responseDto);
+
+        return Response.success(responseDto);
+    }
 }
