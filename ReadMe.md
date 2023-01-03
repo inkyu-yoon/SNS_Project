@@ -67,7 +67,9 @@ dependencies {
 
 ## ERD
 
-<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8erd.svg" alt="프로젝트erd" style="zoom:110%;" />
+<p align="center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230104002450542.png" alt="image-20230104002450542"  />
+</p>
 
 <br>
 
