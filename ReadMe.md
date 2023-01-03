@@ -111,16 +111,22 @@ dependencies {
 
 ## EndPoint
 
-| METHOD | URL                                | Description               | input                                      |
-| ------ | ---------------------------------- |---------------------------| ------------------------------------------ |
-| POST   | /api/v1/users/join                 | 회원가입                      | {"username": "string","password":"string"} |
-| POST   | /api/v1/users/login                | 로그인                       | {"username": "string","password":"string"} |
-| POST   | /api/v1/users/{userId}/role/change | 회원 등급 변경(ADMIN 등급만 가능)    | { "role": "string" }                       |
-| GET    | /api/v1/posts                      | 게시글 조회(최신 글 20개 페이징 처리)   | -                                          |
-| GET    | /api/v1/posts/{postId}             | 특정 게시글 상세 조회              | -                                          |
-| POST   | /api/v1/posts                      | 게시글 작성 (jwt 토큰 헤더에 담아 요청) | { "title": "string" , "body": "string"}    |
-| PUT    | /api/v1/posts/{postId}             | 게시글 수정 (jwt 토큰 헤더에 담아 요청) | { "title": "string" , "body": "string"}    |
-| DELETE | /api/v1/posts/{postId}             | 게시글 삭제 (jwt 토큰 헤더에 담아 요청) | -                                          |
+| METHOD | URL                                         | Description                                    | input                                     |
+|--------|---------------------------------------------|------------------------------------------------|-------------------------------------------|
+| POST   | /api/v1/users/join                          | 회원가입                                           | {"username": "string","password":"string"} |
+| POST   | /api/v1/users/login                         | 로그인                                            | {"username": "string","password":"string"} |
+| POST   | /api/v1/users/{userId}/role/change          | 회원 등급 변경(ADMIN 등급만 가능)                         | { "role": "string" }                      |
+| GET    | /api/v1/posts                               | 게시글 조회(최신 글 20개 페이징 처리)                        | -                                         |
+| GET    | /api/v1/posts/{postId}                      | 특정 게시글 상세 조회                                   | -                                         |
+| POST   | /api/v1/posts                               | 게시글 작성 (jwt 토큰 헤더에 담아 요청)                      | { "title": "string" , "body": "string"}   |
+| PUT    | /api/v1/posts/{postId}                      | 게시글 수정 (jwt 토큰 헤더에 담아 요청)                      | { "title": "string" , "body": "string"}   |
+| DELETE | /api/v1/posts/{postId}                      | 게시글 삭제 (jwt 토큰 헤더에 담아 요청)                      | -                                         |
+| GET    | /api/v1/posts/{postId}/comments             | postId에 해당하는 게시글에 존재하는 댓글 조회(최신 댓글 10개 페이징 처리) | -                                         |
+| POST   | /api/v1/posts/{postId}/comments             | 댓글 작성 (jwt 토큰 헤더에 담아 요청)                       | { "comment": "string"}  |
+| PUT    | /api/v1/posts/{postId}/comments/{commentId} | 댓글 수정 (jwt 토큰 헤더에 담아 요청)                       | { "comment": "string"}  |
+| DELETE | /api/v1/posts/{postId}/comments/{commentId}  | 댓글 삭제 (jwt 토큰 헤더에 담아 요청)                       | -                                         |
+| GET    | /api/v1/posts/{postsId}/likes  | 좋아요 개수 조회                                      | -                                         |
+| POST   | /api/v1/posts/{postsId}/likes  | 좋아요 입력 (jwt 토큰 헤더에 담아 요청)                      | -                                         |
 
 ## Endpoint Return Example
 
@@ -274,6 +280,133 @@ dependencies {
 
 <br>
 
+### 9. 댓글 조회 (GET) : /api/v1/posts/{postId}/comments
+
+```json
+{
+  "resultCode": "SUCCESS",
+  "result": {
+    "content": [
+      {
+        "id": 2,
+        "comment": "comment2",
+        "userName": "userName1",
+        "postId": 1,
+        "createdAt": "yyyy/mm/dd hh:mm:ss"
+      },
+      {
+        "id": 1,
+        "comment": "comment2",
+        "userName": "userName1",
+        "postId": 1,
+        "createdAt": "yyyy/mm/dd hh:mm:ss"
+      }
+    ],
+    "pageable": {
+      "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+      },
+      "offset": 0,
+      "pageSize": 10,
+      "pageNumber": 0,
+      "unpaged": false,
+      "paged": true
+    },
+    "last": true,
+    "totalElements": 2,
+    "totalPages": 1,
+    "size": 10,
+    "number": 0,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 2,
+    "empty": false
+  }
+}
+```
+
+<br>
+
+### 10. 댓글 작성 (POST) : /api/v1/posts/{postId}/comments
+
+```json
+{
+  "resultCode": "SUCCESS",
+  "result":{
+    "id": 1,
+    "comment": "comment",
+    "userName": "userName",
+    "postId": 1,
+    "createdAt": "yyyy/mm/dd hh:mm:ss"
+  }
+}
+```
+
+<br>
+
+### 11. 댓글 수정 (PUT) : /api/v1/posts/{postId}/comments/{commentId}
+
+```json
+{
+  "resultCode": "SUCCESS",
+  "result":{
+    "id": 1,
+    "comment": "comment",
+    "userName": "userName",
+    "postId": 1,
+    "createdAt": "yyyy/mm/dd hh:mm:ss",
+    "modifiedAt": "yyyy/mm/dd hh:mm:ss"
+  }
+}
+```
+
+<br>
+
+### 12. 댓글 삭제 (DELETE) : /api/v1/posts/{postId}/comments/{commentId}
+
+```json
+{
+  "resultCode": "SUCCESS",
+  "result":{
+    "message": "댓글 삭제 완료",
+    "id": 1
+  }
+}
+```
+
+<br>
+
+### 13. 좋아요 추가 (POST) : /api/v1//posts/{postId}/likes
+
+```json
+{
+  "resultCode":"SUCCESS",
+  "result": "좋아요를 눌렀습니다."
+}
+```
+
+<br>
+
+### 14. 좋아요 개수 (GET) : /api/v1/posts/{postsId}/likes
+
+```json
+{
+  "resultCode":"SUCCESS",
+  "result": 0
+}
+```
+
+<br>
+
+
+
+
 
 
 ---
@@ -283,17 +416,19 @@ dependencies {
 ## Error Info
 
 | Status Code | Error Message        | When                                               |
-|-------------| -------------------- |----------------------------------------------------|
+|-------------|----------------------|----------------------------------------------------|
 | 409         | DUPLICATED_USER_NAME | 회원 가입 시 중복일 때 발생                                   |
 | 404         | USERNAME_NOT_FOUND   | DB에 저장된 회원명이 없는 경우 발생                              |
 | 404         | POST_NOT_FOUND       | 상세 조회, 삭제, 수정 요청 시, 요청한 postId에 해당하는 게시글이 없는 경우 발생 |
+| 404         | COMMENT_NOT_FOUND    | 댓글 삭제, 수정 요청 시, 요청한 commentId 해당하는 게시글이 없는 경우 발생   |
 | 401         | INVALID_PASSWORD     | 로그인 시 패스워드 잘못 입력한 경우 발생                            |
 | 401         | EXPIRED_TOKEN        | 만료된 토큰으로 요청할 시 발생                                  |
 | 401         | INVALID_TOKEN        | jwt 토큰이 아니거나 유효하지 않은 토큰으로 요청할 시 발생                 |
 | 401         | TOKEN_NOT_FOUND      | 토큰 없이, 토큰이 필요한 작업 요청 시 발생                          |
 | 401         | USER_NOT_MATCH       | 게시글 수정 · 삭제 요청 시, 요청자와 작성자가 다른 경우 발생               |
-| 403         |FORBIDDEN_REQUEST  | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생        |
-| 400         |BAD_REQUEST  | 권한을 "ADMIN" 혹은 "USER" 가 아닌 다른 문자열을 담아 요청하는 경우 발생   |
+| 403         | FORBIDDEN_REQUEST    | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생        |
+| 403         | FORBIDDEN_ADD_LIKE   | 이미 좋아요를 입력하고, 2번째 입력하는 경우                          |
+| 400         | BAD_REQUEST          | 권한을 "ADMIN" 혹은 "USER" 가 아닌 다른 문자열을 담아 요청하는 경우 발생   |
 | 500         | DATABASE_ERROR       | DB 연결이 끊어질 경우 발생                                   |
 
 <br>

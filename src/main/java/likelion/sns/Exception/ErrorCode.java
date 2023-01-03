@@ -14,6 +14,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "토큰이 존재하지 않습니다."),
     FORBIDDEN_REQUEST(HttpStatus.FORBIDDEN, "ADMIN 회원만 접근할 수 있습니다."),
+    FORBIDDEN_ADD_LIKE(HttpStatus.FORBIDDEN, "좋아요는 한번만 누를 수 있습니다."),
     USER_NOT_MATCH(HttpStatus.UNAUTHORIZED, "작성자와 요청자가 일치하지 않습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 포스트가 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다."),
