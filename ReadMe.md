@@ -105,15 +105,23 @@ dependencies {
     - comment 작성은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - comment 수정 · 삭제는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능하고 요청자와 작성자가 같아야 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 · 작성자와 요청자가 일치하지
     않는 경우 에러 발생
+    - comment 작성 시, 알림 데이터가 생성되고, 만약 게시글 주인과 comment를 작성한 사람이 같으면, 알림을 따로 저장하지 않음
 
 - [x] Like 입력 및 개수 조회 기능 구현
     - Like 개수 조회는 모든 사용자(로그인되어 있지 않은 사용자 포함) 접근 가능
     - Like 입력은 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - Like 입력은 한 계정당 하나만 가능 (중복 입력 불가능)
-      
+    - Like 입력 시, 알림 데이터가 생성되고, 만약 게시글 주인과 Like를 입력한 사람이 같으면, 알림을 따로 저장하지 않음
+
 - [x] 마이 피드(요청자가 작성한 게시글 모아보기) 기능 구현
     - 마이피드 조회는 로그인한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - 10개씩 페이징되며, 최신에 작성한 게시글 순으로 조회
+
+- [x] Alarm 조회(요청자에게 온 알림 모아보기) 기능 구현
+    - 알림 조회를 요청한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
+    - 20개씩 페이징되며, 최신에 생성된 알림 순으로 조회 가능
+
+
 
 - [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 및 댓글 수정 · 삭제할 수 있는 기능 구현
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
@@ -148,6 +156,7 @@ dependencies {
 | GET    | /api/v1/posts/{postsId}/likes               | 좋아요 개수 조회                                      | -                                         |
 | POST   | /api/v1/posts/{postsId}/likes               | 좋아요 입력 (jwt 토큰 헤더에 담아 요청)                      | -                                         |
 | GET    | /api/v1/posts/my                            | 요청자가 작성한 게시글 조회 (최신 글 10개 페이징 처리)              | -                                         |
+| GET    | /api/v1/alarms                           | 요청자에게 온 알림 조회 (최신 알림 20개 페이징 처리)               | -                                         |
 
 ## Endpoint Return Example
 
@@ -480,7 +489,60 @@ dependencies {
 
 <br>
 
+### 16. 알림 조회 (GET) : /api/v1/alarms
 
+```json
+{
+  "resultCode": "SUCCESS",
+  "result": {
+    "content": [
+      {
+        "id": 2,
+        "alarmType": "NEW_LIKE_ON_POST",
+        "fromUserId": 1,
+        "targetId": 1,
+        "text": "new like!",
+        "createdAt": "yyyy/mm/dd hh:mm:ss"
+      },
+      {
+        "id": 1,
+        "alarmType": "NEW_COMMENT_ON_POST",
+        "fromUserId": 1,
+        "targetId": 1,
+        "text": "new comment!",
+        "createdAt": "yyyy/mm/dd hh:mm:ss"
+      }
+    ],
+    "pageable": {
+      "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+      },
+      "offset": 0,
+      "pageNumber": 0,
+      "pageSize": 20,
+      "unpaged": false,
+      "paged": true
+    },
+    "last": true,
+    "totalPages": 1,
+    "totalElements": 2,
+    "size": 20,
+    "number": 0,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 2,
+    "empty": false
+  }
+}
+```
+
+<br>
 
 
 

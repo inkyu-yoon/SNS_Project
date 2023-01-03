@@ -7,10 +7,8 @@ import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
-import likelion.sns.domain.entity.Comment;
-import likelion.sns.domain.entity.Post;
-import likelion.sns.domain.entity.User;
-import likelion.sns.domain.entity.UserRole;
+import likelion.sns.domain.entity.*;
+import likelion.sns.repository.AlarmRepository;
 import likelion.sns.repository.CommentRepository;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
@@ -32,6 +30,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final AlarmRepository alarmRepository;
 
     /**
      * 댓글 리스트 조회 (특정 포스트의 댓글만)
@@ -56,6 +55,22 @@ public class CommentService {
         // 댓글 저장
         Comment comment = new Comment(requestDto.getComment(), requestUser, foundPost);
         commentRepository.save(comment);
+
+        // 댓글 등록 시 , 알림 엔티티에 데이터 저장
+        // 댓글이 달린 게시글 id
+        Long targetId = foundPost.getId();
+
+        // 게시글을 작성한 user id
+        User postAuthor = foundPost.getUser();
+
+        // 알림을 발생시킨(댓글을 작성한) user id
+        Long fromUserId = requestUser.getId();
+        log.info("게시글 id : {} 댓글 작성자 id : {} 알림이 도착할 사용자 id:{}",targetId,fromUserId,postAuthor);
+
+        //만약 게시글 주인과 알림을 발생시킨 아이디가 같다면, 알림을 저장하지 않음
+        if (!(postAuthor.getId() == fromUserId)) {
+            alarmRepository.save(new Alarm(postAuthor, AlarmType.NEW_COMMENT_ON_POST, fromUserId, targetId));
+        }
 
         return new CommentWriteResponseDto(comment,requestUserName,postId);
     }
