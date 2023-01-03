@@ -58,7 +58,7 @@ public class PostRestController {
         String requestUserName = authentication.getName();
         log.info("작성 요청자 userName : {}", requestUserName);
 
-        PostWriteResponseDto responseDto = postService.writePost(requestDto, authentication.getName());
+        PostWriteResponseDto responseDto = postService.writePost(requestDto, requestUserName);
         log.info("{}", responseDto);
 
         return Response.success(responseDto);
