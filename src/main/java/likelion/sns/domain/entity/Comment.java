@@ -23,7 +23,13 @@ public class Comment extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+    public Comment(String comment, User user, Post post) {
+        this.comment = comment;
+        this.user = user;
+        this.post = post;
+    }
 }

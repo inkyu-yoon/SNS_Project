@@ -3,15 +3,16 @@ package likelion.sns.controller.restController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import likelion.sns.domain.Response;
+import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
+import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
+import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.sql.SQLException;
@@ -34,4 +35,22 @@ public class CommentRestController {
         log.info("postId : {}", postId);
         return Response.success(commentService.getCommentList(postId, pageable));
     }
+
+    /**
+     * 해당 postId에 댓글 작성
+     */
+    @PostMapping("/{postId}/comments")
+    @ApiOperation(value = "Comment 작성", notes = "Path variable에 해당하는 포스트에, 입력한 comment 내용을 저장")
+    public Response write(@PathVariable(name = "postId") Long postId, @RequestBody CommentWriteRequestDto requestDto, @ApiIgnore Authentication authentication) throws SQLException {
+        log.info("{}", requestDto);
+
+        String requestUserName = authentication.getName();
+        log.info("작성 요청자 userName : {}", requestUserName);
+
+        CommentWriteResponseDto responseDto = commentService.writeComment(requestDto, requestUserName, postId);
+        log.info("{}", responseDto);
+
+        return Response.success(responseDto);
+    }
+
 }
