@@ -11,13 +11,13 @@ import java.text.SimpleDateFormat;
 @AllArgsConstructor
 public class CommentListDto {
 
-    private Long id;
+    private Long commentId;
     private String comment;
     private String userName;
     private Long postId;
     private String createdAt;
     public CommentListDto(Comment comment) {
-        this.id = comment.getId();
+        this.commentId = comment.getId();
         this.comment = comment.getComment();
         this.userName = comment.getUser().getUserName();
         this.postId = comment.getPost().getId();
