@@ -70,11 +70,14 @@
             }).catch((error) => {
                 if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
                     alert("토큰이 만료되었으니 다시 로그인 해주세요");
-                    // window.location.href = '/posts/';
-                }else if(error.response.data.result["errorCode"] =="USER_NOT_MATCH"){
-                    alert("본인이 작성한 게시글만 삭제할 수 있습니다.");
-                }else if(error.response.data.result["errorCode"] =="INVALID_TOKEN"){
+                }else if(error.response.data.result["errorCode"] =="TOKEN_NOT_FOUND"){
                     alert("로그인 후 이용해주세요");
+                }else if(error.response.data.result["errorCode"] =="INVALID_TOKEN"){
+                    alert("다시 로그인 후 이용해주세요");
+                }else if(error.response.data.result["errorCode"] =="DATABASE_ERROR"){
+                    alert("DB 에러가 발생했습니다.");
+                }else if(error.response.data.result["errorCode"] =="USERNAME_NOT_FOUND"){
+                    alert("가입된 회원이 아닙니다. 회원가입 후 진행해주세요");
                 }
             });
         }
