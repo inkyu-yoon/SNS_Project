@@ -1,7 +1,9 @@
 package likelion.sns.controller;
 
+import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
+import likelion.sns.service.CommentService;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.sql.SQLException;
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     /**
      * 게시글 리스트 (페이지)
@@ -45,9 +48,17 @@ public class PostController {
      * 게시글 상세 페이지
      **/
     @GetMapping("/{postId}")
-    public String showDetail(@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
+    public String showDetail(@PathVariable(name = "postId") Long postId, Model model,Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
+        Page<CommentListDto> comments = commentService.getCommentList(postId, pageable);
+
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("userName") != null) {
+            model.addAttribute("loginUserName", session.getAttribute("userName"));
+        }
+
         model.addAttribute("post", post);
+        model.addAttribute("comments", comments);
         return "posts/details";
     }
 

@@ -8,7 +8,6 @@ import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
-import likelion.sns.domain.dto.post.delete.PostDeleteResponseDto;
 import likelion.sns.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

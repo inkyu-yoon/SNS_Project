@@ -57,8 +57,6 @@ class PostRestControllerTest {
     @MockBean PostService postService;
     @MockBean UserService userService;
     @Value("${jwt.token.secret}") String secretKey;
-    PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
-    PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", 1L);
 
     /**
      * SecurityConfig 로 설정한 Filter Chain 적용
@@ -159,6 +157,8 @@ class PostRestControllerTest {
     @Nested
     @DisplayName("포스트 작성 테스트")
     class PostWriteTest {
+        PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
+
         String token = JwtTokenUtil.createToken("userName", secretKey);
         String content = gson.toJson(postWriteRequestDto);
 
@@ -231,6 +231,9 @@ class PostRestControllerTest {
     @Nested
     @DisplayName("포스트 수정 테스트")
     class PostModifyTest {
+
+        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", 1L);
+
         String token = JwtTokenUtil.createToken("userName", secretKey);
 
         String content = gson.toJson(postModifyResponseDto);
@@ -458,6 +461,50 @@ class PostRestControllerTest {
                     .andExpect(jsonPath("$.result").exists())
                     .andExpect(jsonPath("$.result.errorCode").value("DATABASE_ERROR"))
                     .andExpect(jsonPath("$.result.message").value("DB 에러"));
+        }
+    }
+
+    /**
+     * 마이피드 테스트
+     */
+    @Nested
+    @DisplayName("포스트 마이피드 테스트")
+    class PostMyFeedTest {
+
+        String token = JwtTokenUtil.createToken("userName", secretKey);
+
+        /**
+         * 마이 피드 조회 성공 테스트
+         */
+        @Test
+        @DisplayName("마이피드 조회 성공 테스트")
+        public void myFeedSuccess() throws Exception {
+
+            mockMvc.perform(get("/api/v1/posts/my")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").exists())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"));
+
+        }
+
+        /**
+         *  마이 피드 조회 실패 테스트, 로그인 하지 않은 경우
+         */
+        @Test
+        @DisplayName("마이피드 실패 테스트 (로그인 하지 않은 경우 = 토큰 없이 요청하는 경우)")
+        public void myFeedError() throws Exception {
+
+            mockMvc.perform(get("/api/v1/posts/my"))
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.resultCode").exists())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
+                    .andExpect(jsonPath("$.result.message").value("토큰이 존재하지 않습니다."));
         }
     }
 }
