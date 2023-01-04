@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="en">
+
+<!--헤더-->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +12,7 @@
 </head>
 
 
-<!--    배경 효과    -->
+<!--  비 내리는 듯한 배경 효과 적용 <style> + select box 커스텀   -->
 
 <div class="rain"></div>
 <style>
@@ -68,29 +70,6 @@
         font-family: Montserrat;
     }
 
-    .selectBox .icoArrow {
-        position: absolute;
-        top: 0;
-        right: 0;
-        z-index: 1;
-        width: 35px;
-        height: inherit;
-        border-left: 2px solid lightcoral;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .selectBox .icoArrow img {
-        width: 50%;
-        transition: .3s;
-    / / 부드럽게 회전
-    }
-
-    .selectBox .select:focus + .icoArrow img {
-        transform: rotate(180deg);
-    }
-
     @keyframes fall {
         from {
         }
@@ -102,7 +81,11 @@
     }
 </style>
 
+
 <script>
+
+    // 비 내리는 효과 구현
+
     const body = document.querySelector("body");
 
     const MIN_DURATION = 10;
@@ -133,9 +116,18 @@
     for (let index = 0; index < 50; index++) {
         setTimeout(makeRain, 500 * index);
     }
+
+    // 로그아웃, localstorage 에서 토큰 제거
+
+    function removeToken() {
+        localStorage.removeItem("token");
+        alert("로그아웃 되었습니다.");
+    }
 </script>
 
+
 <!--    Nav Bar    -->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/"> 🏡홈화면</a>
@@ -168,16 +160,5 @@
         </div>
     </div>
 </nav>
-
-
-<script>
-    function removeToken() {
-        localStorage.removeItem("token");
-        alert("로그아웃 되었습니다.");
-    }
-
-</script>
-
-<body></body>
 
 <br>

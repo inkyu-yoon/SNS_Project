@@ -17,7 +17,6 @@
             <tr>
                 <th scope="row">{{id}}</th>
                 <td><a href="/posts/{{id}}">{{title}}</a></td>
-
                 <th scope="row">{{userName}}</th>
                 <th scope="row">{{createdAt}}</th>
             </tr>
@@ -26,16 +25,26 @@
     </table>
 
     <ul class="pagination justify-content-center">
-        <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous </a> </li>
         <li class="page-item"><a class="page-link" href="?page={{next}}">Next</a></li>
     </ul>
+
 </form>
+
+<!--게시글 작성 버튼 -->
+
 <form class="container justify-content-center " form action="/posts/write" method="get">
     <div align="right">
         <button class="btn btn-primary" type="submit">게시글 작성</button>
     </div>
 </form>
+
+
 <br>
+
+<!--검색-->
+
+
 <form class="form-inline w-100 justify-content-center ">
 
     <div class="selectBox">
@@ -48,8 +57,4 @@
     <input class="form-control me-sm-2" type="search" placeholder="검색">
     <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
 </form>
-<br>
-<br>
 
-
-<br>

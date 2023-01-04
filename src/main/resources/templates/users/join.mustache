@@ -1,89 +1,67 @@
 {{>layouts/header}}
 
+<br><br><br>
 
-<div align="center">
-    <H1>회원가입 화면 입니다.</H1>
+<div class="form-group" align="center">
+    <h3>Welcome 🤗</h3>
+    <br>
+    <div class="form-floating mb-3">
+        <label for="floatingInput">회원 명</label>
+        <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요" style="width:300px;height:50px;">
+    </div>
+    <div class="form-floating">
+        <label for="floatingPassword">비밀번호</label>
+        <input name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요" style="width:300px;height:50px;">
+    </div>
 
+    <br>
+
+    <button type="button" class="btn btn-primary" id="user-create-btn">회원가입</button>
 </div>
-<br>
 
-<form class="container">
-    <div class="form-group" align="center">
-        <h2><strong>회원 명</strong></h2>
-        <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요">
-    </div>
-    <br>
-    <br>
-    <br>
-
-    <div class="form-group" align="center">
-        <h2><strong>비밀번호</strong></h2>
-        <input name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요">
-    </div>
-    <br>
-    <div align="center">
-        <button type="button" class="btn btn-primary" id="user-create-btn">회원가입</button>
-
-    </div>
-</form>
-
-<br>
-<br>
-
-<div align="center">
-    <form class="container" form action="/" method="get">
-        <br>
-        <button class="btn btn-success btn-lg" type="submit" style="width: 25%">홈 화면으로</button>
-    </form>
-</div>
 
 <Script>
-    // user 객체 생성
+
     let user = {
-        // 초기화(이벤트 등록) 메소드
+
         init: function () {
 
             var _this = this;
 
-            // 버튼 클릭 시 createBtn 이 생성됨
-            // querySelector 는 id를 기준으로 값을 가져온다.
             const createBtn = document.querySelector('#user-create-btn');
 
-            // 생성 버튼 클릭 시, 동작 할 메소드를 연결
             createBtn.addEventListener('click', _this.create);
         },
 
 
         create: function () {
-            // form 데이터를 JSON으로 만듬
 
-            // data 객체를 만든다. 일종의 dto 객체 형식으로 만드는 것과 비슷한 느낌이다.
             let data = {
                 userName: document.querySelector('#input-userName').value.trim(),
                 password: document.querySelector('#input-password').value.trim(),
             };
             var blank_pattern = /[\s]/g;
 
-            if (blank_pattern.test(data.userName) == true || data.userName=='') {
+            if (blank_pattern.test(data.userName) == true || data.userName == '') {
                 alert('회원명에 공백이 입력되었습니다. 다시 입력해주세요');
                 return;
             }
-            if (blank_pattern.test(data.password) == true||data.password=='') {
+            if (blank_pattern.test(data.password) == true || data.password == '') {
                 alert('비밀번호에 공백이 입력되었습니다. 다시 입력해주세요');
                 return;
             }
 
-            // 데이터 생성 요청을 보냄
+
             axios.post("/api/v1/users/join",
-                    JSON.stringify(data),{ // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+                    JSON.stringify(data), {
                         headers: {
-                            'Content-Type': 'application/json' //json 타입인 것을 설정한다.
+                            'Content-Type': 'application/json'
                         }
                     }
-            ).then((response)=>{
+            ).then((response) => {
                 alert("회원가입이 완료되었습니다.");
                 window.location.href = '/';
-            }).catch((error)=>{
+            }).catch((error) => {
                 console.log(error.response.data.result["errorCode"])
                 if (error.response.data.result["errorCode"] == "DUPLICATED_USER_NAME") {
                     alert("이미 가입된 회원입니다. 다른 회원명을 입력해주세요.");
@@ -91,6 +69,5 @@
             });
         }
     };
-    // 객체 초기화
     user.init();
 </script>

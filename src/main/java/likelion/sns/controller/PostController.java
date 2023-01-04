@@ -48,7 +48,7 @@ public class PostController {
      * 게시글 상세 페이지
      **/
     @GetMapping("/{postId}")
-    public String showDetail(@PathVariable(name = "postId") Long postId, Model model,Pageable pageable, HttpServletRequest request) throws SQLException {
+    public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         Page<CommentListDto> comments = commentService.getCommentList(postId, pageable);
 
@@ -66,7 +66,13 @@ public class PostController {
      * 게시글 작성
      **/
     @GetMapping("/write")
-    public String writePost() {
+    public String writePost(Model model, HttpServletRequest request) {
+
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("userName") != null) {
+            model.addAttribute("loginUserName", session.getAttribute("userName"));
+        }
+
         return "posts/write";
     }
 
@@ -74,9 +80,16 @@ public class PostController {
      * 게시글 수정
      **/
     @GetMapping("/modify/{postId}")
-    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model) throws SQLException {
+    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
+
+
+        HttpSession session = request.getSession(true);
+        if (session.getAttribute("userName") != null) {
+            model.addAttribute("loginUserName", session.getAttribute("userName"));
+        }
+
         return "posts/modify";
     }
 
