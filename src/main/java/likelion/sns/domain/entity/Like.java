@@ -26,8 +26,15 @@ public class Like extends BaseEntity{
     @JoinColumn(name = "post_id")
     private Post post;
 
+    /**
+     * 정적 팩토리 메서드 용 생성자
+     */
     public Like(User user, Post post) {
         this.user = user;
         this.post = post;
+    }
+
+    public static Like createLike(User user, Post post) {
+        return new Like(user, post);
     }
 }

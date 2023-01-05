@@ -2,6 +2,8 @@ package likelion.sns.controller.restController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ErrorDto;
 import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.post.delete.PostDeleteResponseDto;
 import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
@@ -14,7 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -52,7 +57,12 @@ public class PostRestController {
      **/
     @ApiOperation(value="Post 추가", notes="(유효한 jwt Token 필요) title, body 데이터를 저장")
     @PostMapping
-    public Response write(@RequestBody PostWriteRequestDto requestDto, @ApiIgnore Authentication authentication) throws SQLException {
+    public ResponseEntity write(@Validated @RequestBody PostWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+        //바인딩 에러 처리
+        if (br.hasErrors()) {
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+        }
 
         log.info("{}", requestDto);
 
@@ -63,7 +73,7 @@ public class PostRestController {
         PostWriteResponseDto responseDto = postService.writePost(requestDto, requestUserName);
         log.info("{}", responseDto);
 
-        return Response.success(responseDto);
+        return ResponseEntity.ok(Response.success(responseDto));
     }
 
     /**
@@ -71,7 +81,12 @@ public class PostRestController {
      **/
     @ApiOperation(value="Post 수정", notes="(유효한 jwt Token 필요) path variable로 입력한 postId의 Post를 title, body 로 수정")
     @PutMapping("/{postId}")
-    public Response modify(@PathVariable(name = "postId") Long postId, @RequestBody PostModifyRequestDto requestDto, @ApiIgnore Authentication authentication) throws SQLException {
+    public ResponseEntity modify(@PathVariable(name = "postId") Long postId, @Validated @RequestBody PostModifyRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+        //바인딩 에러 처리
+        if (br.hasErrors()) {
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+        }
 
         log.info("{}", requestDto);
 
@@ -84,7 +99,8 @@ public class PostRestController {
         PostModifyResponseDto responseDto = new PostModifyResponseDto(postId);
         log.info("{}", responseDto);
 
-        return Response.success(responseDto);
+        return ResponseEntity.ok(Response.success(responseDto));
+
     }
 
     /**

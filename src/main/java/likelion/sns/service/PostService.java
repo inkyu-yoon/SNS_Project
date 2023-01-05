@@ -31,6 +31,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+
     /**
      * 게시글 리스트 조회
      */
@@ -41,9 +42,10 @@ public class PostService {
     /**
      * 게시글 단건 조회
      */
-    public PostDetailDto getPostById(Long id) throws SQLException {
-        // id에 해당하는 포스트 존재하지 않을 시 예외 처리
-        Post foundPost = postRepository.findById(id).orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
+    public PostDetailDto getPostById(Long postId) throws SQLException {
+        // post 유효성 검사하고 찾아오기
+        Post foundPost = postValid(postId);
+
         return new PostDetailDto(foundPost);
     }
 
@@ -52,11 +54,11 @@ public class PostService {
      */
     @Transactional
     public PostWriteResponseDto writePost(PostWriteRequestDto requestDto, String requestUserName) throws SQLException {
-        // 해당하는 회원이 없을 시, 예외 처리
-        User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
 
-        Post post = new Post(requestDto.getTitle(), requestDto.getBody(), requestUser);
+        // 정적 팩토리 메서드 방식
+        Post post = Post.writePost(requestDto.getTitle(), requestDto.getBody(), requestUser);
 
         return new PostWriteResponseDto(postRepository.save(post));
 
@@ -68,30 +70,24 @@ public class PostService {
     @Transactional
     public void modifyPost(PostModifyRequestDto requestDto, Long postId, String requestUserName) throws SQLException {
 
-        //유저가 존재하지 않음
-        User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
 
-        //포스트가 존재하지 않음
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
-
+        // post 유효성 검사하고 찾아오기
+        Post foundPost = postValid(postId);
 
         User foundUser = foundPost.getUser();
 
         UserRole requestUserRole = requestUser.getRole();
-        String userName = foundUser.getUserName();
-        log.info("게시글 수정 요청자 ROLE = {}", requestUserRole);
-        log.info("게시글 작성자 userName = {}", userName);
+        String author = foundUser.getUserName();
+        log.info("게시글 수정 요청자 ROLE = {} 게시글 작성자 author = {}", requestUserRole, author);
 
-        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 수정 가능함)
-        if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !userName.equals(requestUserName)) {
-            throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
-        }
+        // 작성자와 요청자 유효성 검사
+        checkAuth(requestUserName, author, requestUserRole);
 
         String newTitle = requestDto.getTitle();
         String newBody = requestDto.getBody();
-        log.info("게시글 수정 요청 제목 = {} , 내용 = {}", newTitle,newBody);
+        log.info("게시글 수정 요청 제목 = {} , 내용 = {}", newTitle, newBody);
 
         foundPost.modifyPost(newTitle, newBody);
     }
@@ -101,25 +97,20 @@ public class PostService {
      */
     @Transactional
     public void deletePost(Long postId, String requestUserName) throws SQLException {
-        //유저가 존재하지 않음
-        User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
 
-        //포스트가 존재하지 않음
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
+        // post 유효성 검사하고 찾아오기
+        Post foundPost = postValid(postId);
 
         User foundUser = foundPost.getUser();
 
         UserRole requestUserRole = requestUser.getRole();
-        String userName = foundUser.getUserName();
-        log.info("게시글 삭제 요청자 ROLE = {}", requestUserRole);
-        log.info("게시글 작성자 userName = {}", userName);
+        String author = foundUser.getUserName();
+        log.info("게시글 수정 요청자 ROLE = {} 게시글 작성자 author = {}", requestUserRole, author);
 
-        //작성자와 유저가 일치하지 않음 (단 ADMIN이면 삭제 가능함)
-        if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !userName.equals(requestUserName)) {
-            throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
-        }
+        // 작성자와 요청자 유효성 검사
+        checkAuth(requestUserName, author, requestUserRole);
 
         foundPost.deletePost();
 //        postRepository.delete(foundPost);
@@ -128,15 +119,52 @@ public class PostService {
     /**
      * 마이 피드 기능 (작성한 글 페이징)
      */
-    public Page<PostListDto> getMyPosts(String requestUserName,Pageable pageable) {
+    public Page<PostListDto> getMyPosts(String requestUserName, Pageable pageable) {
 
-        // 요청한 회원이 존재하는지 확인
-        User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
 
         Long requestUserId = requestUser.getId();
-        log.info("마이 피드 조회 요청 userId : {} ",requestUserId);
+        log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
 
         return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+    }
+
+    /*
+    아래 메서드는 유효성 검사 및 중복 메서드 정리
+     */
+
+    /**
+     * 해당하는 회원이 없을 시, 예외 처리
+     */
+    public User userValid(String userName) {
+        return userRepository.findByUserName(userName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+    }
+
+    /**
+     * 해당하는 게시글이 없을 시, 그리고 deletedAt 데이터가 있을 시 예외 처리
+     */
+    public Post postValid(Long postId) {
+
+        //DB에 저장되어 있는 게시글이 없는 경우
+        Post foundPost = postRepository.findById(postId)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
+
+        // deletedAt 에 데이터가 채워져서 삭제 처리가 된 경우
+        if(foundPost.getDeletedAt() != null){
+            throw new SNSAppException(ErrorCode.POST_NOT_FOUND);
+        }
+
+        return foundPost;
+    }
+
+    /**
+     * 권한이 ADMIN 이 아니면서 요청자와 작성자가 다른 경우
+     */
+    public void checkAuth(String requestUserName, String author, UserRole requestUserRole) {
+        if (!requestUserRole.equals(UserRole.ROLE_ADMIN) && !author.equals(requestUserName)) {
+            throw new SNSAppException(ErrorCode.USER_NOT_MATCH);
+        }
     }
 }

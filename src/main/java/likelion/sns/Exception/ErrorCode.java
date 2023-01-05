@@ -20,6 +20,7 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB 에러"),
     BAD_REQUEST(HttpStatus.FORBIDDEN, "권한은 ADMIN 또는 USER 로 변경할 수 있습니다." ),
+    BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN, "공백 또는 null 을 입력할 수 없습니다." ),
 
     // hello Controller 전용
     BAD_REQUEST_SUM(HttpStatus.FORBIDDEN, "숫자만 입력해주세요" );

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.configuration.SecurityConfig;
+import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
 import likelion.sns.domain.dto.post.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
@@ -232,12 +233,12 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 테스트")
     class PostModifyTest {
 
-        PostModifyResponseDto postModifyResponseDto = new PostModifyResponseDto("수정 내용", 1L);
+        PostModifyRequestDto PostModifyRequestDto = new PostModifyRequestDto("수정 제목","수정 내용");
 
         String token = JwtTokenUtil.createToken("userName", secretKey);
 
-        String content = gson.toJson(postModifyResponseDto);
-        Long postId = postModifyResponseDto.getPostId();
+        String content = gson.toJson(PostModifyRequestDto);
+        Long postId = 1L;
 
         /**
          * 포스트 수정 성공 테스트

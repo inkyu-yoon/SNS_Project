@@ -30,10 +30,19 @@ public class Alarm extends BaseEntity {
     // 알림이 일어난 포스트 아이디
     private Long targetId;
 
+    /**
+     * 정적 팩토리 메서드 용 생성자
+     */
+
     public Alarm(User user, AlarmType alarmType, Long fromUserId, Long targetId) {
         this.user = user;
         this.alarmType = alarmType;
         this.fromUserId = fromUserId;
         this.targetId = targetId;
+    }
+
+    public static Alarm createAlarm(User user, AlarmType alarmType, Long fromUserId, Long targetId) {
+        return new Alarm(user, alarmType, fromUserId, targetId);
+
     }
 }

@@ -29,10 +29,17 @@ public class Post extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Post(String title, String body,User user) {
+    /**
+     * 정적 팩토리 메서드 용 생성자
+     */
+    public Post(String title, String body, User user) {
         this.title = title;
         this.body = body;
         this.user = user;
+    }
+
+    public static Post writePost(String title, String body, User user) {
+        return new Post(title, body, user);
     }
 
     public void modifyPost(String title, String body) {

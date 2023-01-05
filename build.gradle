@@ -44,6 +44,9 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-test'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+
+	// request dto 필드 유효성 검사
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

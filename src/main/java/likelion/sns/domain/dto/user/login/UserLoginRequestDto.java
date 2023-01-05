@@ -6,12 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
+
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
 @ToString(of={"userName","password"})
 public class UserLoginRequestDto {
+
+    @NotBlank(message = "공백 하면 ㄴㄴ")
     private String userName;
+
+    @NotBlank
     private String password;
 
 }

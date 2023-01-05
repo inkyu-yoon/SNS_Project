@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
 import java.text.SimpleDateFormat;
 
 @AllArgsConstructor
@@ -12,5 +13,6 @@ import java.text.SimpleDateFormat;
 @NoArgsConstructor
 @ToString(of = {"comment"})
 public class CommentWriteRequestDto {
+    @NotBlank
     private String comment;
 }

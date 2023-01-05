@@ -30,12 +30,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
+    /**
+     * 정적 팩토리 메서드 용 생성자
+     */
     public User(String userName, String password) {
         this.userName = userName;
         this.password = password;
         this.role = UserRole.ROLE_USER;
     }
 
+    public static User createUser(String userName, String password){
+        return new User(userName, password);
+    }
     public void changeRole(String requestRole) {
         if (requestRole.equalsIgnoreCase("admin")) {
             this.role = UserRole.ROLE_ADMIN;

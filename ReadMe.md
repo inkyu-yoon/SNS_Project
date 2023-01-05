@@ -56,6 +56,9 @@ dependencies {
     implementation 'org.springframework.security:spring-security-test'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+
+    // request dto 필드 유효성 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 ```
 
@@ -124,6 +127,8 @@ dependencies {
     - 알림 조회를 요청한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - 20개씩 페이징되며, 최신에 생성된 알림 순으로 조회 가능
 
+- [x] Rest Controller 에서 `request dto` @Valid 유효성 검사 후 예외 처리 
+    - null 이나 공백만으로 이루어진 값 허용하지 않음
 
 - [x] ADMIN 회원의 경우 회원 등급 변경 가능 · 모든 게시글 및 댓글 수정 · 삭제할 수 있는 기능 구현
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
@@ -555,21 +560,22 @@ dependencies {
 
 ## Error Info
 
-| Status Code | Error Message        | When                                               |
-|-------------|----------------------|----------------------------------------------------|
-| 409         | DUPLICATED_USER_NAME | 회원 가입 시 중복일 때 발생                                   |
-| 404         | USERNAME_NOT_FOUND   | DB에 저장된 회원명이 없는 경우 발생                              |
+| Status Code | Error Message        | When                                           |
+|-------------|----------------------|------------------------------------------------|
+| 409         | DUPLICATED_USER_NAME | 회원 가입 시 중복일 때 발생                               |
+| 404         | USERNAME_NOT_FOUND   | DB에 저장된 회원명이 없는 경우 발생                          |
 | 404         | POST_NOT_FOUND       | 상세 조회, 삭제, 수정 요청 시, 요청한 postId에 해당하는 게시글이 없는 경우 발생 |
-| 404         | COMMENT_NOT_FOUND    | 댓글 삭제, 수정 요청 시, 요청한 commentId 해당하는 게시글이 없는 경우 발생   |
-| 401         | INVALID_PASSWORD     | 로그인 시 패스워드 잘못 입력한 경우 발생                            |
-| 401         | EXPIRED_TOKEN        | 만료된 토큰으로 요청할 시 발생                                  |
-| 401         | INVALID_TOKEN        | jwt 토큰이 아니거나 유효하지 않은 토큰으로 요청할 시 발생                 |
-| 401         | TOKEN_NOT_FOUND      | 토큰 없이, 토큰이 필요한 작업 요청 시 발생                          |
-| 401         | USER_NOT_MATCH       | 게시글 수정 · 삭제 요청 시, 요청자와 작성자가 다른 경우 발생               |
-| 403         | FORBIDDEN_REQUEST    | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생        |
-| 403         | FORBIDDEN_ADD_LIKE   | 이미 좋아요를 입력하고, 2번째 입력하는 경우                          |
-| 400         | BAD_REQUEST          | 권한을 "ADMIN" 혹은 "USER" 가 아닌 다른 문자열을 담아 요청하는 경우 발생   |
-| 500         | DATABASE_ERROR       | DB 연결이 끊어질 경우 발생                                   |
+| 404         | COMMENT_NOT_FOUND    | 댓글 삭제, 수정 요청 시, 요청한 commentId 해당하는 게시글이 없는 경우 발생 |
+| 401         | INVALID_PASSWORD     | 로그인 시 패스워드 잘못 입력한 경우 발생                        |
+| 401         | EXPIRED_TOKEN        | 만료된 토큰으로 요청할 시 발생                              |
+| 401         | INVALID_TOKEN        | jwt 토큰이 아니거나 유효하지 않은 토큰으로 요청할 시 발생             |
+| 401         | TOKEN_NOT_FOUND      | 토큰 없이, 토큰이 필요한 작업 요청 시 발생                      |
+| 401         | USER_NOT_MATCH       | 게시글 수정 · 삭제 요청 시, 요청자와 작성자가 다른 경우 발생           |
+| 403         | FORBIDDEN_REQUEST    | ADMIN만 접근할 수 있는 요청을 ADMIN이 아닌 사용자가 요청할 시 발생    |
+| 403         | FORBIDDEN_ADD_LIKE   | 이미 좋아요를 입력하고, 2번째 입력하는 경우                      |
+| 400         | BAD_REQUEST          | 권한을 "ADMIN" 혹은 "USER" 가 아닌 다른 문자열을 담아 요청하는 경우 발생 |
+| 400         | BLANK_NOT_ALLOWED          | 공백 또는 null 유효성 검사 시, 에러가 발생할 경우                |
+| 500         | DATABASE_ERROR       | DB 연결이 끊어질 경우 발생                               |
 
 <br>
 
@@ -734,7 +740,25 @@ StackOverFlow, 스프링 시큐리티 공식 문서 등에서 적용할 방법�
 
 - [Security Chain Filter 포함해서 Controller Test 하기](https://inkyu-yoon.github.io/docs/Language/SpringBoot/SecurityChainTest)
 
+<br>
 
+### Controller 에서 request Dto 필드 값 `null`로 입력되는 것 방지
 
+<br>
 
+POST · PUT 요청 시, JSON 형식의 데이터를 request 할때, request dto 객체의 필드 데이터가 null인 경우를 처리를 해주지 않았더니 UI를 구성할 때
+
+null 인 데이터 때문에, 페이지 랜더링을 잘 못하는 현상이 일어났다.
+
+물론, mustache 문법으로 처리할 수 도 있었지만, 
+
+애초에 회원명, 비밀번호, 게시글 제목, 게시글 내용 등등의 데이터가 null로 입력되어 저장되는 것은 이상하다고 생각했다.
+
+따라서, null 체크를 하는 로직을 추가하였다.
+
+controller 에서 request 객체를 받으면, service에서 null인지 체크하는 로직을 구현할 수도 있었지만
+
+`validation` 라이브러리를 이용하여 Controller 단에서 바로 처리하게끔 구현하였다.
+
+- [Controller 에서 요청 객체 변수 유효성 검사하기](https://inkyu-yoon.github.io/docs/Language/SpringBoot/validation)
 

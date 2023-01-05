@@ -22,13 +22,27 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
 
+    /**
+     * 알람 목록 확인
+     */
     public Page<AlarmListDto> getAlarms(String requestUserName, Pageable pageable) {
-        // 해당하는 회원이 없을 시, 예외 처리
-        User requestUser = userRepository.findByUserName(requestUserName)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
 
         Long requestUserId = requestUser.getId();
 
         return alarmRepository.findByUser_IdOrderByCreatedAtDesc(requestUserId, pageable).map(alarm -> new AlarmListDto(alarm));
+    }
+
+    /*
+    아래 메서드는 유효성 검사 및 중복 메서드 정리
+     */
+
+    /**
+     * 해당하는 회원이 없을 시, 예외 처리
+     */
+    public User userValid(String userName) {
+        return userRepository.findByUserName(userName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
     }
 }

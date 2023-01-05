@@ -16,6 +16,11 @@ public class ErrorDto {
         this.message = e.getErrorCode().getMessage();
     }
 
+    public ErrorDto(ErrorCode errorCode) {
+        this.errorCode = errorCode.toString();
+        this.message = errorCode.getMessage();
+    }
+
     public ErrorDto(SQLException e) {
         this.errorCode = ErrorCode.DATABASE_ERROR.toString();
         this.message = ErrorCode.DATABASE_ERROR.getMessage();
