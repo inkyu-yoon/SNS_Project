@@ -7,6 +7,7 @@ import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
 import likelion.sns.domain.entity.UserRole;
+import likelion.sns.repository.LikeRepository;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -23,13 +24,14 @@ class PostServiceTest {
 
     PostRepository postRepository = mock(PostRepository.class);
     UserRepository userRepository = mock(UserRepository.class);
+    LikeRepository likeRepository = mock(LikeRepository.class);
 
     Post mockPost = mock(Post.class);
     User mockUser = mock(User.class);
 
     @BeforeEach
     void setUp() {
-        postService = new PostService(postRepository, userRepository);
+        postService = new PostService(postRepository, userRepository,likeRepository);
     }
 
     /**

@@ -742,7 +742,7 @@ StackOverFlow, 스프링 시큐리티 공식 문서 등에서 적용할 방법�
 
 <br>
 
-### Controller 에서 request Dto 필드 값 `null`로 입력되는 것 방지
+### 4. Controller 에서 request Dto 필드 값 `null`로 입력되는 것 방지
 
 <br>
 

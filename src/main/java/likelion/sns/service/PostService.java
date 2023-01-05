@@ -11,6 +11,7 @@ import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
 import likelion.sns.domain.entity.UserRole;
+import likelion.sns.repository.LikeRepository;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,18 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
 
 
     /**
      * 게시글 리스트 조회
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
-        return postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
+        Page<PostListDto> posts = postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
+        for (PostListDto postListDto : posts) {
+            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
+        }
+        return posts;
     }
 
     /**
@@ -152,7 +158,7 @@ public class PostService {
                 .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
         // deletedAt 에 데이터가 채워져서 삭제 처리가 된 경우
-        if(foundPost.getDeletedAt() != null){
+        if (foundPost.getDeletedAt() != null) {
             throw new SNSAppException(ErrorCode.POST_NOT_FOUND);
         }
 

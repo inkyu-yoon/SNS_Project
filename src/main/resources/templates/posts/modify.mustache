@@ -14,11 +14,15 @@
             <label class="form-label">게시글 내용</label>
             <textarea class="form-control" rows="10" name="body" id="input-body">{{body}}</textarea>
         </div>
+        <div align="center">
+            <button type="button" class="btn btn-primary btn-lg" id="post-modify-btn"
+                    style="width:120px;height:40px;font-size: 15px">게시글 수정
+            </button>
 
-        <div class="d-grid gap-2 col-6 mx-auto">
-            <button type="button" class="btn btn-primary" id="post-modify-btn">수정</button>
+            <button type="button" class="btn btn-danger btn-lg" onclick = "location.href = '/posts/{{id}}' "
+                    style="width:120px;height:40px;font-size: 15px">수정 취소
+            </button>
         </div>
-
     </form>
 {{/post}}
 
@@ -47,38 +51,40 @@
             };
 
             console.log(data);
+            const con_check = confirm("게시글을 수정 하시겠습니까?");
 
-            if (data.title == null || data.title == "") {
-                alert('제목이 비어있습니다. 입력해주세요.');
-                return;
-            }
-            if (data.body == null || data.body == "") {
-                alert('내용이 비어있습니다. 입력해주세요.');
-                return;
-            }
-
-            axios.put("/api/v1/posts/" + postId,
-                    JSON.stringify(data), {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem("token")}`
+            if (con_check === true) {
+                axios.put("/api/v1/posts/" + postId,
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                            }
                         }
-                    }
-            ).then((response) => {
-                        console.log(response);
+                ).then((response) => {
+                            console.log(response);
+                            alert("게시글이 수정되었습니다.")
+                            window.location.href = '/posts/' + postId;
+                        }
+                ).catch((error) => {
+                    console.log(error.response.status);
+                    if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
+                        alert("토큰이 만료되었으니 다시 로그인 해주세요");
+                        window.location.href = '/users/login';
+                    } else if (error.response.data.result["errorCode"] == "USER_NOT_MATCH") {
+                        alert("본인이 작성한 게시글만 수정할 수 있습니다.");
                         window.location.href = '/posts/' + postId;
+                    } else if (error.response.data.result["errorCode"] == "INVALID_TOKEN") {
+                        alert("로그인 후 이용해주세요");
+                        window.location.href = '/users/login';
+                    } else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                        alert("수정할 제목이나 내용을 입력해주세요");
+                        window.location.href = '/posts/' + postId;
+                    } else {
+                        alert("문제가 발생했습니다. 에러가 계속된다면 관리자에게 문의해주세요");
                     }
-            ).catch((error) => {
-                console.log(error.response.status);
-                if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
-                    alert("토큰이 만료되었으니 다시 로그인 해주세요");
-                }else if(error.response.data.result["errorCode"] =="USER_NOT_MATCH"){
-                    alert("본인이 작성한 게시글만 수정할 수 있습니다.");
-                }else if(error.response.data.result["errorCode"] =="INVALID_TOKEN"){
-                    alert("로그인 후 이용해주세요");
-                }
-                    window.location.href = '/posts/';
-            });
+                });
+            }
         }
     };
     post.init();

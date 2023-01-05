@@ -10,6 +10,8 @@
             <th scope="col">제목</th>
             <th scope="col">회원 이름</th>
             <th scope="col">작성 날짜</th>
+<!--            <th scope="col">💬</th>-->
+            <th scope="col">❤</th>
         </tr>
         </thead>
         <tbody>
@@ -19,6 +21,7 @@
                 <td><a href="/posts/{{id}}">{{title}}</a></td>
                 <th scope="row">{{userName}}</th>
                 <th scope="row">{{createdAt}}</th>
+                <th scope="row">{{likeNum}}</th>
             </tr>
         {{/posts}}
         </tbody>

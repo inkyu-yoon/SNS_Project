@@ -4,6 +4,7 @@ import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.service.CommentService;
+import likelion.sns.service.LikeService;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class PostController {
     @GetMapping("")
     public String searchList(Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         Page<PostListDto> posts = postService.getPostList(pageable);
+
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
             model.addAttribute("loginUserName", session.getAttribute("userName"));
