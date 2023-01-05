@@ -53,7 +53,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
-        Page<CommentListDto> comments = commentService.getCommentList(postId, pageable);
+        Page<CommentListDto> comments = commentService.getCommentListAsc(postId, pageable);
         Long likesCount = likeService.getLikesCount(postId);
 
         log.info("{}", likesCount);

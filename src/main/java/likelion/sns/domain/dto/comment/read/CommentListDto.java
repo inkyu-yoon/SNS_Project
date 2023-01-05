@@ -21,7 +21,7 @@ public class CommentListDto {
         this.comment = comment.getComment();
         this.userName = comment.getUser().getUserName();
         this.postId = comment.getPost().getId();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         this.createdAt = sdf.format(comment.getCreatedAt());
     }
 }

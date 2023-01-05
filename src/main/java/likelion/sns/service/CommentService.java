@@ -33,10 +33,17 @@ public class CommentService {
     private final AlarmRepository alarmRepository;
 
     /**
-     * 댓글 리스트 조회 (특정 포스트의 댓글만)
+     * 댓글 리스트 조회 (특정 포스트의 댓글만 최신순으로)
      */
     public Page<CommentListDto> getCommentList(Long postId, Pageable pageable) throws SQLException {
         return commentRepository.findByPost_IdOrderByCreatedAtDesc(postId, pageable).map(comment -> new CommentListDto(comment));
+    }
+
+    /**
+     * 댓글 리스트 조회 (특정 포스트의 댓글만)
+     */
+    public Page<CommentListDto> getCommentListAsc(Long postId, Pageable pageable) throws SQLException {
+        return commentRepository.findByPost_Id(postId, pageable).map(comment -> new CommentListDto(comment));
     }
 
     /**

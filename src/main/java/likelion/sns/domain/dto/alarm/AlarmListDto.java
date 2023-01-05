@@ -31,7 +31,7 @@ public class AlarmListDto {
             this.text = "new like!";
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         this.createdAt = sdf.format(alarm.getCreatedAt());
 

@@ -4,15 +4,25 @@
         <input type="hidden" name="id" value="{{id}}" id="input-postId"/>
         <form class="container">
             <ul class="list-group">
-                <li class="list-group-item active" aria-current="true">{{title}}</li>
+                <li class="list-group-item active" aria-current="true"
+                    style="font-size: 30px;font-weight: bold">{{title}}</li>
 
-                <li class="list-group-item"> 작성자 : {{userName}}</li>
 
                 {{#isModified}}
-                    <li class="list-group-item"> 작성일자 : {{lastModifiedAt}}  {{isModified}}</li>
+                    <li class="list-group-item">
+                        <span>
+                    <span style="font-size: 20px;font-weight: bold;">{{userName}}</span>
+                    <span style="font-size:10px"> {{lastModifiedAt}} {{isModified}}</span>
+                </span>
+                    </li>
                 {{/isModified}}
                 {{^isModified}}
-                    <li class="list-group-item"> 작성일자 : {{createdAt}}</li>
+                    <li class="list-group-item">
+                        <span>
+                    <span style="font-size: 20px;font-weight: bold;">{{userName}}</span>
+                    <span style="font-size:10px">{{createdAt}}</span>
+                </span>
+                    </li>
                 {{/isModified}}
 
                 <li class="list-group-item" style="height: 500px">  {{body}}</li>
@@ -85,10 +95,10 @@
                 </span>
 
                         <a type="button" class="comment-edit-btn" data-toggle="collapse"
-                           data-target=".multi-collapse-{{commentId}}">수정</a>
+                           data-target=".multi-collapse-{{commentId}}" style="font-size: 12px">수정</a>
                         </small>
 
-                        <a class="accordion-button collapsed" type="button"
+                        <a class="accordion-button collapsed" type="button" style="font-size: 12px;color: darkred"
                            onclick="main.commentDelete({{id}},{{commentId}})">
                             삭제
                         </a>

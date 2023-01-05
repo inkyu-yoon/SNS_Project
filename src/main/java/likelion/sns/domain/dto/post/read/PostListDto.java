@@ -27,7 +27,7 @@ public class PostListDto {
         this.body = post.getBody();
         this.userName = post.getUser().getUserName();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
         this.createdAt = sdf.format(post.getCreatedAt());
 

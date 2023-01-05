@@ -25,7 +25,7 @@ public class CommentModifyResponseDto {
         this.comment = comment.getComment();
         this.userName = userName;
         this.postId = postId;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         this.createdAt = sdf.format(comment.getCreatedAt());
         this.modifiedAt = sdf.format(comment.getModifiedAt());
     }
