@@ -26,15 +26,14 @@
         </form>
 
         <div align="center">
-
-
-            <div style="display: inline-block">
-                <form class="container">
-                    <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn"
-                            style="width:60px;height:50px;font-size: 20px">❤
-                    </button>
-                </form>
-            </div>
+            <form class="container">
+                <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn"
+                        style="width:60px;height:50px;font-size: 20px">❤
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg"
+                        style="width:60px;height:50px;font-size: 20px">{{likesCount}}
+                </button>
+            </form>
         </div>
 
         <br>
@@ -328,7 +327,7 @@
             const con_check = confirm("좋아요를 누르시겠습니까?");
             const url = "/api/v1/posts/" + postId + "/likes";
             if (con_check === true) {
-                axios.post(url, data,{
+                axios.post(url, data, {
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${localStorage.getItem("token")}`
@@ -359,7 +358,7 @@
                     }
                 });
             }
-        },
+        }
     };
 
     main.init();

@@ -28,6 +28,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final LikeService likeService;
 
     /**
      * 게시글 리스트 (페이지)
@@ -53,12 +54,16 @@ public class PostController {
     public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         Page<CommentListDto> comments = commentService.getCommentList(postId, pageable);
+        Long likesCount = likeService.getLikesCount(postId);
+
+        log.info("{}", likesCount);
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
             model.addAttribute("loginUserName", session.getAttribute("userName"));
         }
 
+        model.addAttribute("likesCount", likesCount);
         model.addAttribute("post", post);
         model.addAttribute("comments", comments);
         return "posts/details";
