@@ -31,6 +31,9 @@ public class Post extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "post")
+    List<Comment> comments = new ArrayList<>();
+
     /**
      * 정적 팩토리 메서드 용 생성자
      */

@@ -98,8 +98,8 @@ class PostRestControllerTest {
 
             //일단 리스트에 담는다.
             List<PostListDto> posts = new ArrayList<>();
-            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(),0L);
-            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(),0L);
+            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(),0L,0);
+            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(),0L,0);
             posts.add(postListDtoOld);
             posts.add(postListDtoNew);
 

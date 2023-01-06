@@ -21,6 +21,7 @@ public class PostListDto {
     private String lastModifiedAt;
     private Long likeNum;
 
+    private int commentNum;
     public PostListDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
@@ -34,5 +35,6 @@ public class PostListDto {
         if (post.getModifiedAt() != null) {
             this.lastModifiedAt = sdf.format(post.getModifiedAt());
         }
+        this.commentNum = post.getComments().size();
     }
 }

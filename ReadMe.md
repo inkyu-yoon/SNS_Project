@@ -134,10 +134,6 @@ dependencies {
     - 회원 가입 후, DB로 관리자(ADMIN) 아이디 ROLE (USER -> ADMIN) 변경
     - 모든 게시글 및 댓글 수정 및 삭제 가능 · 회원 등급 변경 가능
 
-
-- [x] User · Post Controller 기능 동작을 중점으로 UI 구현
-    - [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?)
-
 <br>
 
 ---
@@ -146,9 +142,7 @@ dependencies {
 
 ## UI 개발 상황
 
-UI 개발 진행 사항
-
-
+주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?)
 
 - [x] 홈 화면
   - [x] 홈 화면 이동, 게시판 이동, 회원가입 화면, 로그인 화면 으로 이동할 수 있는 상단 바 구현

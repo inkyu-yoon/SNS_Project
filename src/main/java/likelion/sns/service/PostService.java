@@ -136,6 +136,7 @@ public class PostService {
         return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
     }
 
+
     /*
     아래 메서드는 유효성 검사 및 중복 메서드 정리
      */
