@@ -203,7 +203,7 @@ class CommentRestControllerTest {
         public void commentModifySuccess() throws Exception {
 
             when(commentService.getOneComment(any(), any(), any()))
-                    .thenReturn(new CommentModifyResponseDto(commentId, "new comment", "userName", postId, "created time", "modified time",null));
+                    .thenReturn(new CommentModifyResponseDto(commentId, "new comment", "userName", postId, "created time", "modified time"));
 
             mockMvc.perform(put("/api/v1/posts/" + postId + "/comments/" + commentId)
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

@@ -62,6 +62,7 @@ public class UserService {
         String inputUsername = loginRequest.getUserName();
         String inputPassword = loginRequest.getPassword();
 
+        log.info("패스워드 {} ", inputPassword);
         // 로긘 요청한 userName이 가입된 적 없으면 에러를 발생시킴
         User found = userRepository.findByUserName(inputUsername)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));

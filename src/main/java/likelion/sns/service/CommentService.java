@@ -189,7 +189,7 @@ public class CommentService {
 
         //만약 게시글 주인과 알림을 발생시킨 아이디가 같다면, 알림을 저장하지 않음
         if (!(postAuthor.getId() == fromUserId)) {
-            alarmRepository.save(Alarm.createAlarm(postAuthor, AlarmType.NEW_LIKE_ON_POST, fromUserId, targetId));
+            alarmRepository.save(Alarm.createAlarm(postAuthor, AlarmType.NEW_COMMENT_ON_POST, fromUserId, targetId));
         }
     }
 

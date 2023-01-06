@@ -153,6 +153,12 @@
                         <a class="nav-link">{{loginUserName}} 님 로그인 중</a>
                     </li>
                     <li class="nav-item">
+                        <button class="btn btn-light btn-lg" type="button" data-toggle="collapse" data-target=".multi-collapse-alarm" >
+                            🔔
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
                         <form class="container" form action="/users/logout" method="get">
                             <button class="btn btn-success btn-lg" type="submit" onclick="return removeToken();">
                                 로그아웃
@@ -165,5 +171,19 @@
         </div>
     </div>
 </nav>
+<div style="position: absolute;top: 60px;right: 70px;">
 
+    <table class="collapse multi-collapse-alarm table table-striped table-hover" style="width: 50%" align="right">
+        <tbody>
+        <thead class="table-light">
+{{#alarms}}
+        <tr>
+            <th scope="row" style="text-align: center;font-size: xx-small;">
+                【{{fromUserName}}】님이 【{{PostName}}】 게시글에 {{text}}</th>
+        </tr>
+{{/alarms}}
+    </thead>
+        </tbody>
+    </table>
+</div>
 <br>

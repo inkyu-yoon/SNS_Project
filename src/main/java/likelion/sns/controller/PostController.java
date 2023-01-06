@@ -1,8 +1,10 @@
 package likelion.sns.controller;
 
+import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
 import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
+import likelion.sns.service.AlarmService;
 import likelion.sns.service.CommentService;
 import likelion.sns.service.LikeService;
 import likelion.sns.service.PostService;
@@ -29,6 +31,7 @@ public class PostController {
     private final PostService postService;
     private final CommentService commentService;
     private final LikeService likeService;
+    private final AlarmService alarmService;
 
     /**
      * 게시글 리스트 (페이지)
@@ -39,7 +42,11 @@ public class PostController {
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
-            model.addAttribute("loginUserName", session.getAttribute("userName"));
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
         }
         model.addAttribute("posts", posts);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
@@ -60,7 +67,11 @@ public class PostController {
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
-            model.addAttribute("loginUserName", session.getAttribute("userName"));
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
         }
 
         model.addAttribute("likesCount", likesCount);
@@ -73,11 +84,15 @@ public class PostController {
      * 게시글 작성
      **/
     @GetMapping("/write")
-    public String writePost(Model model, HttpServletRequest request) {
+    public String writePost(Model model, HttpServletRequest request,Pageable pageable) {
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
-            model.addAttribute("loginUserName", session.getAttribute("userName"));
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
         }
 
         return "posts/write";
@@ -87,14 +102,18 @@ public class PostController {
      * 게시글 수정
      **/
     @GetMapping("/modify/{postId}")
-    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request) throws SQLException {
+    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request,Pageable pageable) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
 
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
-            model.addAttribute("loginUserName", session.getAttribute("userName"));
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
         }
 
         return "posts/modify";

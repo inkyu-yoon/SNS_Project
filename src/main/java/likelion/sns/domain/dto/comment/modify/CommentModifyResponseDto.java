@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString(of = {"id","comment","userName","postId","createdAt","modifiedAt"})
+@ToString(of = {"id","comment","userName","postId","createdAt","lastModifiedAt"})
 public class CommentModifyResponseDto {
     private Long id;
     private String comment;

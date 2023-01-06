@@ -1,7 +1,13 @@
 package likelion.sns.controller;
 
 
+import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
+import likelion.sns.domain.dto.alarm.AlarmListDto;
+import likelion.sns.service.AlarmService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,16 +19,24 @@ import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/")
+@RequiredArgsConstructor
 @ApiIgnore
 public class IndexController {
 
+    private final AlarmService alarmService;
 
     @GetMapping("")
-    public String index(Model model, HttpServletRequest request) {
+    public String index(Model model, HttpServletRequest request, Pageable pageable) {
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
-            model.addAttribute("loginUserName", session.getAttribute("userName"));
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
         }
+
+
         return "index";
     }
 
