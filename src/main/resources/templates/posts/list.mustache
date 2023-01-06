@@ -1,58 +1,38 @@
 {{>layouts/header}}
 
 
-
-<form class="container">
-<!--    <table class="table table-striped table-hover" style="table-layout: fixed;width: 100%">-->
-<!--        <thead class="table-primary">-->
-<!--        <tr>-->
-<!--            <th scope="col" style="width: 5%;text-align: center">Id</th>-->
-<!--            <th scope="col" style="width: 60%;text-align: center">제목</th>-->
-<!--            <th scope="col" style="width: 10%;text-align: center">회원 이름</th>-->
-<!--            <th scope="col" style="width: 20%;text-align: center">작성 날짜</th>-->
-<!--            <th scope="col" style="width: 5%;font-size: 15px">💬</th>-->
-<!--            <th scope="col" style="width: 5%;font-size: 15px">❤</th>-->
-<!--        </tr>-->
-<!--        </thead>-->
-<!--        <tbody>-->
-<!--        {{#posts}}-->
-<!--            <tr>-->
-<!--                <th scope="row" style="text-align: center">{{id}}</th>-->
-<!--                <td style="text-align: center"><a href="/posts/{{id}}">{{title}}</a></td>-->
-<!--                <th scope="row" style="text-align: center">{{userName}}</th>-->
-<!--                <th scope="row" style="text-align: center">{{createdAt}}</th>-->
-<!--                <th scope="row" style="text-align: center">{{commentNum}}</th>-->
-<!--                <th scope="row" style="text-align: center">{{likeNum}}</th>-->
-<!--            </tr>-->
-<!--        {{/posts}}-->
-<!--        </tbody>-->
-<!--    </table>-->
-    {{#posts}}
-
-        <div class="card border-primary mb-3" style="width: 50%;margin: auto;">
-            <div class="card-body">
-                <h4 class="card-title"><a href="/posts/{{id}}">{{id}}. {{title}}</a>
-
-                </h4>
-
-                <h6 class="card-subtitle"><p style="display: inline-block;font-weight: bold">{{userName}}</p>
-                    <p style="font-size: small;float: right"> {{createdAt}} </p></h6>
-                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
-                <br>
-                <p class="card-text"  style="background-color: #fff9ec" ><a href="/posts/{{id}}">{{body}}</a></p>
-                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
-                <p style="float: left;color: darkred"> 💖 : {{likeNum}}  </p> <p style="float: right;color: #78C2AD">  💬 : {{commentNum}}</p>
-            </div>
-        </div>
-        <br>
-    {{/posts}}
+<div class="container">
+    <table class="table table-striped table-hover" style="table-layout: fixed;width: 100%;border-color: #78C2AD" border="1">
+        <thead class="table-primary">
+        <tr>
+            <th scope="col" style="width: 5%;text-align: center">Id</th>
+            <th scope="col" style="width: 60%;text-align: center">제목</th>
+            <th scope="col" style="width: 10%;text-align: center">회원 이름</th>
+            <th scope="col" style="width: 20%;text-align: center">작성 날짜</th>
+            <th scope="col" style="width: 5%;font-size: 15px">💬</th>
+            <th scope="col" style="width: 5%;font-size: 15px">❤</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#posts}}
+            <tr>
+                <th scope="row" style="text-align: center">{{id}}</th>
+                <td style="text-align: center"><a href="/posts/{{id}}">{{title}}</a></td>
+                <th scope="row" style="text-align: center">{{userName}}</th>
+                <th scope="row" style="text-align: center">{{createdAt}}</th>
+                <th scope="row" style="text-align: center">{{commentNum}}</th>
+                <th scope="row" style="text-align: center">{{likeNum}}</th>
+            </tr>
+        {{/posts}}
+        </tbody>
+    </table>
+</div>
 
     <ul class="pagination justify-content-center">
-        <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous </a> </li>
-        <li class="page-item"><a class="page-link" href="?page={{next}}">Next </a> </li>
+        <li class="page-item"><a class="page-link" href="?page={{previous}}" >← </a> </li>
+        <li class="page-item"><a class="page-link" href="?page={{next}}">→ </a> </li>
     </ul>
 
-</form>
 
 <!--게시글 작성 버튼 -->
 
