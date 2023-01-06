@@ -29,17 +29,18 @@
 <!--    </table>-->
     {{#posts}}
 
-        <div class="card" style="width: 50%;margin: auto;">
+        <div class="card border-primary mb-3" style="width: 50%;margin: auto;">
             <div class="card-body">
                 <h4 class="card-title"><a href="/posts/{{id}}">{{id}}. {{title}}</a>
 
                 </h4>
+
                 <h6 class="card-subtitle"><p style="display: inline-block;font-weight: bold">{{userName}}</p>
                     <p style="font-size: small;float: right"> {{createdAt}} </p></h6>
-                <hr>
+                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
                 <br>
-                <p class="card-text"><a href="/posts/{{id}}">{{body}}</a></p>
-                <hr>
+                <p class="card-text"  style="background-color: #fff9ec" ><a href="/posts/{{id}}">{{body}}</a></p>
+                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
                 <p style="float: left;color: darkred"> 💖 : {{likeNum}}  </p> <p style="float: right;color: #78C2AD">  💬 : {{commentNum}}</p>
             </div>
         </div>
