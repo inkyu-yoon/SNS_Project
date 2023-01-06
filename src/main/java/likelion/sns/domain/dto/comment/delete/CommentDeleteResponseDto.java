@@ -10,10 +10,10 @@ import lombok.ToString;
 @ToString(of={"message","commentId"})
 public class CommentDeleteResponseDto {
     private String message;
-    private Long commentId;
+    private Long id;
 
     public CommentDeleteResponseDto(Long commentId) {
         this.message = "댓글 삭제 완료";
-        this.commentId = commentId;
+        this.id = commentId;
     }
 }

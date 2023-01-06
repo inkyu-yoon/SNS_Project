@@ -349,7 +349,7 @@ class CommentRestControllerTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
                     .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.commentId").value(1L))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.id").value(1L))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("댓글 삭제 완료"));
         }
 

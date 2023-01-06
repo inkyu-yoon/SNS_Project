@@ -77,50 +77,50 @@
         </div>
 
     </div>
+{{/post}}
 
-    <br>
-    <hr>
-    <div class="container">
-        <div class="card border-primary mb-3">
-            <div class="card-header bi bi-chat-dots"> {{#comments.size}}{{comments.numberOfElements}}{{/comments.size}}
-                Comments
-            </div>
+<br>
+<hr>
+<div class="container">
+    <div class="card border-primary mb-3">
+        <div class="card-header bi bi-chat-dots"> {{#comments.size}}{{comments.numberOfElements}}{{/comments.size}}
+            Comments
+        </div>
 
-            <ul class="list-group-flush">
-                {{#comments}}
-                    <li id="comments-{{commentId}}" class="list-group-item">
+        <ul class="list-group-flush">
+            {{#comments}}
+                <li id="comments-{{id}}" class="list-group-item">
                 <span>
                     <span style="font-size: small">{{userName}}</span>
                     <span style="font-size: xx-small">{{createdAt}}</span>
                 </span>
 
-                        <a type="button" class="comment-edit-btn" data-toggle="collapse"
-                           data-target=".multi-collapse-{{commentId}}" style="font-size: 12px">수정</a>
-                        </small>
+                    <a type="button" class="comment-edit-btn" data-toggle="collapse"
+                       data-target=".multi-collapse-{{id}}" style="font-size: 12px">수정</a>
+                    </small>
 
-                        <a class="accordion-button collapsed" type="button" style="font-size: 12px;color: darkred"
-                           onclick="main.commentDelete({{id}},{{commentId}})">
-                            삭제
-                        </a>
+                    <a class="accordion-button collapsed" type="button" style="font-size: 12px;color: darkred"
+                       onclick="main.commentDelete({{postId}},{{id}})">
+                        삭제
+                    </a>
 
-                        <div>{{comment}}</div>
+                    <div>{{comment}}</div>
 
-                        <form class="collapse multi-collapse-{{commentId}}">
-                            <div class="form-group">
-                                <textarea class="form-control" id="comment-content" rows="3">{{comment}}</textarea>
-                            </div>
-                            <input type="hidden" id="comment-id" value="{{commentId}}">
-                            <input type="hidden" id="post-id" value="{{id}}">
-                            <div align="right">
-                                <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료</button>
-                            </div>
-                        </form>
-                    </li>
-                {{/comments}}
-            </ul>
-        </div>
+                    <form class="collapse multi-collapse-{{id}}">
+                        <div class="form-group">
+                            <textarea class="form-control" id="comment-content" rows="3">{{comment}}</textarea>
+                        </div>
+                        <input type="hidden" id="comment-id" value="{{id}}">
+                        <input type="hidden" id="post-id" value="{{postId}}">
+                        <div align="right">
+                            <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료</button>
+                        </div>
+                    </form>
+                </li>
+            {{/comments}}
+        </ul>
     </div>
-{{/post}}
+</div>
 
 <form class="container">
     <div class="mb-3">
@@ -345,6 +345,7 @@
                         }
                 ).then((response) => {
                             console.log(response);
+                            alert("💖")
                             window.location.href = '/posts/' + postId;
                         }
                 ).catch((error) => {
