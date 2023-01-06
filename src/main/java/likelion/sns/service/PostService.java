@@ -39,9 +39,11 @@ public class PostService {
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
         Page<PostListDto> posts = postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
+
         for (PostListDto postListDto : posts) {
             postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
         }
+
         return posts;
     }
 
@@ -133,7 +135,13 @@ public class PostService {
         Long requestUserId = requestUser.getId();
         log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
 
-        return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+        Page<PostListDto> posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+
+        for (PostListDto postListDto : posts) {
+            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
+        }
+
+        return posts;
     }
 
 

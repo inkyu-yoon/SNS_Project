@@ -84,7 +84,7 @@ public class PostController {
      * 게시글 작성
      **/
     @GetMapping("/write")
-    public String writePost(Model model, HttpServletRequest request,Pageable pageable) {
+    public String writePost(Model model, HttpServletRequest request, Pageable pageable) {
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
@@ -102,7 +102,7 @@ public class PostController {
      * 게시글 수정
      **/
     @GetMapping("/modify/{postId}")
-    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request,Pageable pageable) throws SQLException {
+    public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request, Pageable pageable) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
 
@@ -117,6 +117,36 @@ public class PostController {
         }
 
         return "posts/modify";
+    }
+
+    /**
+     * 마이페이지
+     **/
+    @GetMapping("/my")
+    public String modifyPost(Model model, HttpServletRequest request, Pageable pageable) throws SQLException {
+
+
+        HttpSession session = request.getSession(true);
+
+        if (session.getAttribute("userName") != null) {
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
+        }
+
+        if (session.getAttribute("userName") != null) {
+            Object loginUserName = session.getAttribute("userName");
+            Page<PostListDto> myPosts = postService.getMyPosts(loginUserName.toString(), pageable);
+            model.addAttribute("myPosts", myPosts);
+        }
+
+        model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
+        model.addAttribute("next", pageable.next().getPageNumber());
+
+        return "posts/myPage";
     }
 
 

@@ -1,0 +1,26 @@
+{{>layouts/header}}
+
+<div class="container">
+    <div align="center">
+    <h2>✍🏻 내가 작성한 게시글</h2>
+    </div>
+    <br>
+    {{#myPosts}}
+    <div class="card" style="width: 50%;margin: auto;">
+        <div class="card-body" >
+            <h4 class="card-title"><a href="/posts/{{id}}">{{id}}. {{title}}   </a></h4>
+            <h6 class="card-subtitle"> {{createdAt}} </h6>
+            <hr><br>
+            <p class="card-text"><a href="/posts/{{id}}">{{body}}</a></p>
+            <hr>
+            <p style="float : right"> 【💬 : {{commentNum}}】【💖 : {{likeNum}}】</p>
+        </div>
+    </div>
+    <br>
+    {{/myPosts}}
+
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous </a> </li>
+        <li class="page-item"><a class="page-link" href="?page={{next}}">Next </a> </li>
+    </ul>
+</div>
