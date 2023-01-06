@@ -12,7 +12,8 @@
     </div>
 
     <div class="d-grid gap-2 col-6 mx-auto" align="center">
-        <button type="button" class="btn btn-primary" id="post-write-btn">게시글 작성</button>
+        {{! 게시글 등록 버튼!! 클릭 시 postCreate 함수 실행}}
+        <button type="button" class="btn btn-primary" id="post-write-btn" onclick="post.postCreate()">게시글 작성</button>
     </div>
 
 </form>
@@ -21,16 +22,11 @@
     let post = {
 
         init: function () {
-
             var _this = this;
-
-            const createBtn = document.querySelector('#post-write-btn');
-
-            createBtn.addEventListener('click', _this.create);
         },
 
 
-        create: function () {
+        postCreate: function () {
             let data = {
                 title: document.querySelector('#input-title').value.trim(),
                 body: document.querySelector('#input-body').value,

@@ -6,17 +6,26 @@
     <h3>Welcome 🤗</h3>
     <br>
     <div class="form-floating mb-3">
-        <label for="floatingInput">회원 명</label>
-        <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요" style="width:300px;height:50px;">
+        <label for="floatingInput"><strong>회원 명</strong></label>
+        <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요"
+               style="width:300px;height:50px;">
     </div>
     <div class="form-floating">
-        <label for="floatingPassword">비밀번호</label>
-        <input name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요" style="width:300px;height:50px;">
+        <label for="floatingPassword"><strong>비밀번호</strong></label>
+        <input type ="password" name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요"
+               style="width:300px;height:50px;">
     </div>
 
     <br>
 
-    <button type="button" class="btn btn-primary" id="user-create-btn">회원가입</button>
+    <div class="form-floating">
+        <input type ="password" name="password" class="form-control" id="input-password-check" placeholder="비밀번호를 한번더 입력해주세요"
+               style="width:300px;height:50px;">
+    </div>
+
+    <br>
+    {{! 회원 등록 버튼!! 클릭 시 userCreate 함수 실행}}
+    <button type="button" class="btn btn-primary btn-lg" id="user-create-btn" onclick="user.userCreate()">회원가입</button>
 </div>
 
 
@@ -28,13 +37,9 @@
 
             var _this = this;
 
-            const createBtn = document.querySelector('#user-create-btn');
-
-            createBtn.addEventListener('click', _this.create);
         },
 
-
-        create: function () {
+        userCreate: function () {
 
             let data = {
                 userName: document.querySelector('#input-userName').value.trim(),
@@ -52,21 +57,37 @@
             }
 
 
-            axios.post("/api/v1/users/join",
-                    JSON.stringify(data), {
-                        headers: {
-                            'Content-Type': 'application/json'
+            const con_check = confirm("회원가입을 하시겠습니까?");
+
+            const password = document.querySelector('#input-password').value.trim();
+            const passwordCheck = document.querySelector('#input-password-check').value;
+
+            if (password != passwordCheck) {
+                alert('비밀번호가 일치하지 않습니다. 다시 입력해주세요');
+                return;
+            }
+
+            if (con_check === true) {
+                axios.post("/api/v1/users/join",
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
                         }
+                ).then((response) => {
+                    alert("회원가입이 완료되었습니다.");
+                    window.location.href = '/';
+                }).catch((error) => {
+                    console.log(error.response.data.result["errorCode"])
+                    if (error.response.data.result["errorCode"] == "DUPLICATED_USER_NAME") {
+                        alert("이미 가입된 회원입니다. 다른 회원명을 입력해주세요.");
+                    } else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                        alert("회원명 혹은 비밀번호를 입력해주세요");
+                    } else {
+                        alert("문제가 발생했습니다. 에러가 계속된다면 관리자에게 문의해주세요");
                     }
-            ).then((response) => {
-                alert("회원가입이 완료되었습니다.");
-                window.location.href = '/';
-            }).catch((error) => {
-                console.log(error.response.data.result["errorCode"])
-                if (error.response.data.result["errorCode"] == "DUPLICATED_USER_NAME") {
-                    alert("이미 가입된 회원입니다. 다른 회원명을 입력해주세요.");
-                }
-            });
+                });
+            }
         }
     };
     user.init();

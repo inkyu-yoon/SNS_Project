@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @ToString(of={"userName","password"})
 public class UserLoginRequestDto {
 
-    @NotBlank(message = "공백 하면 ㄴㄴ")
+    @NotBlank
     private String userName;
 
     @NotBlank

@@ -5,17 +5,17 @@
     <h3>💂🏻‍♀️ 로그인 💂🏻‍♂️</h3>
     <br>
     <div class="form-floating mb-3">
-        <label for="floatingInput">회원 명</label>
+        <label for="floatingInput"><strong>회원 명</strong></label>
         <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요" style="width:300px;height:50px;">
     </div>
     <div class="form-floating">
-        <label for="floatingPassword">비밀번호</label>
-        <input name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요" style="width:300px;height:50px;">
+        <label for="floatingPassword"><strong>비밀번호</strong></label>
+        <input type ="password" name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요" style="width:300px;height:50px;">
     </div>
 
     <br>
-
-    <button type="button" class="btn btn-primary" id="user-login-btn">로그인</button>
+    {{! 회원 로그인 버튼!! 클릭 시 userLogin 함수 실행}}
+    <button type="button" class="btn btn-primary" id="user-login-btn" onclick="user.userLogin()">로그인</button>
 </div>
 
 
@@ -25,46 +25,44 @@
 
             var _this = this;
 
-            const loginBtn = document.querySelector('#user-login-btn');
-
-            loginBtn.addEventListener('click', _this.login);
         },
 
-
-        login: function () {
+        userLogin: function () {
             let data = {
                 userName: document.querySelector('#input-userName').value.trim(),
                 password: document.querySelector('#input-password').value.trim(),
             };
             console.log(data);
-            if (data.userName == '') {
-                alert('회원명을 입력해주세요');
-                return;
-            }
-            if (data.password == '') {
-                alert('비밀번호를 입력해주세요');
-                return;
-            }
 
-            axios.post("/api/v1/users/login",
-                    JSON.stringify(data), {
-                        headers: {
-                            'Content-Type': 'application/json'
+
+            const con_check = confirm("로그인 하시겠습니까?");
+
+            if (con_check === true) {
+
+                axios.post("/api/v1/users/login",
+                        JSON.stringify(data), {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
                         }
+                ).then((response) => {
+                    localStorage.setItem("token", response.data.result["jwt"]);
+                    alert("로그인이 완료되었습니다.");
+                    window.location.href = '/';
+                }).catch((error) => {
+                    console.log(error.response.data.result["errorCode"])
+                    if (error.response.data.result["errorCode"] == "USERNAME_NOT_FOUND") {
+                        alert("가입된 회원이 아닙니다. 회원가입 후 로그인 해주세요");
+                    } else if (error.response.data.result["errorCode"] == "INVALID_PASSWORD") {
+                        alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요");
+                    }else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                        alert("회원명 혹은 비밀번호를 입력해주세요");
+                    }else {
+                        alert("문제가 발생했습니다. 에러가 계속된다면 관리자에게 문의해주세요");
                     }
-            ).then((response) => {
-                localStorage.setItem("token", response.data.result["jwt"]);
-                alert("로그인이 완료되었습니다.");
-                window.location.href = '/';
-            }).catch((error) => {
-                console.log(error.response.data.result["errorCode"])
-                if (error.response.data.result["errorCode"] == "USERNAME_NOT_FOUND") {
-                    alert("가입된 회원이 아닙니다. 회원가입 후 로그인 해주세요");
-                }else if(error.response.data.result["errorCode"]=="INVALID_PASSWORD"){
-                    alert("비밀번호가 일치하지 않습니다. 다시 입력해주세요");
-                }
 
-            });
+                });
+            }
         }
     };
     user.init();

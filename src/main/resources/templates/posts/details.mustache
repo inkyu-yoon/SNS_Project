@@ -1,13 +1,12 @@
 {{>layouts/header}}
 <div>
 {{#post}}
-        <input type="hidden" name="id" value="{{id}}" id="input-postId"/>
         <form class="container">
             <ul class="list-group">
                 <li class="list-group-item active" aria-current="true"
                     style="font-size: 30px;font-weight: bold">{{title}}</li>
 
-
+                {{! 게시글 수정 할 시, (수정됨) 이라고 표시됨}}
                 {{#isModified}}
                     <li class="list-group-item">
                         <span>
@@ -24,20 +23,19 @@
                 </span>
                     </li>
                 {{/isModified}}
+                {{!}}
 
                 <li class="list-group-item" style="height: 500px">  {{body}}</li>
                 <br>
-
             </ul>
-
-
             </tbody>
             </table>
         </form>
 
         <div align="center">
             <form class="container">
-                <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn"
+                {{! 좋아요 입력 버튼!! 클릭 시 likeCreate 함수 파라미터에 post id를 전달하고 함수 실행}}
+                <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn" onclick="main.likeCreate({{id}})"
                         style="width:60px;height:50px;font-size: 20px">❤
                 </button>
                 <button type="button" class="btn btn-secondary btn-lg"
@@ -51,6 +49,7 @@
         <div align="center">
 
             <div style="display: inline-block">
+                {{! 게시글 수정 버튼!! 클릭 시 수정 페이지로 이동}}
                 <form class="container" form action="/posts/modify/{{id}}" method="get">
                     <button type="submit" class="btn btn-primary btn-lg"
                             style="width:120px;height:40px;font-size: 15px">게시글 수정
@@ -61,7 +60,8 @@
 
             <div style="display: inline-block">
                 <form class="container">
-                    <button type="button" class="btn btn-danger btn-lg" id="post-delete-btn"
+                    {{! 게시글 삭제 버튼!! 클릭 시 postDelete 함수 파라미터에 post id를 전달하고 함수 실행}}
+                    <button type="button" class="btn btn-danger btn-lg" id="post-delete-btn" onclick="main.postDelete({{id}})"
                             style="width:120px;height:40px;font-size: 15px">게시글 삭제
                     </button>
                 </form>
@@ -95,10 +95,12 @@
                     <span style="font-size: xx-small">{{createdAt}}</span>
                 </span>
 
+                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
                     <a type="button" class="comment-edit-btn" data-toggle="collapse"
                        data-target=".multi-collapse-{{id}}" style="font-size: 12px">수정</a>
                     </small>
 
+                    {{! 댓글 삭제 버튼!! 클릭 시 commentDelete 함수에 위 해당 댓글의 id와 postId를 전달한다.}}
                     <a class="accordion-button collapsed" type="button" style="font-size: 12px;color: darkred"
                        onclick="main.commentDelete({{postId}},{{id}})">
                         삭제
@@ -108,11 +110,15 @@
 
                     <form class="collapse multi-collapse-{{id}}">
                         <div class="form-group">
+                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-content 내용 전달 }}
                             <textarea class="form-control" id="comment-content" rows="3">{{comment}}</textarea>
                         </div>
+                        {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}
                         <input type="hidden" id="comment-id" value="{{id}}">
+                        {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}
                         <input type="hidden" id="post-id" value="{{postId}}">
                         <div align="right">
+                            {{! 댓글 수정 버튼!! 클릭 시 위 id가 comment-content 인 textarea 내용을 form 형태로 전달하여 수정}}
                             <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료</button>
                         </div>
                     </form>
@@ -124,12 +130,15 @@
 
 <form class="container">
     <div class="mb-3">
+        {{! 댓글 등록 버튼!! 클릭 시, id 가 input-write-comment 내용 전달 }}
         <input class="form-control" id="input-write-comment" rows="1" name="comment" placeholder="댓글 입력">
     </div>
-
+{{#post}}
     <div align="right">
-        <button type="button" class="btn btn-primary btn-lg" id="comment-write-btn">댓글 등록</button>
+        {{! 댓글 등록 버튼!! 클릭 시 commentWrite 함수 파라미터에 post id를 전달하고 함수 실행}}
+        <button type="button" class="btn btn-primary btn-lg" id="comment-write-btn" onclick="main.commentWrite({{id}})" >댓글 등록</button>
     </div>
+{{/post}}
 </form>
 
 
@@ -139,16 +148,8 @@
 
             const _this = this;
 
+            // 댓글 수정 버튼 클릭시
             const updateBtns = document.querySelectorAll('#comment-update-btn');
-
-            const commentWriteBtn = document.querySelector('#comment-write-btn');
-            commentWriteBtn.addEventListener('click', _this.commentWrite);
-
-            const postDeleteBtn = document.querySelector('#post-delete-btn');
-            postDeleteBtn.addEventListener('click', _this.postDelete);
-
-            const LikeBtn = document.querySelector('#like-btn');
-            LikeBtn.addEventListener('click', _this.likeCreate);
 
             updateBtns.forEach(function (item) {
                 item.addEventListener('click', function () {
@@ -160,9 +161,8 @@
 
         },
         /** 게시글 삭제 **/
-        postDelete: function () {
+        postDelete: function (postId) {
 
-            let postId = document.querySelector(`#input-postId`).value;
             const con_check = confirm("게시글을 삭제 하시겠습니까?");
 
             if (con_check === true) {
@@ -198,13 +198,12 @@
         },
 
         /** 댓글 작성 **/
-        commentWrite: function () {
-
-            let postId = document.querySelector(`#input-postId`).value;
+        commentWrite: function (postId) {
 
             let data = {
                 comment: document.querySelector('#input-write-comment').value.trim()
             };
+
             console.log(data);
 
 
@@ -243,8 +242,9 @@
         /** 댓글 수정 */
         commentUpdate: function (form) {
 
-            const postId = form.querySelector('#post-id').value;
             const commentId = form.querySelector('#comment-id').value;
+            const postId = form.querySelector('#post-id').value;
+
             const data = {
                 comment: form.querySelector('#comment-content').value
             }
@@ -295,7 +295,9 @@
 
             const url = `/api/v1/posts/${postId}/comments/${commentId}`;
             console.log(url);
+
             const con_check = confirm("삭제하시겠습니까?");
+
             if (con_check === true) {
 
                 axios.delete(url, {
@@ -330,12 +332,13 @@
         },
 
         /** 좋아요 클릭 **/
-        likeCreate: function () {
+        likeCreate: function (postId) {
 
-            let postId = document.querySelector(`#input-postId`).value;
             const data = null;
             const con_check = confirm("좋아요를 누르시겠습니까?");
+
             const url = "/api/v1/posts/" + postId + "/likes";
+
             if (con_check === true) {
                 axios.post(url, data, {
                             headers: {
@@ -373,5 +376,4 @@
     };
 
     main.init();
-
 </script>
