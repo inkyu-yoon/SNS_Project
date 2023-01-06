@@ -203,7 +203,7 @@ class CommentRestControllerTest {
         public void commentModifySuccess() throws Exception {
 
             when(commentService.getOneComment(any(), any(), any()))
-                    .thenReturn(new CommentModifyResponseDto(commentId, "new comment", "userName", postId, "created time", "modified time"));
+                    .thenReturn(new CommentModifyResponseDto(commentId, "new comment", "userName", postId, "created time", "modified time",null));
 
             mockMvc.perform(put("/api/v1/posts/" + postId + "/comments/" + commentId)
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -220,7 +220,7 @@ class CommentRestControllerTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.userName").value("userName"))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.createdAt").value("created time"))
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.modifiedAt").value("modified time"));
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.lastModifiedAt").value("modified time"));
         }
 
         /**

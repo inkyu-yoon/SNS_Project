@@ -1,5 +1,6 @@
 package likelion.sns.domain.dto.comment.modify;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import likelion.sns.domain.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,9 @@ public class CommentModifyResponseDto {
     private String userName;
     private Long postId;
     private String createdAt;
-    private String modifiedAt;
+    private String lastModifiedAt;
+
+
 
     public CommentModifyResponseDto(Comment comment, String userName, Long postId) {
         this.id = comment.getId();
@@ -27,6 +30,7 @@ public class CommentModifyResponseDto {
         this.postId = postId;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         this.createdAt = sdf.format(comment.getCreatedAt());
-        this.modifiedAt = sdf.format(comment.getModifiedAt());
+        this.lastModifiedAt = sdf.format(comment.getModifiedAt());
+
     }
 }
