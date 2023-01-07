@@ -7,6 +7,8 @@ import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteRequestDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteResponseDto;
 import likelion.sns.domain.entity.*;
 import likelion.sns.repository.AlarmRepository;
 import likelion.sns.repository.CommentRepository;
@@ -36,14 +38,21 @@ public class CommentService {
      * 댓글 리스트 조회 (특정 포스트의 댓글만 최신순으로)
      */
     public Page<CommentListDto> getCommentList(Long postId, Pageable pageable) throws SQLException {
-        return commentRepository.findByPost_IdOrderByCreatedAtDesc(postId, pageable).map(comment -> new CommentListDto(comment));
+        return commentRepository.findByPost_IdAndParentIsNullOrderByCreatedAtDesc(postId, pageable).map(comment -> new CommentListDto(comment));
     }
 
     /**
      * 댓글 리스트 조회 (특정 포스트의 댓글만)
      */
     public Page<CommentListDto> getCommentListAsc(Long postId, Pageable pageable) throws SQLException {
-        return commentRepository.findByPost_Id(postId, pageable).map(comment -> new CommentListDto(comment));
+        return commentRepository.findByPost_IdAndParentIsNull(postId, pageable).map(comment -> new CommentListDto(comment));
+    }
+
+    /**
+     * 대댓글 리스트 조회 (특정 포스트의 댓글의 대댓글)
+     */
+    public Page<CommentListDto> getReplyCommentListAsc(Long postId, Long parentCommentId, Pageable pageable) throws SQLException {
+        return commentRepository.findByPost_IdAndParent_Id(postId, parentCommentId, pageable).map(comment -> new CommentListDto(comment));
     }
 
     /**
@@ -68,6 +77,32 @@ public class CommentService {
         saveAlarm(foundPost, requestUser);
 
         return new CommentWriteResponseDto(comment, requestUserName, postId);
+    }
+
+    /**
+     * 대댓글 작성 (특정 포스트에)
+     */
+    @Transactional
+    public ReplyCommentWriteResponseDto writeReplyComment(ReplyCommentWriteRequestDto requestDto, String requestUserName, Long postId, Long parentCommentId) throws SQLException {
+        //user 유효성 검사하고 찾아오기
+        User requestUser = userValid(requestUserName);
+
+        // post 유효성 검사하고 찾아오기
+        Post foundPost = postValid(postId);
+
+        String commentBody = requestDto.getReplyComment();
+        log.info("댓글 내용 = {}", commentBody);
+
+        Comment parentComment = commentRepository.findById(parentCommentId).get();
+
+        // 댓글 저장
+        Comment comment = Comment.createReplyComment(commentBody, requestUser, foundPost, parentComment);
+        commentRepository.save(comment);
+
+        // 댓글 저장 시 알림 저장
+        saveAlarm(foundPost, requestUser);
+
+        return new ReplyCommentWriteResponseDto(comment, requestUserName, postId, parentCommentId);
     }
 
     /**

@@ -31,7 +31,7 @@ class PostServiceTest {
 
     @BeforeEach
     void setUp() {
-        postService = new PostService(postRepository, userRepository,likeRepository);
+        postService = new PostService(postRepository, userRepository);
     }
 
     /**

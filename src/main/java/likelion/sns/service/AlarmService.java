@@ -61,7 +61,7 @@ public class AlarmService {
                     .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND)).getUserName();
             String title = postRepository.findById(postId)
                     .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND)).getTitle();
-            alarmsDto.add(new AlarmListDetailsDto(alarm.getAlarmType(), fromUserName, title));
+            alarmsDto.add(new AlarmListDetailsDto(alarm, fromUserName, title));
 
         }
         return new PageImpl<>(alarmsDto);

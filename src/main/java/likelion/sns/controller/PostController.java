@@ -20,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/posts")
@@ -70,6 +71,12 @@ public class PostController {
     public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         Page<CommentListDto> comments = commentService.getCommentListAsc(postId, pageable);
+        for (CommentListDto comment : comments) {
+            List<CommentListDto> commentListDtos = commentService.getReplyCommentListAsc(postId, comment.getId(), pageable).toList();
+            comment.setReplys(commentListDtos);
+            comment.setReplysSize(commentListDtos.size());
+            log.info("{}{}",comment.getId(),commentListDtos.size());
+        }
 
         // 로그인 시, 화면에 로그인 회원명, 알림 표시
         showLoginUserNameAndAlarm(request, model, pageable);

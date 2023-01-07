@@ -10,6 +10,8 @@ import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteRequestDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteResponseDto;
 import likelion.sns.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,31 @@ public class CommentRestController {
         log.info("작성 요청자 userName : {}", requestUserName);
 
         CommentWriteResponseDto responseDto = commentService.writeComment(requestDto, requestUserName, postId);
+        log.info("{}", responseDto);
+
+        return ResponseEntity.ok(Response.success(responseDto));
+
+    }
+
+    /**
+     * 해당 postId에 댓글의 대댓글 작성
+     */
+    @PostMapping("/{postId}/comments/{commentId}")
+    @ApiOperation(value = "Comment 작성", notes = "Path variable에 해당하는 포스트에, 입력한 comment 내용을 저장")
+    public ResponseEntity write(@PathVariable(name = "postId") Long postId,@PathVariable(name = "commentId") Long parentCommentId, @Validated @RequestBody ReplyCommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+
+        //바인딩 에러 처리
+        if (br.hasErrors()) {
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+        }
+
+        log.info("{}", requestDto);
+
+        String requestUserName = authentication.getName();
+        log.info("작성 요청자 userName : {}", requestUserName);
+
+        ReplyCommentWriteResponseDto responseDto = commentService.writeReplyComment(requestDto, requestUserName, postId,parentCommentId);
         log.info("{}", responseDto);
 
         return ResponseEntity.ok(Response.success(responseDto));

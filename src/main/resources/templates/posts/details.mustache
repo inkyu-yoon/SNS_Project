@@ -117,21 +117,86 @@
                     <div>{{comment}}</div>
 
                     {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
+
                     <a type="button" class="comment-reply-btn" data-toggle="collapse"
-                       data-target=".multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글</a>
+                       data-target=".multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글 {{replysSize}} 개</a>
                     </small>
 
-                    {{! 댓댓글}}
+                    {{! 대댓글}}
+                    <div class="collapse-group">
                     <form class="collapse multi-collapse-reply-{{id}}">
-                        <div class="form-group">
-                            <textarea class="form-control" id="comment-reply-content" rows="1" placeholder="댓글을 입력하세요."></textarea>
-                        </div>
-                        <input type="hidden" id="comment-id" value="{{id}}">
-                        <input type="hidden" id="post-id" value="{{postId}}">
-                        <div align="right">
-                            <button type="button" class="btn btn-info" id="comment-reply-btn">댓글 입력</button>
-                        </div>
+                        <ul class="list-group-flush">
+                            {{#replys}}
+                                <li id="reply-comments-{{id}}" class="list-group-item">
+                <span>
+                    <span style="font-size: 15px;font-weight: bold;">{{userName}}</span>
+                    {{^isModified}}
+                        <span style="font-size: xx-small;">{{createdAt}}</span>
+                    {{/isModified}}
+                    {{#isModified}}
+                        <span style="font-size: xx-small;">{{lastModifiedAt}} {{isModified}}</span>
+                    {{/isModified}}
+
+                        </span>
+
+<!--                                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}-->
+<!--                                    <a type="button" class="comment-reply-edit-btn" data-toggle="collapse"-->
+<!--                                       data-target=".multi-collapse-reply-edit-{{id}}" style="font-size: xx-small;">수정</a>-->
+<!--                                    </small>-->
+
+                                    {{! 댓글 삭제 버튼!! 클릭 시 commentDelete 함수에 위 해당 댓글의 id와 postId를 전달한다.}}
+                                    <a class="accordion-button collapsed" type="button"
+                                       style="font-size: xx-small;color: darkred;"
+                                       onclick="main.commentDelete({{postId}},{{id}})">
+                                        삭제
+                                    </a>
+
+                                    <div>{{comment}}</div>
+
+<!--                                    <form class="collapse multi-collapse-reply-edit-{{id}}">-->
+<!--                                        <div class="form-group">-->
+<!--                                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-content 내용 전달 }}-->
+<!--                                            <textarea class="form-control" id="comment-content"-->
+<!--                                                      rows="1" class = "collapse">{{comment}}</textarea>-->
+<!--                                        </div>-->
+<!--                                        {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}-->
+<!--                                        <input type="hidden" id="comment-id" value="{{id}}">-->
+<!--                                        {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}-->
+<!--                                        <input type="hidden" id="post-id" value="{{postId}}">-->
+<!--                                        <div align="right">-->
+<!--                                            {{! 댓글 수정 버튼!! 클릭 시 위 id가 comment-content 인 textarea 내용을 form 형태로 전달하여 수정}}-->
+<!--                                            <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                    </form>-->
+
+                                </li>
+                            {{/replys}}
+                        </ul>
+
+
+                        <form class="collapse multi-collapse-reply-{{id}}">
+                            <div class="mb-3">
+                                {{! 댓글 등록 버튼!! 클릭 시, id 가 input-write-comment 내용 전달 }}
+                                <textarea class="form-control" id="comment-reply-content" rows="1"></textarea>
+                            </div>
+                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}
+                            <input type="hidden" id="comment-id" value="{{id}}">
+                            {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}
+                            <input type="hidden" id="post-id" value="{{postId}}">
+                                <div align="right">
+                                    {{! 댓글 등록 버튼!! 클릭 시 commentWrite 함수 파라미터에 post id를 전달하고 함수 실행}}
+                                    <button type="button" class="btn btn-info" id="comment-reply-btn">댓글 등록</button>
+
+                                    </button>
+                                </div>
+                        </form>
                     </form>
+                    </div>
+                    {{! 대댓글 END}}
+
+
+
 
                     <form class="collapse multi-collapse-{{id}}">
                         <div class="form-group">
@@ -183,6 +248,16 @@
                 item.addEventListener('click', function () {
                     var form = this.closest('form');
                     _this.commentUpdate(form);
+                });
+            });
+
+            // 대댓글 작성 버튼 클릭시
+            const replyBtns = document.querySelectorAll('#comment-reply-btn');
+
+            replyBtns.forEach(function (item) {
+                item.addEventListener('click', function () {
+                    var form = this.closest('form');
+                    _this.replyCommentWrite(form);
                 });
             });
 
@@ -266,6 +341,51 @@
                 });
             }
         },
+
+        replyCommentWrite: function (form) {
+
+            const commentId = form.querySelector('#comment-id').value;
+            const postId = form.querySelector('#post-id').value;
+
+            const data = {
+                replyComment: form.querySelector('#comment-reply-content').value
+            }
+
+            console.log(data);
+
+
+            const con_check = confirm("댓글을 작성 하시겠습니까?");
+
+            if (con_check === true) {
+                axios.post("/api/v1/posts/" + postId + "/comments/" + commentId,
+                        JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                            }
+                        }
+                ).then((response) => {
+                    alert("댓글 작성이 완료되었습니다.");
+                    window.location.href = '/posts/' + postId;
+                }).catch((error) => {
+                    if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
+                        alert("토큰이 만료되었으니 다시 로그인 해주세요");
+                        window.location.href = '/users/login';
+                    } else if (error.response.data.result["errorCode"] == "INVALID_TOKEN") {
+                        alert("로그인 후 이용해주세요");
+                        window.location.href = '/users/login';
+                    } else if (error.response.data.result["errorCode"] == "TOKEN_NOT_FOUND") {
+                        alert("로그인 후 이용해주세요");
+                        window.location.href = '/users/login';
+                    } else if (error.response.data.result["errorCode"] == "BLANK_NOT_ALLOWED") {
+                        alert("댓글 내용을 입력해주세요");
+                    } else {
+                        alert("문제가 발생했습니다. 에러가 계속된다면 관리자에게 문의해주세요");
+                    }
+                });
+            }
+        },
+
 
         /** 댓글 수정 */
         commentUpdate: function (form) {

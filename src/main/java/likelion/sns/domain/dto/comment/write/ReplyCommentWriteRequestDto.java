@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
-import java.text.SimpleDateFormat;
+import javax.validation.constraints.Positive;
 
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-@ToString(of = {"comment"})
-public class CommentWriteRequestDto {
+@ToString(of = {"replyComment"})
+public class ReplyCommentWriteRequestDto {
     @NotBlank
-    private String comment;
+    private String replyComment;
 
 }

@@ -2,12 +2,15 @@ package likelion.sns.domain.dto.post.read;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import likelion.sns.domain.dto.comment.read.CommentListDto;
 import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
@@ -21,6 +24,7 @@ public class PostDetailDto {
     private String lastModifiedAt;
 
     private int likeNum;
+    private List<CommentListDto> comments = new ArrayList<>();
 
     @JsonIgnore
     private String isModified;

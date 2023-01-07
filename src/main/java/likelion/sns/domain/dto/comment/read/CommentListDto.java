@@ -5,10 +5,14 @@ import likelion.sns.domain.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class CommentListDto {
 
@@ -18,6 +22,10 @@ public class CommentListDto {
     private Long postId;
     private String createdAt;
     private String lastModifiedAt;
+
+    private List<CommentListDto> replys ;
+
+    private int replysSize =0;
 
     @JsonIgnore
     private String isModified;

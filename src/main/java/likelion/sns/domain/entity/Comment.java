@@ -30,6 +30,14 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
+
+
     /**
      * 정적 팩토리 메서드용 생성자
      */
@@ -39,8 +47,19 @@ public class Comment extends BaseEntity {
         this.post = post;
     }
 
+    public Comment(String comment, User user, Post post, Comment parent) {
+        this.comment = comment;
+        this.user = user;
+        this.post = post;
+        this.parent = parent;
+    }
+
     public static Comment createComment(String comment, User user, Post post) {
         return new Comment(comment, user, post);
+    }
+
+    public static Comment createReplyComment(String comment, User user, Post post, Comment parent) {
+        return new Comment(comment, user, post, parent);
     }
 
     public void modifyComment(String newComment) {
