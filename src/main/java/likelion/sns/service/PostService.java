@@ -31,7 +31,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
 
 
     /**
@@ -39,10 +38,6 @@ public class PostService {
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
         Page<PostListDto> posts = postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
-
-        for (PostListDto postListDto : posts) {
-            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
-        }
 
         return posts;
     }
@@ -137,10 +132,6 @@ public class PostService {
 
         Page<PostListDto> posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
 
-        for (PostListDto postListDto : posts) {
-            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
-        }
-
         return posts;
     }
 
@@ -149,10 +140,6 @@ public class PostService {
      */
     public Page<PostListDto> getPostsByTitle(String title, Pageable pageable) throws SQLException {
         Page<PostListDto> posts = postRepository.findByTitleContainingAndDeletedAtIsNullOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
-
-        for (PostListDto postListDto : posts) {
-            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
-        }
 
         return posts;
     }
@@ -170,9 +157,6 @@ public class PostService {
 
             posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
 
-            for (PostListDto postListDto : posts) {
-                postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
-            }
         }
 
         return posts;

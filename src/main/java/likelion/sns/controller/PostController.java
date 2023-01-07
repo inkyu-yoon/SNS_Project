@@ -30,7 +30,6 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
-    private final LikeService likeService;
     private final AlarmService alarmService;
 
     /**
@@ -39,26 +38,22 @@ public class PostController {
     @GetMapping("")
     public String searchList(@RequestParam(required = false) String keyword, @RequestParam(required = false) String condition, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         log.info("검색 조건 : {}", condition);
-        Page<PostListDto> posts = postService.getPostList(pageable);
+        Page<PostListDto> posts = null;
 
+        // 검색 키워드가 있으면, 키워드로 page 구성, 검색 키워드가 없으면 전체 페이지
         if (condition != null) {
-            if(condition.equals("title")){
+            if (condition.equals("title")) {
                 posts = postService.getPostsByTitle(keyword, pageable);
             } else if (condition.equals("userName")) {
                 posts = postService.getPostsByUserName(keyword, pageable);
             }
+        } else {
+            posts = postService.getPostList(pageable);
         }
         log.info("키워드:{}", keyword);
 
-
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute("userName") != null) {
-            Object loginUserName = session.getAttribute("userName");
-            model.addAttribute("loginUserName", loginUserName);
-
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
-            model.addAttribute("alarms", alarms);
-        }
+        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        showLoginUserNameAndAlarm(request, model, pageable);
 
         model.addAttribute("keyword", keyword);
         model.addAttribute("condition", condition);
@@ -75,20 +70,10 @@ public class PostController {
     public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
         Page<CommentListDto> comments = commentService.getCommentListAsc(postId, pageable);
-        Long likesCount = likeService.getLikesCount(postId);
 
-        log.info("{}", likesCount);
+        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        showLoginUserNameAndAlarm(request, model, pageable);
 
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute("userName") != null) {
-            Object loginUserName = session.getAttribute("userName");
-            model.addAttribute("loginUserName", loginUserName);
-
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
-            model.addAttribute("alarms", alarms);
-        }
-
-        model.addAttribute("likesCount", likesCount);
         model.addAttribute("post", post);
         model.addAttribute("comments", comments);
         return "posts/details";
@@ -100,14 +85,8 @@ public class PostController {
     @GetMapping("/write")
     public String writePost(Model model, HttpServletRequest request, Pageable pageable) {
 
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute("userName") != null) {
-            Object loginUserName = session.getAttribute("userName");
-            model.addAttribute("loginUserName", loginUserName);
-
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
-            model.addAttribute("alarms", alarms);
-        }
+        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        showLoginUserNameAndAlarm(request, model, pageable);
 
         return "posts/write";
     }
@@ -120,15 +99,8 @@ public class PostController {
         PostDetailDto post = postService.getPostById(postId);
         model.addAttribute("post", post);
 
-
-        HttpSession session = request.getSession(true);
-        if (session.getAttribute("userName") != null) {
-            Object loginUserName = session.getAttribute("userName");
-            model.addAttribute("loginUserName", loginUserName);
-
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
-            model.addAttribute("alarms", alarms);
-        }
+        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        showLoginUserNameAndAlarm(request, model, pageable);
 
         return "posts/modify";
     }
@@ -142,14 +114,8 @@ public class PostController {
 
         HttpSession session = request.getSession(true);
 
-        if (session.getAttribute("userName") != null) {
-            Object loginUserName = session.getAttribute("userName");
-            model.addAttribute("loginUserName", loginUserName);
-
-
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
-            model.addAttribute("alarms", alarms);
-        }
+        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        showLoginUserNameAndAlarm(request, model, pageable);
 
         if (session.getAttribute("userName") != null) {
             Object loginUserName = session.getAttribute("userName");
@@ -163,5 +129,20 @@ public class PostController {
         return "posts/myPage";
     }
 
+    /**
+     * 로그인 시, 세션에 로그인 회원명, 알람 표시
+     */
 
+    public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model, Pageable pageable) {
+        HttpSession session = request.getSession(true);
+
+        if (session.getAttribute("userName") != null) {
+            Object loginUserName = session.getAttribute("userName");
+            model.addAttribute("loginUserName", loginUserName);
+
+
+            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            model.addAttribute("alarms", alarms);
+        }
+    }
 }

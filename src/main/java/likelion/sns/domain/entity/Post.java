@@ -34,6 +34,10 @@ public class Post extends BaseEntity{
     @OneToMany(mappedBy = "post")
     List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post")
+    List<Like> likes = new ArrayList<>();
+
+
     /**
      * 정적 팩토리 메서드 용 생성자
      */

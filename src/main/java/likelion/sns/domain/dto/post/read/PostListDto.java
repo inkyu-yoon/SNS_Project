@@ -9,9 +9,8 @@ import lombok.ToString;
 import java.text.SimpleDateFormat;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@ToString(of = {"id", "title", "body", "userName", "createdAt", "lastModifiedAt"})
+@ToString(of = {"id", "title", "body", "userName", "createdAt", "lastModifiedAt","likeNum","commentNum"})
 public class PostListDto {
     private Long id;
     private String title;
@@ -19,8 +18,7 @@ public class PostListDto {
     private String userName;
     private String createdAt;
     private String lastModifiedAt;
-    private Long likeNum;
-
+    private int likeNum;
     private int commentNum;
     public PostListDto(Post post) {
         this.id = post.getId();
@@ -36,5 +34,6 @@ public class PostListDto {
             this.lastModifiedAt = sdf.format(post.getModifiedAt());
         }
         this.commentNum = post.getComments().size();
+        this.likeNum = post.getLikes().size();
     }
 }

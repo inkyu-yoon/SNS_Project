@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 
 @AllArgsConstructor
 @Getter
-@ToString(of={"id","title","body","userName","createdAt","lastModifiedAt"})
+@ToString(of={"id","title","body","userName","createdAt","lastModifiedAt","likeNum"})
 public class PostDetailDto {
     private Long id;
     private String title;
@@ -19,6 +19,8 @@ public class PostDetailDto {
     private String userName;
     private String createdAt;
     private String lastModifiedAt;
+
+    private int likeNum;
 
     @JsonIgnore
     private String isModified;
@@ -38,5 +40,6 @@ public class PostDetailDto {
         if (!createdAt.equals(lastModifiedAt)) {
             this.isModified = "(수정됨)";
         }
+        this.likeNum = post.getLikes().size();
     }
 }

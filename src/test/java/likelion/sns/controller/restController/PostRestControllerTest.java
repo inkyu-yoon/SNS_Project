@@ -98,8 +98,8 @@ class PostRestControllerTest {
 
             //일단 리스트에 담는다.
             List<PostListDto> posts = new ArrayList<>();
-            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(),0L,0);
-            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(),0L,0);
+            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(),0,0);
+            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(),0,0);
             posts.add(postListDtoOld);
             posts.add(postListDtoNew);
 
@@ -136,7 +136,7 @@ class PostRestControllerTest {
         void postDetailSuccess() throws Exception {
 
             Long id = 1L;
-            PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33", null);
+            PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33",0, null);
 
             given(postService.getPostById(any())).willReturn(post);
 

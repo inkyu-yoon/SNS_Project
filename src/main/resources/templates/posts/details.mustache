@@ -40,7 +40,7 @@
                         style="width:60px;height:50px;font-size: 20px">❤
                 </button>
                 <button type="button" class="btn btn-secondary btn-lg"
-                        style="width:60px;height:50px;font-size: 20px">{{likesCount}}
+                        style="width:60px;height:50px;font-size: 20px">{{likeNum}}
                 </button>
             </form>
         </div>
@@ -116,10 +116,27 @@
 
                     <div>{{comment}}</div>
 
+                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
+                    <a type="button" class="comment-reply-btn" data-toggle="collapse"
+                       data-target=".multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글</a>
+                    </small>
+
+                    {{! 댓댓글}}
+                    <form class="collapse multi-collapse-reply-{{id}}">
+                        <div class="form-group">
+                            <textarea class="form-control" id="comment-reply-content" rows="1" placeholder="댓글을 입력하세요."></textarea>
+                        </div>
+                        <input type="hidden" id="comment-id" value="{{id}}">
+                        <input type="hidden" id="post-id" value="{{postId}}">
+                        <div align="right">
+                            <button type="button" class="btn btn-info" id="comment-reply-btn">댓글 입력</button>
+                        </div>
+                    </form>
+
                     <form class="collapse multi-collapse-{{id}}">
                         <div class="form-group">
                             {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-content 내용 전달 }}
-                            <textarea class="form-control" id="comment-content" rows="3">{{comment}}</textarea>
+                            <textarea class="form-control" id="comment-content" rows="1">{{comment}}</textarea>
                         </div>
                         {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}
                         <input type="hidden" id="comment-id" value="{{id}}">
@@ -130,6 +147,7 @@
                             <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료</button>
                         </div>
                     </form>
+
                 </li>
             {{/comments}}
         </ul>
