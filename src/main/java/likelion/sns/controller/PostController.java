@@ -37,8 +37,19 @@ public class PostController {
      * 게시글 리스트 (페이지)
      **/
     @GetMapping("")
-    public String searchList(Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
+    public String searchList(@RequestParam(required = false) String keyword, @RequestParam(required = false) String condition, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
+        log.info("검색 조건 : {}", condition);
         Page<PostListDto> posts = postService.getPostList(pageable);
+
+        if (condition != null) {
+            if(condition.equals("title")){
+                posts = postService.getPostsByTitle(keyword, pageable);
+            } else if (condition.equals("userName")) {
+                posts = postService.getPostsByUserName(keyword, pageable);
+            }
+        }
+        log.info("키워드:{}", keyword);
+
 
         HttpSession session = request.getSession(true);
         if (session.getAttribute("userName") != null) {
@@ -48,6 +59,9 @@ public class PostController {
             Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
             model.addAttribute("alarms", alarms);
         }
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("condition", condition);
         model.addAttribute("posts", posts);
         model.addAttribute("previous", pageable.previousOrFirst().getPageNumber());
         model.addAttribute("next", pageable.next().getPageNumber());

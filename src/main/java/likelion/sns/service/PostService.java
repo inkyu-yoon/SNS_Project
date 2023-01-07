@@ -144,6 +144,39 @@ public class PostService {
         return posts;
     }
 
+    /**
+     * 게시글 리스트 조회 (제목으로 검색)
+     */
+    public Page<PostListDto> getPostsByTitle(String title, Pageable pageable) throws SQLException {
+        Page<PostListDto> posts = postRepository.findByTitleContainingAndDeletedAtIsNullOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
+
+        for (PostListDto postListDto : posts) {
+            postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
+        }
+
+        return posts;
+    }
+
+    /**
+     * 게시글 리스트 조회 (회원명 으로 검색)
+     */
+    public Page<PostListDto> getPostsByUserName(String userName, Pageable pageable) throws SQLException {
+        User requestUser = userRepository.findByUserName(userName).orElse(null);
+
+        Page<PostListDto> posts = null;
+        if (requestUser != null) {
+            Long requestUserId = requestUser.getId();
+            log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
+
+            posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+
+            for (PostListDto postListDto : posts) {
+                postListDto.setLikeNum(likeRepository.countByPost_Id(postListDto.getId()));
+            }
+        }
+
+        return posts;
+    }
 
     /*
     아래 메서드는 유효성 검사 및 중복 메서드 정리

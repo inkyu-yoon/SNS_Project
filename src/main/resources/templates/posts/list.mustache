@@ -2,7 +2,7 @@
 
 
 <div class="container">
-    <table class="table table-striped table-hover" style="table-layout: fixed;width: 100%;border-color: #78C2AD" border="1">
+    <table class="table table-striped table-hover" style="border-color: #78C2AD" border="1">
         <thead class="table-primary">
         <tr>
             <th scope="col" style="width: 5%;text-align: center">Id</th>
@@ -28,10 +28,22 @@
     </table>
 </div>
 
-    <ul class="pagination justify-content-center">
-        <li class="page-item"><a class="page-link" href="?page={{previous}}" >← </a> </li>
-        <li class="page-item"><a class="page-link" href="?page={{next}}">→ </a> </li>
-    </ul>
+<ul class="pagination justify-content-center">
+    {{#condition}}
+
+        {{#keyword}}
+            <li class="page-item"><a class="page-link" href="?condition={{condition}}&keyword={{keyword}}&page={{previous}}">Previous</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="?condition={{condition}}&keyword={{keyword}}&page={{next}}">Next</a></li>
+        {{/keyword}}
+    {{/condition}}
+    {{^condition}}
+        {{^keyword}}
+            <li class="page-item"><a class="page-link" href="?page={{previous}}">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{next}}">Next</a></li>
+        {{/keyword}}
+    {{/condition}}
+</ul>
 
 
 <!--게시글 작성 버튼 -->
@@ -48,16 +60,20 @@
 <!--검색-->
 
 
-<form class="form-inline w-100 justify-content-center ">
+<form class="form-inline w-100 justify-content-center " action ="/posts" method = "get">
 
     <div class="selectBox">
-        <select name="searchCondition" class="select">
-            <option value="titleCon">제목 검색</option>
-            <option value="userNameCon">회원명 검색</option>
+        <select name="condition" class="select">
+            <option value="title">제목 검색</option>
+            <option value="userName">회원명 검색</option>
         </select>
     </div>
-
-    <input class="form-control me-sm-2" type="search" placeholder="검색">
+    {{#keyword}}
+        <input class="form-control me-sm-2" type="text" name="keyword" value="{{keyword}}" placeholder="검색">
+    {{/keyword}}
+    {{^keyword}}
+        <input class="form-control me-sm-2"  name="keyword" type="search" placeholder="검색">
+    {{/keyword}}
     <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
 </form>
 
