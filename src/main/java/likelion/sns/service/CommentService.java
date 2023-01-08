@@ -93,7 +93,8 @@ public class CommentService {
         String commentBody = requestDto.getReplyComment();
         log.info("댓글 내용 = {}", commentBody);
 
-        Comment parentComment = commentRepository.findById(parentCommentId).get();
+        // 댓글 유효성 검사
+        Comment parentComment = commentValid(parentCommentId);
 
         // 댓글 저장
         Comment comment = Comment.createReplyComment(commentBody, requestUser, foundPost, parentComment);

@@ -8,6 +8,8 @@ import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteRequestDto;
+import likelion.sns.domain.dto.comment.write.ReplyCommentWriteResponseDto;
 import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.CommentService;
@@ -95,8 +97,6 @@ class CommentRestControllerTest {
     }
 
 
-
-
     /**
      * 댓글 작성 테스트
      */
@@ -182,6 +182,125 @@ class CommentRestControllerTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("해당 포스트가 없습니다."));
         }
+    }
+
+    /**
+     * 댓글의 댓글 작성 테스트
+     */
+    @Nested
+    @DisplayName("댓글의 댓글 작성 테스트")
+    class ReplyCommentWriteTest {
+
+        ReplyCommentWriteRequestDto replyCommentWriteTest = new ReplyCommentWriteRequestDto("reply comment");
+        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String content = gson.toJson(replyCommentWriteTest);
+        Long parentCommentId = 1L;
+
+        /**
+         * 댓글의 댓글 작성 성공 테스트
+         */
+        @Test
+        @DisplayName("댓글의 댓글 작성 성공 테스트")
+        public void replyCommentWriteSuccess() throws Exception {
+
+            when(commentService.writeReplyComment(any(), any(), any(), any()))
+                    .thenReturn(new ReplyCommentWriteResponseDto(1L, "comment", "userName", postId, "time", parentCommentId));
+
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/comments/" + parentCommentId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.id").value(1L))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.comment").value("comment"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.userName").value("userName"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.postId").value(postId))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.createdAt").value("time"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.parentId").value(parentCommentId));
+
+        }
+
+        /**
+         * 댓글의 댓글 작성 실패 (로그인 하지 않은 경우)
+         */
+        @Test
+        @DisplayName("댓글의 댓글 작성 실패 (로그인 하지 않은 경우)")
+        public void replyCommentWriteError1() throws Exception {
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/comments/" + parentCommentId)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("토큰이 존재하지 않습니다."));
+        }
+
+        /**
+         * 댓글의 댓글 작성 실패 (게시물이 존재하지 않는 경우)
+         */
+        @Test
+        @DisplayName("댓글의 댓글 작성 실패 (게시물이 존재하지 않는 경우)")
+        public void replyCommentWriteError2() throws Exception {
+
+            when(commentService.writeReplyComment(any(), any(), any(),any()))
+                    .thenThrow(new SNSAppException(ErrorCode.POST_NOT_FOUND));
+
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/comments/" + parentCommentId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNotFound())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("POST_NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("해당 포스트가 없습니다."));
+        }
+
+        /**
+         * 댓글의 댓글 작성 실패 (댓글의 댓글을 달 부모 댓글이 없는 경우)
+         */
+        @Test
+        @DisplayName("댓글의 댓글 작성 실패 (댓글의 댓글을 달 부모 댓글이 없는 경우)")
+        public void replyCommentWriteError3() throws Exception {
+
+            when(commentService.writeReplyComment(any(), any(), any(),any()))
+                    .thenThrow(new SNSAppException(ErrorCode.COMMENT_NOT_FOUND));
+
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/comments/" + parentCommentId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNotFound())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("COMMENT_NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("해당 댓글이 없습니다."));
+        }
+
+
+
     }
 
     /**
@@ -326,7 +445,7 @@ class CommentRestControllerTest {
     }
 
 
-     /**
+    /**
      * 댓글 삭제 테스트
      */
     @Nested
@@ -442,7 +561,6 @@ class CommentRestControllerTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("DB 에러"));
         }
     }
-
 
 
 }

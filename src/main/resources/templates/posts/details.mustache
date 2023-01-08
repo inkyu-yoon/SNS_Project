@@ -106,7 +106,6 @@
                     {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
                     <a type="button" class="comment-edit-btn" data-toggle="collapse"
                        data-target=".multi-collapse-{{id}}" style="font-size: xx-small;">수정</a>
-                    </small>
 
                     {{! 댓글 삭제 버튼!! 클릭 시 commentDelete 함수에 위 해당 댓글의 id와 postId를 전달한다.}}
                     <a class="accordion-button collapsed" type="button" style="font-size: xx-small;color: darkred;"
@@ -119,15 +118,16 @@
                     {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
 
                     <a type="button" class="comment-reply-btn" data-toggle="collapse"
-                       data-target=".multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글 {{replysSize}} 개</a>
-                    </small>
+                       data-target="#multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글 {{replysSize}}
+                        개</a>
+
 
                     {{! 대댓글}}
                     <div class="collapse-group">
-                    <form class="collapse multi-collapse-reply-{{id}}">
-                        <ul class="list-group-flush">
-                            {{#replys}}
-                                <li id="reply-comments-{{id}}" class="list-group-item">
+                        <form class="collapse" id="multi-collapse-reply-{{id}}">
+                            <ul class="list-group-flush">
+                                {{#replys}}
+                                    <li id="reply-comments-{{id}}" class="list-group-item">
                 <span>
                     <span style="font-size: 15px;font-weight: bold;">{{userName}}</span>
                     {{^isModified}}
@@ -139,59 +139,47 @@
 
                         </span>
 
-<!--                                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}-->
-<!--                                    <a type="button" class="comment-reply-edit-btn" data-toggle="collapse"-->
-<!--                                       data-target=".multi-collapse-reply-edit-{{id}}" style="font-size: xx-small;">수정</a>-->
-<!--                                    </small>-->
+                                        <a type="button" class="comment-reply-edit-btn" data-toggle="collapse"
+                                           data-target="#multi-collapse-reply-edit-{{id}}" style="font-size: xx-small;">수정</a>
 
-                                    {{! 댓글 삭제 버튼!! 클릭 시 commentDelete 함수에 위 해당 댓글의 id와 postId를 전달한다.}}
-                                    <a class="accordion-button collapsed" type="button"
-                                       style="font-size: xx-small;color: darkred;"
-                                       onclick="main.commentDelete({{postId}},{{id}})">
-                                        삭제
-                                    </a>
+                                        <a class="accordion-button collapsed" type="button"
+                                           style="font-size: xx-small;color: darkred;"
+                                           onclick="main.commentDelete({{postId}},{{id}})">
+                                            삭제
+                                        </a>
 
-                                    <div>{{comment}}</div>
-
-<!--                                    <form class="collapse multi-collapse-reply-edit-{{id}}">-->
-<!--                                        <div class="form-group">-->
-<!--                                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-content 내용 전달 }}-->
-<!--                                            <textarea class="form-control" id="comment-content"-->
-<!--                                                      rows="1" class = "collapse">{{comment}}</textarea>-->
-<!--                                        </div>-->
-<!--                                        {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}-->
-<!--                                        <input type="hidden" id="comment-id" value="{{id}}">-->
-<!--                                        {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}-->
-<!--                                        <input type="hidden" id="post-id" value="{{postId}}">-->
-<!--                                        <div align="right">-->
-<!--                                            {{! 댓글 수정 버튼!! 클릭 시 위 id가 comment-content 인 textarea 내용을 form 형태로 전달하여 수정}}-->
-<!--                                            <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료-->
-<!--                                            </button>-->
-<!--                                        </div>-->
-<!--                                    </form>-->
-
-                                </li>
-                            {{/replys}}
-                        </ul>
+                                        <div>{{comment}}</div>
+                                        <div class="collapse" id="multi-collapse-reply-edit-{{id}}">
+                                            <form>
+                                                <textarea class="form-control" id="comment-content"
+                                                          rows="1">{{comment}}</textarea>
+                                                <input type="hidden" id="comment-id" value="{{id}}">
+                                                <input type="hidden" id="post-id" value="{{postId}}">
+                                                <div align="right">
+                                                    <button type="button" class="btn btn-warning" id="comment-update-btn">
+                                                        수정 완료
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {{/replys}}
+                            </ul>
 
 
-                        <form class="collapse multi-collapse-reply-{{id}}">
-                            <div class="mb-3">
-                                {{! 댓글 등록 버튼!! 클릭 시, id 가 input-write-comment 내용 전달 }}
-                                <textarea class="form-control" id="comment-reply-content" rows="1"></textarea>
-                            </div>
-                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}
-                            <input type="hidden" id="comment-id" value="{{id}}">
-                            {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}
-                            <input type="hidden" id="post-id" value="{{postId}}">
+                            <form class="collapse" id="multi-collapse-reply-{{id}}">
+                                <div class="mb-3">
+                                    <textarea class="form-control" id="comment-reply-content" rows="1"></textarea>
+                                </div>
+                                <input type="hidden" id="comment-id" value="{{id}}">
+                                <input type="hidden" id="post-id" value="{{postId}}">
                                 <div align="right">
-                                    {{! 댓글 등록 버튼!! 클릭 시 commentWrite 함수 파라미터에 post id를 전달하고 함수 실행}}
                                     <button type="button" class="btn btn-info" id="comment-reply-btn">댓글 등록</button>
 
                                     </button>
                                 </div>
+                            </form>
                         </form>
-                    </form>
                     </div>
                     {{! 대댓글 END}}
 
@@ -209,7 +197,7 @@
                         <input type="hidden" id="post-id" value="{{postId}}">
                         <div align="right">
                             {{! 댓글 수정 버튼!! 클릭 시 위 id가 comment-content 인 textarea 내용을 form 형태로 전달하여 수정}}
-                            <button type="button" class="btn btn-info" id="comment-update-btn">수정 완료</button>
+                            <button type="button" class="btn btn-warning" id="comment-update-btn">수정 완료</button>
                         </div>
                     </form>
 

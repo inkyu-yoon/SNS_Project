@@ -60,19 +60,40 @@
 <!--검색-->
 
 
-<form class="form-inline w-100 justify-content-center " action ="/posts" method = "get">
+<form class="form-inline w-100 justify-content-center " action="/posts" method="get">
+    {{#condition}}
+        {{#titleCon}}
+            <div class="selectBox">
+                <select name="condition" class="select">
+                    <option value="제목 검색">제목 검색</option>
+                    <option value="회원명 검색">회원명 검색</option>
+                </select>
+            </div>
+        {{/titleCon}}
+        {{#userNameCon}}
+            <div class="selectBox">
+                <select name="condition" class="select">
+                    <option value="회원명 검색">회원명 검색</option>
+                    <option value="제목 검색">제목 검색</option>
+                </select>
+            </div>
+        {{/userNameCon}}
+    {{/condition}}
 
-    <div class="selectBox">
-        <select name="condition" class="select">
-            <option value="title">제목 검색</option>
-            <option value="userName">회원명 검색</option>
-        </select>
-    </div>
+    {{^condition}}
+        <div class="selectBox">
+            <select name="condition" class="select">
+                <option value="제목 검색">제목 검색</option>
+                <option value="회원명 검색">회원명 검색</option>
+            </select>
+        </div>
+    {{/condition}}
+
     {{#keyword}}
         <input class="form-control me-sm-2" type="text" name="keyword" value="{{keyword}}" placeholder="검색">
     {{/keyword}}
     {{^keyword}}
-        <input class="form-control me-sm-2"  name="keyword" type="search" placeholder="검색">
+        <input class="form-control me-sm-2" name="keyword" type="search" placeholder="검색">
     {{/keyword}}
     <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
 </form>

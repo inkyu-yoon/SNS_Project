@@ -10,12 +10,16 @@
         <label class="form-label">게시글 내용</label>
         <textarea class="form-control" rows="10" name="body" id="input-body" placeholder="내용을 입력하세요"></textarea>
     </div>
+    <div align="center">
 
-    <div class="d-grid gap-2 col-6 mx-auto" align="center">
         {{! 게시글 등록 버튼!! 클릭 시 postCreate 함수 실행}}
-        <button type="button" class="btn btn-primary" id="post-write-btn" onclick="post.postCreate()">게시글 작성</button>
+        <button type="button" class="btn btn-primary" id="post-write-btn" onclick="post.postCreate()"
+                style="width:120px;height:40px;font-size: 15px">게시글 작성
+        </button>
+        <button type="button" class="btn btn-danger btn-lg" onclick="location.href = '/posts' "
+                style="width:120px;height:40px;font-size: 15px">작성 취소
+        </button>
     </div>
-
 </form>
 
 <Script>
