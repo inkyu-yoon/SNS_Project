@@ -18,6 +18,7 @@ public enum ErrorCode {
     USER_NOT_MATCH(HttpStatus.UNAUTHORIZED, "작성자와 요청자가 일치하지 않습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 포스트가 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 댓글이 없습니다."),
+    ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 알림이 없습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB 에러"),
     BAD_REQUEST(HttpStatus.FORBIDDEN, "권한은 ADMIN 또는 USER 로 변경할 수 있습니다." ),
     BLANK_NOT_ALLOWED(HttpStatus.FORBIDDEN, "공백 또는 null 을 입력할 수 없습니다." ),

@@ -48,7 +48,7 @@ public class LikeService {
         likeRepository.save(Like.createLike(requestUser,foundPost));
 
 
-        // 좋아요 입력 후 , 유효한 알람이라면 알림 엔티티에 데이터 저장
+        // 좋아요 입력 후 , 유효한 알림이라면 알림 엔티티에 데이터 저장
         saveAlarm(foundPost, requestUser);
 
     }

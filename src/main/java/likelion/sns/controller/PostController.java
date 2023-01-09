@@ -140,7 +140,7 @@ public class PostController {
     }
 
     /**
-     * 로그인 시, 세션에 로그인 회원명, 알람 표시
+     * 로그인 시, 세션에 로그인 회원명, 알림 표시
      */
 
     public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model, Pageable pageable) {

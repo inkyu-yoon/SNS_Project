@@ -14,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +34,7 @@ public class AlarmService {
     private final PostRepository postRepository;
 
     /**
-     * 알람 목록 확인
+     * 알림 목록 확인
      */
     public Page<AlarmListDto> getAlarms(String requestUserName, Pageable pageable) {
         //user 유효성 검사하고 찾아오기
@@ -43,7 +46,7 @@ public class AlarmService {
     }
 
     /**
-     * 알람 목록 확인(상세 아이디, 게시글 제목, 알람 형태)
+     * 알림 목록 확인(상세 아이디, 게시글 제목, 알림 형태)
      */
     public Page<AlarmListDetailsDto> getDetailAlarms(String requestUserName, Pageable pageable) {
         //user 유효성 검사하고 찾아오기
@@ -67,6 +70,30 @@ public class AlarmService {
         return new PageImpl<>(alarmsDto);
     }
 
+
+    /**
+     * 알림 삭제 (헤더에서 확인 체크시)
+     */
+    @Transactional
+    public void deleteAlarm(String requestUserName, Long alarmId) {
+
+        userValid(requestUserName);
+
+        Alarm foundAlarm = alarmRepository.findById(alarmId)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.ALARM_NOT_FOUND));
+
+        alarmRepository.delete(foundAlarm);
+
+    }
+
+    /**
+     * 알림 삭제 (게시글이 soft delete되면, 해당 포스트에 대한 알림을 모두 삭제)
+     */
+    @Transactional
+    public void deleteAlarmWithPost(Long postId) {
+        alarmRepository.deleteAlarmWithPost(postId);
+    }
+
     /*
     아래 메서드는 유효성 검사 및 중복 메서드 정리
      */
@@ -78,4 +105,6 @@ public class AlarmService {
         return userRepository.findByUserName(userName)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
     }
+
+
 }

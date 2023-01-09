@@ -71,10 +71,10 @@ public class CommentRestController {
     }
 
     /**
-     * 해당 postId에 댓글의 대댓글 작성
+     * 해당 postId에 댓글의 댓글 작성
      */
     @PostMapping("/{postId}/comments/{commentId}")
-    @ApiOperation(value = "Comment 작성", notes = "Path variable에 해당하는 포스트에, 입력한 comment 내용을 저장")
+    @ApiOperation(value = "Reply Comment(댓글의 댓글) 작성", notes = "Path variable에 해당하는 포스트의 코멘트에, 입력한 replyComment 내용을 저장")
     public ResponseEntity write(@PathVariable(name = "postId") Long postId,@PathVariable(name = "commentId") Long parentCommentId, @Validated @RequestBody ReplyCommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
 
         //바인딩 에러 처리

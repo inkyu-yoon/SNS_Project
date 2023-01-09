@@ -60,20 +60,20 @@ class AlarmRestControllerTest {
     }
 
     /**
-     * 알람 테스트
+     * 알림 테스트
      */
 
     @Nested
-    @DisplayName("알람 테스트")
+    @DisplayName("알림 테스트")
     class AlarmTest {
 
         String token = JwtTokenUtil.createToken("userName", secretKey);
 
         /**
-         * 알람 목록 조회 성공 테스트
+         * 알림 목록 조회 성공 테스트
          */
         @Test
-        @DisplayName("알람 목록 조회 성공 테스트")
+        @DisplayName("알림 목록 조회 성공 테스트")
         public void alarmReadSuccess() throws Exception {
 
             mockMvc.perform(get("/api/v1/alarms")
@@ -85,10 +85,10 @@ class AlarmRestControllerTest {
         }
 
         /**
-         * 알람 목록 조회 에러 테스트 (로그인 하지 않은 경우)
+         * 알림 목록 조회 에러 테스트 (로그인 하지 않은 경우)
          */
         @Test
-        @DisplayName("알람 목록 조회 에러 테스트 (로그인 하지 않은 경우)")
+        @DisplayName("알림 목록 조회 에러 테스트 (로그인 하지 않은 경우)")
         public void alarmReadError() throws Exception {
 
             mockMvc.perform(get("/api/v1/alarms"))

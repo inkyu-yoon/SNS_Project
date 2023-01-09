@@ -11,6 +11,7 @@ import likelion.sns.domain.dto.post.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
+import likelion.sns.service.AlarmService;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import java.sql.SQLException;
 public class PostRestController {
 
     private final PostService postService;
+    private final AlarmService alarmService;
 
     /**
      * 포스트 리스트 조회 (최신 글 순서로 정렬)
@@ -116,6 +118,8 @@ public class PostRestController {
         postService.deletePost(postId, requestUserName);
         PostDeleteResponseDto responseDto = new PostDeleteResponseDto(postId);
         log.info("{}", responseDto);
+
+        alarmService.deleteAlarmWithPost(postId);
 
         return Response.success(responseDto);
     }

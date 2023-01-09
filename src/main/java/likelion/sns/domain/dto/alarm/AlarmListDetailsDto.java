@@ -10,17 +10,22 @@ import java.text.SimpleDateFormat;
 
 @Getter
 @AllArgsConstructor
-@ToString(of = {"fromUserName", "PostName", "text"})
+@ToString(of = {"alarmId", "fromUserName", "PostName", "postId", "text"})
 public class AlarmListDetailsDto {
+
+    private Long alarmId;
     private String fromUserName;
     private String PostName;
+    private Long postId;
     private String text;
 
     private String createdAt;
 
     public AlarmListDetailsDto(Alarm alarm, String fromUserName, String PostName) {
+        this.alarmId = alarm.getId();
         this.fromUserName = fromUserName;
         this.PostName = PostName;
+        this.postId = alarm.getTargetId();
 
         if (alarm.getAlarmType().equals(AlarmType.NEW_LIKE_ON_POST)) {
             this.text = "좋아요를 눌렀습니다.";
