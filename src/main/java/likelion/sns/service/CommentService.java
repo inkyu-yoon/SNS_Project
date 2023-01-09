@@ -42,6 +42,7 @@ public class CommentService {
     }
 
     /**
+     * UI 용 메서드
      * 댓글 리스트 조회 (특정 포스트의 댓글만)
      */
     public Page<CommentListDto> getCommentListAsc(Long postId, Pageable pageable) throws SQLException {
@@ -66,11 +67,8 @@ public class CommentService {
         // post 유효성 검사하고 찾아오기
         Post foundPost = postValid(postId);
 
-        String commentBody = requestDto.getComment();
-        log.info("댓글 내용 = {}", commentBody);
-
         // 댓글 저장
-        Comment comment = Comment.createComment(commentBody, requestUser, foundPost);
+        Comment comment = Comment.createComment(requestDto.getComment(), requestUser, foundPost);
         commentRepository.save(comment);
 
         // 댓글 저장 시 알림 저장
@@ -90,14 +88,11 @@ public class CommentService {
         // post 유효성 검사하고 찾아오기
         Post foundPost = postValid(postId);
 
-        String commentBody = requestDto.getReplyComment();
-        log.info("댓글 내용 = {}", commentBody);
-
         // 댓글 유효성 검사
         Comment parentComment = commentValid(parentCommentId);
 
         // 댓글 저장
-        Comment comment = Comment.createReplyComment(commentBody, requestUser, foundPost, parentComment);
+        Comment comment = Comment.createReplyComment(requestDto.getReplyComment(), requestUser, foundPost, parentComment);
         commentRepository.save(comment);
 
         // 댓글 저장 시 알림 저장
@@ -121,28 +116,21 @@ public class CommentService {
         // 댓글 유효성 검사
         Comment foundComment = commentValid(commentId);
 
-
-        User foundUser = foundComment.getUser();
-
         UserRole requestUserRole = requestUser.getRole();
-        String author = foundUser.getUserName();
+        String author = foundComment.getUser().getUserName();
         log.info("댓글 수정 요청자 ROLE = {} 댓글 작성자 userName = {}", requestUserRole, author);
 
         // 작성자와 요청자 유효성 검사
         checkAuth(requestUserName, author, requestUserRole);
 
-        String newComment = requestDto.getComment();
-        log.info("댓글 수정 요청 내용 = {}", newComment);
-
-        foundComment.modifyComment(newComment);
+        foundComment.modifyComment(requestDto.getComment());
     }
 
     /**
      * 댓글 단건 조회 (수정 적용 후, 데이터를 가져오기 위해서 만든 메서드)
      */
     public CommentModifyResponseDto getOneComment(Long postId, Long commentId, String requestUserName) {
-        Comment foundComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.COMMENT_NOT_FOUND));
+        Comment foundComment = commentValid(commentId);
         return new CommentModifyResponseDto(foundComment, requestUserName, postId);
     }
 
@@ -160,11 +148,9 @@ public class CommentService {
         // 댓글 유효성 검사
         Comment foundComment = commentValid(commentId);
 
-        User foundUser = foundComment.getUser();
-
         UserRole requestUserRole = requestUser.getRole();
-        String author = foundUser.getUserName();
-        log.info("댓글 수정 요청자 ROLE = {} 댓글 작성자 userName = {}", requestUserRole, author);
+        String author = foundComment.getUser().getUserName();
+        log.info("댓글 삭제 요청자 ROLE = {} 댓글 작성자 userName = {}", requestUserRole, author);
 
         // 작성자와 요청자 유효성 검사
         checkAuth(requestUserName, author, requestUserRole);

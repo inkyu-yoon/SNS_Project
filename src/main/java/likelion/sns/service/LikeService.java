@@ -39,30 +39,23 @@ public class LikeService {
         // post 유효성 검사하고 찾아오기
         Post foundPost = postValid(postId);
 
-        Long requestUserId = requestUser.getId();
-        log.info("좋아요를 누른 회원 id = {} , 게시글 id = {} ", requestUserId, postId);
-
         // 이미 좋아요를 누른 경우 2번 입력할 수 없으므로 예외처리
-        likeValid(requestUserId,postId);
+        likeValid(requestUser.getId(), postId);
 
-        likeRepository.save(Like.createLike(requestUser,foundPost));
-
+        likeRepository.save(Like.createLike(requestUser, foundPost));
 
         // 좋아요 입력 후 , 유효한 알림이라면 알림 엔티티에 데이터 저장
         saveAlarm(foundPost, requestUser);
-
     }
 
     /**
      * 좋아요 개수
      */
     public Long getLikesCount(Long postId) {
-
         // 게시글 유효성 검사
         postValid(postId);
 
         Long totalCount = likeRepository.countByPost_Id(postId);
-        log.info("좋아요 총 갯수 : {} ", totalCount);
 
         return totalCount;
     }
@@ -89,7 +82,7 @@ public class LikeService {
                 .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
 
         // deletedAt 에 데이터가 채워져서 삭제 처리가 된 경우
-        if(foundPost.getDeletedAt() != null){
+        if (foundPost.getDeletedAt() != null) {
             throw new SNSAppException(ErrorCode.POST_NOT_FOUND);
         }
 
@@ -99,7 +92,7 @@ public class LikeService {
     /**
      * 좋아요를 이미 누른 회원인 경우 예외처리
      */
-    public void likeValid(Long requestUserId , Long postId) {
+    public void likeValid(Long requestUserId, Long postId) {
         likeRepository.findByUser_IdAndPost_Id(requestUserId, postId)
                 .ifPresent((like) -> {
                     throw new SNSAppException(ErrorCode.FORBIDDEN_ADD_LIKE);
@@ -109,7 +102,7 @@ public class LikeService {
     /**
      * 내가 작성하지 않은 게시글에 좋아요 입력 시 알림 저장
      */
-    public void saveAlarm(Post foundPost,User requestUser) {
+    public void saveAlarm(Post foundPost, User requestUser) {
         Long targetId = foundPost.getId();
 
         // 게시글을 작성한 user

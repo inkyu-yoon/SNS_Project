@@ -12,6 +12,7 @@ import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
 import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
+import likelion.sns.service.AlarmService;
 import likelion.sns.service.PostService;
 import likelion.sns.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,12 +53,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 class PostRestControllerTest {
 
-    @Autowired MockMvc mockMvc;
-    @Autowired WebApplicationContext wac;
-    @Autowired Gson gson;
-    @MockBean PostService postService;
-    @MockBean UserService userService;
-    @Value("${jwt.token.secret}") String secretKey;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    WebApplicationContext wac;
+    @Autowired
+    Gson gson;
+    @MockBean
+    PostService postService;
+    @MockBean
+    UserService userService;
+    @MockBean
+    AlarmService alarmService;
+    @Value("${jwt.token.secret}")
+    String secretKey;
 
     /**
      * SecurityConfig 로 설정한 Filter Chain 적용
@@ -98,8 +107,8 @@ class PostRestControllerTest {
 
             //일단 리스트에 담는다.
             List<PostListDto> posts = new ArrayList<>();
-            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(),0,0);
-            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(),0,0);
+            PostListDto postListDtoOld = new PostListDto(1L, "첫번째 게시글", "내용1", "윤인규", oldPost.toString(), oldPost.toString(), 0, 0);
+            PostListDto postListDtoNew = new PostListDto(2L, "두번째 게시글", "내용2", "윤인규", newPost.toString(), newPost.toString(), 0, 0);
             posts.add(postListDtoOld);
             posts.add(postListDtoNew);
 
@@ -136,7 +145,7 @@ class PostRestControllerTest {
         void postDetailSuccess() throws Exception {
 
             Long id = 1L;
-            PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33",0, null,null);
+            PostDetailDto post = new PostDetailDto(id, "title", "body", "userName", "2022-12-21 17:54:33", "2022-12-21 17:54:33", 0, null, null);
 
             given(postService.getPostById(any())).willReturn(post);
 
@@ -164,7 +173,7 @@ class PostRestControllerTest {
         String content = gson.toJson(postWriteRequestDto);
 
         /**
-         *  포스트 작성 성공 테스트
+         * 포스트 작성 성공 테스트
          */
         @Test
         @DisplayName("게시글 작성 테스트")
@@ -187,7 +196,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 작성 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
+         * 포스트 작성 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
          */
         @Test
         @DisplayName("포스트 작성 에러 (토큰이 Bearer 형식이 아닌 경우)")
@@ -206,7 +215,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 작성 에러 테스트 (토큰이 없이 요청하는 경우)
+         * 포스트 작성 에러 테스트 (토큰이 없이 요청하는 경우)
          */
         @Test
         @DisplayName("포스트 작성 에러 (토큰 없이 요청할 경우)")
@@ -233,7 +242,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 수정 테스트")
     class PostModifyTest {
 
-        PostModifyRequestDto PostModifyRequestDto = new PostModifyRequestDto("수정 제목","수정 내용");
+        PostModifyRequestDto PostModifyRequestDto = new PostModifyRequestDto("수정 제목", "수정 내용");
 
         String token = JwtTokenUtil.createToken("userName", secretKey);
 
@@ -263,7 +272,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 수정 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
+         * 포스트 수정 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
          */
 
         @Test
@@ -283,7 +292,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 수정 에러 테스트 (토큰이 없이 요청하는 경우)
+         * 포스트 수정 에러 테스트 (토큰이 없이 요청하는 경우)
          */
 
         @Test
@@ -302,7 +311,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 수정 에러 테스트 (토큰 검증은 통과했지만 수정요청자와 작성자 불일치)
+         * 포스트 수정 에러 테스트 (토큰 검증은 통과했지만 수정요청자와 작성자 불일치)
          */
 
         @Test
@@ -381,7 +390,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 삭제 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
+         * 포스트 삭제 에러 테스트 (토큰이 Bearer 형식이 아닌 경우)
          */
 
         @Test
@@ -400,7 +409,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 삭제 에러 테스트 (토큰이 없이 요청하는 경우)
+         * 포스트 삭제 에러 테스트 (토큰이 없이 요청하는 경우)
          */
 
         @Test
@@ -418,7 +427,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  포스트 삭제 에러 테스트 (토큰 검증은 통과했지만 삭제 요청자와 작성자 불일치)
+         * 포스트 삭제 에러 테스트 (토큰 검증은 통과했지만 삭제 요청자와 작성자 불일치)
          */
 
         @Test
@@ -492,7 +501,7 @@ class PostRestControllerTest {
         }
 
         /**
-         *  마이 피드 조회 실패 테스트, 로그인 하지 않은 경우
+         * 마이 피드 조회 실패 테스트, 로그인 하지 않은 경우
          */
         @Test
         @DisplayName("마이피드 실패 테스트 (로그인 하지 않은 경우 = 토큰 없이 요청하는 경우)")

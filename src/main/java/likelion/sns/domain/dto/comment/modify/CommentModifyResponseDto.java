@@ -1,6 +1,5 @@
 package likelion.sns.domain.dto.comment.modify;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import likelion.sns.domain.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -2,7 +2,6 @@ package likelion.sns.domain.dto.alarm;
 
 import likelion.sns.domain.entity.Alarm;
 import likelion.sns.domain.entity.AlarmType;
-import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;

@@ -6,7 +6,6 @@ import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.service.AlarmService;
 import likelion.sns.service.CommentService;
-import likelion.sns.service.LikeService;
 import likelion.sns.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +40,7 @@ public class PostController {
      **/
     @GetMapping("")
     public String searchList(@RequestParam(required = false) String keyword, @RequestParam(required = false) String condition, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
-        log.info("검색 조건 : {}", condition);
+        log.info("🔍검색 조건 : {} || 검색 키워드 : {}", condition, keyword);
         Page<PostListDto> posts = null;
 
 
@@ -54,9 +56,8 @@ public class PostController {
         } else {
             posts = postService.getPostList(pageable);
         }
-        log.info("키워드:{}", keyword);
 
-        // 로그인 시, 화면에 로그인 회원명, 알림 표시
+        // 로그인 시, 화면에 로그인 회원명, 알림 전달
         showLoginUserNameAndAlarm(request, model, pageable);
 
         model.addAttribute("keyword", keyword);
@@ -73,12 +74,14 @@ public class PostController {
     @GetMapping("/{postId}")
     public String showDetail(@PathVariable(name = "postId") Long postId, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
+
         Page<CommentListDto> comments = commentService.getCommentListAsc(postId, pageable);
+
+        //댓글에 대댓글 리스트 주입 + 개수 전달
         for (CommentListDto comment : comments) {
             List<CommentListDto> commentListDtos = commentService.getReplyCommentListAsc(postId, comment.getId(), pageable).toList();
             comment.setReplys(commentListDtos);
             comment.setReplysSize(commentListDtos.size());
-            log.info("{}{}",comment.getId(),commentListDtos.size());
         }
 
         // 로그인 시, 화면에 로그인 회원명, 알림 표시
@@ -107,11 +110,11 @@ public class PostController {
     @GetMapping("/modify/{postId}")
     public String modifyPost(@PathVariable(name = "postId") Long postId, Model model, HttpServletRequest request, Pageable pageable) throws SQLException {
         PostDetailDto post = postService.getPostById(postId);
-        model.addAttribute("post", post);
 
         // 로그인 시, 화면에 로그인 회원명, 알림 표시
         showLoginUserNameAndAlarm(request, model, pageable);
 
+        model.addAttribute("post", post);
         return "posts/modify";
     }
 
@@ -127,6 +130,7 @@ public class PostController {
         // 로그인 시, 화면에 로그인 회원명, 알림 표시
         showLoginUserNameAndAlarm(request, model, pageable);
 
+        // 특정 유저가 작성한 게시글만 list 에 담아서 전달
         if (session.getAttribute("userName") != null) {
             Object loginUserName = session.getAttribute("userName");
             Page<PostListDto> myPosts = postService.getMyPosts(loginUserName.toString(), pageable);
@@ -140,9 +144,10 @@ public class PostController {
     }
 
     /**
-     * 로그인 시, 세션에 로그인 회원명, 알림 표시
+     * 로그인 되어 있을 시, 상단 바에(nav bar)에 사용자 명과, 알람 목록 전달
+     * 로그인 여부는 세션에 회원명이 저장되어 있는지로 확인
+     * 서비스는 토큰 존재 여부, 만료 여부 등 유효성으로 체크
      */
-
     public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model, Pageable pageable) {
         HttpSession session = request.getSession(true);
 

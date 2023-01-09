@@ -1,8 +1,6 @@
 package likelion.sns.Exception;
 
 import com.google.gson.Gson;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
 import likelion.sns.domain.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +27,14 @@ public class ExceptionManager {
         log.error("DB 관련 에러가 발생하였습니다.");
         return ResponseEntity.status(ErrorCode.DATABASE_ERROR.getHttpStatus())
                 .body(Response.error(new ErrorDto(e)));
+    }
+
+    /**
+     * requestDto의 값이 null이나 공백인 값으로 요청할 시, BLANK_NOT_ALLOWED 에러 response 반환
+     */
+    public static ResponseEntity ifNullAndBlank() {
+        ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+        return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
     }
 
     /**

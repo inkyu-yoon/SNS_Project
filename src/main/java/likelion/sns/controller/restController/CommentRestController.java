@@ -2,8 +2,7 @@ package likelion.sns.controller.restController;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import likelion.sns.Exception.ErrorCode;
-import likelion.sns.Exception.ErrorDto;
+import likelion.sns.Exception.ExceptionManager;
 import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.comment.delete.CommentDeleteResponseDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
@@ -41,7 +40,9 @@ public class CommentRestController {
     @GetMapping("/{postId}/comments")
     @ApiOperation(value = "Comment 리스트 조회", notes = "작성된 댓글을 최신순으로 10개씩 페이징 해서 가져온다.")
     public Response showCommentList(@PathVariable(name = "postId") Long postId, @ApiIgnore @PageableDefault Pageable pageable) throws SQLException {
-        log.info("postId : {}", postId);
+        log.info("💬댓글을 조회하려는 게시글 id : {}", postId);
+
+        //댓글 조회
         return Response.success(commentService.getCommentList(postId, pageable));
     }
 
@@ -50,46 +51,43 @@ public class CommentRestController {
      */
     @PostMapping("/{postId}/comments")
     @ApiOperation(value = "Comment 작성", notes = "Path variable에 해당하는 포스트에, 입력한 comment 내용을 저장")
-    public ResponseEntity write(@PathVariable(name = "postId") Long postId, @Validated @RequestBody CommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+    public ResponseEntity createComment(@PathVariable(name = "postId") Long postId, @Validated @RequestBody CommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+        log.info("💬댓글을 작성하려는 게시글 id : {} || requestDto : {}", postId, requestDto);
 
-        //바인딩 에러 처리
+        // request dto 바인딩 조건 처리
+        // requestDto의 값이 null이나 공백인 값으로 요청할 시, BLANK_NOT_ALLOWED 에러 메세지 출력
         if (br.hasErrors()) {
-            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
-            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+            return ExceptionManager.ifNullAndBlank();
         }
-
-        log.info("{}", requestDto);
-
         String requestUserName = authentication.getName();
-        log.info("작성 요청자 userName : {}", requestUserName);
 
+        log.info("💬댓글 작성 요청자 userName : {} ", requestUserName);
+
+        // 댓글 작성
         CommentWriteResponseDto responseDto = commentService.writeComment(requestDto, requestUserName, postId);
-        log.info("{}", responseDto);
 
         return ResponseEntity.ok(Response.success(responseDto));
 
     }
 
     /**
-     * 해당 postId에 댓글의 댓글 작성
+     * 해당 postId의 commentId 에 해당하는 댓글에 댓글의 댓글 작성
      */
     @PostMapping("/{postId}/comments/{commentId}")
     @ApiOperation(value = "Reply Comment(댓글의 댓글) 작성", notes = "Path variable에 해당하는 포스트의 코멘트에, 입력한 replyComment 내용을 저장")
-    public ResponseEntity write(@PathVariable(name = "postId") Long postId,@PathVariable(name = "commentId") Long parentCommentId, @Validated @RequestBody ReplyCommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
-
-        //바인딩 에러 처리
+    public ResponseEntity createReplyComment(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long parentCommentId, @Validated @RequestBody ReplyCommentWriteRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+        log.info("💬💬대댓글을 작성하려는 게시글 id : {} 댓글 id : {}", postId, parentCommentId);
+        log.info("💬💬대댓글 작성 requestDto : {}", requestDto);
+        // request dto 바인딩 조건 처리
         if (br.hasErrors()) {
-            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
-            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+            return ExceptionManager.ifNullAndBlank();
         }
 
-        log.info("{}", requestDto);
-
         String requestUserName = authentication.getName();
-        log.info("작성 요청자 userName : {}", requestUserName);
+        log.info("💬💬대댓글 작성 요청자 userName : {}", requestUserName);
 
-        ReplyCommentWriteResponseDto responseDto = commentService.writeReplyComment(requestDto, requestUserName, postId,parentCommentId);
-        log.info("{}", responseDto);
+        //대댓글 작성
+        ReplyCommentWriteResponseDto responseDto = commentService.writeReplyComment(requestDto, requestUserName, postId, parentCommentId);
 
         return ResponseEntity.ok(Response.success(responseDto));
 
@@ -100,24 +98,24 @@ public class CommentRestController {
      **/
     @ApiOperation(value = "Comment 수정", notes = "(유효한 jwt Token 필요) path variable로 입력한 postId의 Post의 commentId의 내용을 수정")
     @PutMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity modify(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId, @Validated @RequestBody CommentModifyRequestDto requestDto, BindingResult br,@ApiIgnore Authentication authentication) throws SQLException {
-        //바인딩 에러 처리
+    public ResponseEntity modify(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId, @Validated @RequestBody CommentModifyRequestDto requestDto, BindingResult br, @ApiIgnore Authentication authentication) throws SQLException {
+        log.info("💬댓글을 수정하려는 게시글 id : {} 댓글 id : {}", postId, commentId);
+        log.info("💬댓글 수정 requestDto : {}", requestDto);
+
+        // request dto 바인딩 조건 처리
         if (br.hasErrors()) {
-            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
-            return ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e)));
+            return ExceptionManager.ifNullAndBlank();
         }
-        log.info("{}", requestDto);
 
         String requestUserName = authentication.getName();
-        log.info("댓글 수정 요청자 userName : {}", requestUserName);
+
+        log.info("💬댓글 수정 요청자 userName : {}", requestUserName);
 
         // 수정 적용
         commentService.modifyComment(requestDto, postId, commentId, requestUserName);
 
         // 수정 날짜가, Transaction이 종료되어야 적용되므로, 수정을 끝낸 후, 가져오는 메서드를 한번더 사용.
         CommentModifyResponseDto responseDto = commentService.getOneComment(postId, commentId, requestUserName);
-
-        log.info("{}", responseDto);
 
         return ResponseEntity.ok(Response.success(responseDto));
 
@@ -129,16 +127,16 @@ public class CommentRestController {
     @ApiOperation(value = "Comment 삭제", notes = "(유효한 jwt Token 필요) path variable로 입력한 postId의 Post의 commentId의 Comment를 삭제")
     @DeleteMapping("/{postId}/comments/{commentId}")
     public Response delete(@PathVariable(name = "postId") Long postId, @PathVariable(name = "commentId") Long commentId, @ApiIgnore Authentication authentication) throws SQLException {
+        log.info("💬댓글을 삭제하려는 게시글 id : {} 댓글 id : {}", postId, commentId);
 
         String requestUserName = authentication.getName();
-        log.info("삭제 요청자 userName : {}", requestUserName);
+        log.info("💬댓글 삭제 요청자 userName : {}", requestUserName);
 
         // 댓글 삭제
         commentService.deleteComment(postId, commentId, requestUserName);
 
-        CommentDeleteResponseDto responseDto = new CommentDeleteResponseDto(commentId);
-        log.info("{}", responseDto);
-
-        return Response.success(responseDto);
+        return Response.success(new CommentDeleteResponseDto(commentId));
     }
+
+
 }

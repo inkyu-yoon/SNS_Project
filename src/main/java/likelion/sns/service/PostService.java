@@ -11,7 +11,6 @@ import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
 import likelion.sns.domain.entity.UserRole;
-import likelion.sns.repository.LikeRepository;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +36,7 @@ public class PostService {
      * 게시글 리스트 조회
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
-        Page<PostListDto> posts = postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
-
-        return posts;
+        return postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
     }
 
     /**
@@ -79,20 +76,14 @@ public class PostService {
         // post 유효성 검사하고 찾아오기
         Post foundPost = postValid(postId);
 
-        User foundUser = foundPost.getUser();
-
         UserRole requestUserRole = requestUser.getRole();
-        String author = foundUser.getUserName();
+        String author = foundPost.getUser().getUserName();
         log.info("게시글 수정 요청자 ROLE = {} 게시글 작성자 author = {}", requestUserRole, author);
 
         // 작성자와 요청자 유효성 검사
         checkAuth(requestUserName, author, requestUserRole);
 
-        String newTitle = requestDto.getTitle();
-        String newBody = requestDto.getBody();
-        log.info("게시글 수정 요청 제목 = {} , 내용 = {}", newTitle, newBody);
-
-        foundPost.modifyPost(newTitle, newBody);
+        foundPost.modifyPost(requestDto.getTitle(), requestDto.getBody());
     }
 
     /**
@@ -106,17 +97,16 @@ public class PostService {
         // post 유효성 검사하고 찾아오기
         Post foundPost = postValid(postId);
 
-        User foundUser = foundPost.getUser();
 
         UserRole requestUserRole = requestUser.getRole();
-        String author = foundUser.getUserName();
+        String author = foundPost.getUser().getUserName();
         log.info("게시글 수정 요청자 ROLE = {} 게시글 작성자 author = {}", requestUserRole, author);
 
         // 작성자와 요청자 유효성 검사
         checkAuth(requestUserName, author, requestUserRole);
 
+        //soft delete 적용
         foundPost.deletePost();
-//        postRepository.delete(foundPost);
     }
 
     /**
@@ -127,36 +117,31 @@ public class PostService {
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
 
-        Long requestUserId = requestUser.getId();
-        log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
+        return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUser.getId(), pageable).map(post -> new PostListDto(post));
 
-        Page<PostListDto> posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
-
-        return posts;
     }
 
     /**
+     * UI 용 메서드 (게시글 검색)
      * 게시글 리스트 조회 (제목으로 검색)
      */
     public Page<PostListDto> getPostsByTitle(String title, Pageable pageable) throws SQLException {
-        Page<PostListDto> posts = postRepository.findByTitleContainingAndDeletedAtIsNullOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
-
-        return posts;
+        return postRepository.findByTitleContainingAndDeletedAtIsNullOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
     }
 
     /**
+     * UI 용 메서드 (게시글 검색)
      * 게시글 리스트 조회 (회원명 으로 검색)
      */
     public Page<PostListDto> getPostsByUserName(String userName, Pageable pageable) throws SQLException {
         User requestUser = userRepository.findByUserName(userName).orElse(null);
 
         Page<PostListDto> posts = null;
+
         if (requestUser != null) {
             Long requestUserId = requestUser.getId();
             log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
-
             posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
-
         }
 
         return posts;

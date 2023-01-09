@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
-import java.text.SimpleDateFormat;
 
 @AllArgsConstructor
 @Getter

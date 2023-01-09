@@ -42,8 +42,7 @@ public class UserService {
         String requestUserName = joinRequest.getUserName();
 
         //만약 db에 가입 요청한 아이디가 이미 존재할 시, 에러를 발생시킴
-        userRepository.findByUserName(requestUserName)
-                .ifPresent(user -> {throw new SNSAppException(ErrorCode.DUPLICATED_USER_NAME);});
+        userJoinValid(requestUserName);
 
         // 회원 가입으로 입력한 raw한 비밀번호를 암호화 한다.
         String encodedPassword = encoder.encode(joinRequest.getPassword());
@@ -59,30 +58,22 @@ public class UserService {
      */
 
     public UserLoginResponseDto loginUser(UserLoginRequestDto loginRequest) throws SQLException {
-        String inputUsername = loginRequest.getUserName();
-        String inputPassword = loginRequest.getPassword();
+        String requestUserName = loginRequest.getUserName();
+        String requestPassword = loginRequest.getPassword();
 
-        log.info("패스워드 {} ", inputPassword);
-        // 로긘 요청한 userName이 가입된 적 없으면 에러를 발생시킴
-        User found = userRepository.findByUserName(inputUsername)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
+        // 로큰 요청한 userName이 가입된 적 없으면 에러를 발생시킴
+        User found = userValid(requestUserName);
 
         // 가입된 회원이지만, 입력한 비밀번호화 DB에 입력된 비밀번호가 다를 경우, 에러를 발생시킴
-        if (!encoder.matches(inputPassword, found.getPassword())) {
+        if (!encoder.matches(requestPassword, found.getPassword())) {
             throw new SNSAppException(ErrorCode.INVALID_PASSWORD, "잘못된 비밀번호 입니다");
         }
 
-        log.info("로그인한 유저의 등급은 {} 입니다.",found.getRole());
         // 로그인에 성공할 시, token을 create 하고 반환
-        return new UserLoginResponseDto(JwtTokenUtil.createToken(inputUsername, secretKey));
+        return new UserLoginResponseDto(JwtTokenUtil.createToken(requestUserName, secretKey));
     }
 
-    /**
-     * JwtTokenFilter 에서 사용하기 위해 만든 메서드
-     */
-    public UserRole findRoleByUserName(String userName) {
-        return userRepository.findByUserName(userName).get().getRole();
-    }
+
 
     /**
      * UserRole(권한) 변경
@@ -104,5 +95,29 @@ public class UserService {
         log.info("{}", found);
 
         found.changeRole(requestRole);
+    }
+
+    /**
+     * JwtTokenFilter 에서 사용하기 위해 만든 메서드
+     */
+    public UserRole findRoleByUserName(String userName) {
+        return userRepository.findByUserName(userName).get().getRole();
+    }
+
+    /**
+     * 해당하는 회원이 없을 시, 예외 처리
+     */
+    public void userJoinValid(String userName) {
+        userRepository.findByUserName(userName)
+                .ifPresent(user -> {throw new SNSAppException(ErrorCode.DUPLICATED_USER_NAME);});
+
+    }
+
+    /**
+     * 해당하는 회원이 없을 시, 예외 처리
+     */
+    public User userValid(String userName) {
+        return userRepository.findByUserName(userName)
+                .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
     }
 }

@@ -3,7 +3,6 @@ package likelion.sns.domain.dto.post.read;
 import likelion.sns.domain.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.text.SimpleDateFormat;

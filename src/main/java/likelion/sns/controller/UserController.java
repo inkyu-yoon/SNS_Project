@@ -9,7 +9,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.net.http.HttpRequest;
 
 @Controller
 @Slf4j
@@ -34,7 +33,9 @@ public class UserController {
     }
 
     /**
-     회원 로그아웃 화면
+     회원 로그아웃
+     세션에 저장되어 있는 회원명 제거
+     토큰은 웹에서(mustache 파일에서) 제거
      **/
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {

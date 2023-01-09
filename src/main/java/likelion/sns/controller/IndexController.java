@@ -2,10 +2,8 @@ package likelion.sns.controller;
 
 
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
-import likelion.sns.domain.dto.alarm.AlarmListDto;
 import likelion.sns.service.AlarmService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -33,13 +31,17 @@ public class IndexController {
         return "index";
     }
 
+    /**
+     * 로그인 되어 있을 시, 상단 바에(nav bar)에 사용자 명과, 알람 목록 전달
+     * 로그인 여부는 세션에 회원명이 저장되어 있는지로 확인
+     * 서비스는 토큰 존재 여부, 만료 여부 등 유효성으로 체크
+     */
     public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model,Pageable pageable) {
         HttpSession session = request.getSession(true);
 
         if (session.getAttribute("userName") != null) {
             Object loginUserName = session.getAttribute("userName");
             model.addAttribute("loginUserName", loginUserName);
-
 
             Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
             model.addAttribute("alarms", alarms);

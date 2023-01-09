@@ -145,6 +145,8 @@
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarColor01">
             <ul class="navbar-nav me-auto">
+
+
                 {{^loginUserName}}
                     <li class="nav-item">
                         <a class="nav-link" href="/users/join">회원가입</a>
@@ -180,6 +182,7 @@
                     </li>
                 {{/loginUserName}}
 
+
             </ul>
         </div>
     </div>
@@ -189,6 +192,7 @@
     <table class="collapse multi-collapse-alarm table table-striped table-hover" style="width: 50%" align="right">
         <tbody>
         <thead class="table-light">
+
         {{#alarms}}
             <tr>
                 <th scope="row" style="text-align: center;font-size: xx-small;">
@@ -203,6 +207,7 @@
                 </th>
             </tr>
         {{/alarms}}
+
         </thead>
         </tbody>
     </table>
