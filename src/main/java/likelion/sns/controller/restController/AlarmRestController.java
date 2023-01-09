@@ -42,7 +42,7 @@ public class AlarmRestController {
      * (웹 페이지에서, 알림 체크 버튼 시, 삭제)
      */
     @DeleteMapping("/{alarmId}")
-    @ApiOperation(value = "Alarm 리스트 조회", notes = "발생된 알림을 최신순으로 20개씩 페이징 해서 가져온다.")
+    @ApiOperation(value = "Alarm 삭제", notes = "특정 alarm id에 해당하는 알림을 삭제한다.")
     public Response deleteOneAlarm(@PathVariable(name = "alarmId") Long alarmId, @ApiIgnore Authentication authentication, @ApiIgnore Pageable pageable) throws SQLException {
 
         String requestUserName = authentication.getName();
