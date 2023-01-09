@@ -71,7 +71,7 @@ dependencies {
 ## ERD
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230104002450542.png" alt="image-20230104002450542"  />
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230109223804607.png" alt="image-20230109223804607" style="zoom:80%;" />
 </p>
 
 <br>
@@ -126,10 +126,9 @@ dependencies {
     - 10개씩 페이징되며, 최신에 작성한 게시글 순으로 조회
 
 - [x] Alarm 조회(요청자에게 온 알림 모아보기), 삭제 기능 구현
-    - 알림 조회를 요청한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
+    - 알림 조회 및 삭제를 요청한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
     - 20개씩 페이징되며, 최신에 생성된 알림 순으로 조회 가능
-    - 알림 ✔ 버튼 클릭 시, 삭제
-    - 알림 클릭 시, 해당 알림이 울린 게시글로 이동
+    - 특정 알림 삭제 가능
 
 - [x] Rest Controller 에서 `request dto` @Valid 유효성 검사 후 예외 처리 
     - null 이나 공백만으로 이루어진 값 허용하지 않음
@@ -159,6 +158,7 @@ dependencies {
 
 - [x] 회원가입
   - [x] 회원가입 시, 회원가입 명 또는 비밀번호 글자 사이에 공백이 포함되어 있는 경우 회원가입 불가
+    - [x] 회원가입 시, 회원명 15글자 이상 문자로 불가
   - [x] 비밀번호 2차 확인 진행, 일치하는 경우에만 회원가입 가능
   - [x] 비밀번호 마스킹 처리
   - [x] 회원 가입 성공 후 홈 화면으로 이동
@@ -183,6 +183,7 @@ dependencies {
   - [x] 댓글 기능 구현
     - [x] 댓글은 로그인한 사용자만 등록 가능
       - [x] 로그인한 사용자 `댓글의 댓글`(대댓글) 작성 · 수정 · 삭제 가능
+      - [x] 댓글의 댓글 수 표시
     - [x] 댓글 수정 및 삭제는 댓글 작성자와 요청자가 일치하는 경우에만 가능
       - [x] 댓글 수정 시, 댓글 작성일자는 수정일자로 바뀌고 (수정됨) 표시
     - [x] 댓글 등록 및 수정시에 내용이 비어있는 경우 등록 및 수정 불가
@@ -197,6 +198,43 @@ dependencies {
 
 - [x] 마이 페이지
   - [x] 로그인 시, 마이페이지 버튼이 상단 바에 생기고, 클릭하면 본인이 작성한 게시글을 확인할 수 있다.
+
+<br>
+
+### 구현한 UI 예시 화면
+
+<br>
+
+#### 1. 회원가입 및 로그인
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/joinAndLogin.gif" alt="joinAndLogin" style="zoom: 40%;" />
+</p>
+
+<br>
+
+#### 2. 게시글 작성 · 댓글 작성 · 좋아요 클릭
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%EA%B2%8C%EC%8B%9C%EA%B8%80%EB%8C%93%EA%B8%80%EC%9E%91%EC%84%B1.gif" alt="게시글댓글작성" style="zoom:40%;" />
+</p>
+
+<br>
+
+#### 3. 알림 확인 및 게시글 수정 · 대댓글 작성 + 수정
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%EC%95%8C%EB%A6%BC%ED%99%95%EC%9D%B8%EB%8C%93%EA%B8%80%EC%88%98%EC%A0%95.gif" alt="알림확인댓글수정" style="zoom:40%;" />
+</p>
+
+<br>
+
+#### 4. 마이페이지 확인 및 게시글 검색 (게시글 제목 · 회원명 검색)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EC%A7%80%EA%B2%80%EC%83%89.gif" alt="마이페이지검색" style="zoom:40%;" />
+</p>
+
 
 
 ---
