@@ -67,7 +67,6 @@ jacoco {
 }
 
 jacocoTestReport {
-	sourceEncoding = 'UTF-8'
 	dependsOn test
 	reports {
 		html.enabled true
