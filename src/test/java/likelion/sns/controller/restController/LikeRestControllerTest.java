@@ -25,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -150,6 +151,30 @@ class LikeRestControllerTest {
                     .andExpect(jsonPath("$.result").exists())
                     .andExpect(jsonPath("$.result.message").value("좋아요는 한번만 누를 수 있습니다."));
         }
+    }
+    /**
+     * 좋아요 개수 테스트
+     */
+    @Nested
+    @DisplayName("좋아요 입력 테스트")
+    class LikeCountTest {
 
+        /**
+         * 좋아요 개수 카운트 성공 테스트
+         */
+        @Test
+        @DisplayName("좋아요 개수 카운트 성공 테스트")
+        public void likeCountSuccess() throws Exception {
+
+            when(likeService.getLikesCount(postId)).thenReturn(1L);
+
+            mockMvc.perform(get("/api/v1/posts/" + postId + "/likes"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.resultCode").exists())
+                    .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result").value(1));
+        }
     }
 }

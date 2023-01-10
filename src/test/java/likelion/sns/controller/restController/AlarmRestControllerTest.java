@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,13 +86,62 @@ class AlarmRestControllerTest {
         }
 
         /**
-         * 알림 목록 조회 에러 테스트 (로그인 하지 않은 경우)
+         * 알림 목록 조회 에러 테스트 (로그인 하지 않은 경우 = 토큰 없이 요청하는 경우)
          */
         @Test
         @DisplayName("알림 목록 조회 에러 테스트 (로그인 하지 않은 경우)")
         public void alarmReadError() throws Exception {
 
             mockMvc.perform(get("/api/v1/alarms"))
+                    .andDo(print())
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.errorCode").value("TOKEN_NOT_FOUND"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("토큰이 존재하지 않습니다."));
+        }
+    }
+
+    /**
+     * 알림 삭제 테스트
+     */
+
+    @Nested
+    @DisplayName("알림 삭제 테스트")
+    class AlarmDeleteTest {
+
+        String token = JwtTokenUtil.createToken("userName", secretKey);
+
+        Long alarmId = 1L;
+        /**
+         * 알림 삭제 성공 테스트
+         */
+        @Test
+        @DisplayName("알림 목록 조회 성공 테스트")
+        public void alarmDeleteSuccess() throws Exception {
+
+            mockMvc.perform(delete("/api/v1/alarms/"+alarmId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").value("SUCCESS"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("알림 삭제 완료"))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.id").exists())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.result.id").value(1L));
+        }
+
+        /**
+         * 알림 삭제 에러 테스트 (로그인 하지 않은 경우)
+         */
+        @Test
+        @DisplayName("알림 삭제 에러 테스트 (로그인 하지 않은 경우)")
+        public void alarmDeleteError() throws Exception {
+
+            mockMvc.perform(delete("/api/v1/alarms/"+alarmId))
                     .andDo(print())
                     .andExpect(status().isUnauthorized())
                     .andExpect(MockMvcResultMatchers.jsonPath("$.resultCode").exists())
