@@ -2,7 +2,11 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+	//jacoco 테스트 커버리지 확인
+	id 'jacoco'
 }
+
 
 group = 'likelion'
 version = '0.0.1-SNAPSHOT'
@@ -47,8 +51,70 @@ dependencies {
 
 	// request dto 필드 유효성 검사
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//mock test (static method 사용 가능하게 만들어줌)
+	testImplementation "org.mockito:mockito-inline:3.4.0"
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+
+test {
+	useJUnitPlatform()// JUnit5를 사용하기 위한 설정
+	finalizedBy 'jacocoTestReport'  // Test 이후 커버리지가 동작하도록 finalizedBy 추가
+}
+
+jacoco {
+	toolVersion = '0.8.8'
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.enabled true
+		xml.enabled false
+		csv.enabled false
+
+		//리포트 위치 지정
+		html.destination file('build/reports/myReport.html')
+
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+
+
+// 검증 단계
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true // 활성화
+			element = 'CLASS' // 클래스 단위로 커버리지 체크
+			includes = [
+			        '**/restController*',
+					'**/service'
+			]
+
+			// 라인 커버리지 제한을 80%로 설정
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+
+			// 브랜치 커버리지 제한을 80%로 설정
+			limit {
+				counter = 'BRANCH'
+				value = 'COVEREDRATIO'
+				minimum = 0.80
+			}
+
+			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
+			limit {
+				counter = 'LINE'
+				value = 'TOTALCOUNT'
+				maximum = 200
+			}
+
+		}
+	}
 }

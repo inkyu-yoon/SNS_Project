@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 
 @Getter
 @AllArgsConstructor
-@ToString(of = {"id", "title", "body", "userName", "createdAt", "lastModifiedAt"})
+@ToString(of = {"id", "alarmType", "fromUserId", "targetId", "text", "createdAt"})
 public class AlarmListDto {
     private Long id;
     private AlarmType alarmType;
