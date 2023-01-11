@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
-@ToString(of={"message","commentId"})
+@ToString(of={"message","id"})
 public class CommentDeleteResponseDto {
     private String message;
     private Long id;

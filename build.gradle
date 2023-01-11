@@ -1,10 +1,10 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.5'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 
-	//jacoco 테스트 커버리지 확인
-	id 'jacoco'
+    //jacoco 테스트 커버리지 확인
+    id 'jacoco'
 }
 
 
@@ -13,108 +13,139 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	compileOnly 'org.projectlombok:lombok'
-
-	// DB
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 
 
-	// template 엔진
-	implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
 
-	//Swagger
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    // DB
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-	//테스트에 사용 (객체 JSON 화)
-	implementation 'com.google.code.gson:gson:2.10'
 
-	//security 관련 라이브러리
-	implementation 'org.springframework.security:spring-security-test'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+    // template 엔진
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
 
-	// request dto 필드 유효성 검사
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    //Swagger
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
-	//mock test (static method 사용 가능하게 만들어줌)
-	testImplementation "org.mockito:mockito-inline:3.4.0"
+    //테스트에 사용 (객체 JSON 화)
+    implementation 'com.google.code.gson:gson:2.10'
+
+    //security 관련 라이브러리
+    implementation 'org.springframework.security:spring-security-test'
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+
+    // request dto 필드 유효성 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //static method 테스트 코드에 사용
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.8.1'
+
 }
 
 
 test {
-	useJUnitPlatform()// JUnit5를 사용하기 위한 설정
-	finalizedBy 'jacocoTestReport'  // Test 이후 커버리지가 동작하도록 finalizedBy 추가
+    useJUnitPlatform()// JUnit5를 사용하기 위한 설정
+    finalizedBy 'jacocoTestReport'  // Test 이후 커버리지가 동작하도록 finalizedBy 추가
 }
 
 jacoco {
-	toolVersion = '0.8.8'
+    toolVersion = '0.8.8'
 }
 
 jacocoTestReport {
-	dependsOn test
-	reports {
-		html.enabled true
-		xml.enabled false
-		csv.enabled false
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
 
-		//리포트 위치 지정
-		html.destination file('build/reports/myReport.html')
+        //리포트 위치 지정
+        html.destination file('build/reports/myReport')
 
-	}
+    }
 
-	finalizedBy 'jacocoTestCoverageVerification'
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            '**/ProjectApplication*',
+                            '**/*Request*',
+                            '**/*Response*',
+                            '**/Hello*',
+                            '**/*Dto',
+                            '**/*Config',
+                            '**/Swagger*',
+                            '**/PasswordEncoderConfig*',
+                            '**/JpaAuditingConfig*'
+                            // ...
+                    ])
+                })
+        )
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
 }
-
 
 
 // 검증 단계
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			enabled = true // 활성화
-			element = 'CLASS' // 클래스 단위로 커버리지 체크
-			includes = [
-			        '**/restController*',
-					'**/service'
-			]
+    violationRules {
+        rule {
+            enabled = true // 활성화
+            element = 'CLASS' // 클래스 단위로 커버리지 체크
+            includes = [
+                    '**/restController*',
+                    '**/service'
+            ]
 
-			// 라인 커버리지 제한을 80%로 설정
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.80
-			}
+            // 라인 커버리지 제한을 80%로 설정
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
 
-			// 브랜치 커버리지 제한을 80%로 설정
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.80
-			}
+            // 브랜치 커버리지 제한을 80%로 설정
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
 
-			// 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
-			limit {
-				counter = 'LINE'
-				value = 'TOTALCOUNT'
-				maximum = 200
-			}
+            // 빈 줄을 제외한 코드의 라인수를 최대 200라인으로 제한
+            limit {
+                counter = 'LINE'
+                value = 'TOTALCOUNT'
+                maximum = 200
+            }
+            excludes = [
+                    '**.*ProjectApplication*',
+                    '**.*Request*',
+                    '**.*Response*',
+                    '**.*Hello*',
+                    '**.*Dto',
+                    '**.*Config',
+                    '**.*Swagger*',
+                    '**.*PasswordEncoder*',
+                    '**.*JpaAuditing*'
 
-		}
-	}
+            ]
+        }
+    }
 }

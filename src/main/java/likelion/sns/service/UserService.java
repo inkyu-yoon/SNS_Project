@@ -105,7 +105,7 @@ public class UserService {
     }
 
     /**
-     * 해당하는 회원이 없을 시, 예외 처리
+     * 해당하는 회원이 존재할 시, 예외 처리
      */
     public void userJoinValid(String userName) {
         userRepository.findByUserName(userName)
