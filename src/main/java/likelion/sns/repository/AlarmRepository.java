@@ -14,6 +14,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     Page<Alarm> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     @Modifying
-    @Query("delete from Alarm a where a.targetId = :postId")
+    @Query("update Alarm a set a.deletedAt = CURRENT_DATE where a.targetId = :postId")
     void deleteAlarmWithPost(@Param("postId") Long postId);
 }
