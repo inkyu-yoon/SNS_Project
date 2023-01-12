@@ -3,6 +3,8 @@ package likelion.sns.domain.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -13,6 +15,8 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE post SET deleted_at = now() WHERE post_id = ?")
 public class Post extends BaseEntity{
 
     @Id
@@ -24,7 +28,7 @@ public class Post extends BaseEntity{
 
     private String body;
 
-    private Timestamp deletedAt;
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,7 +60,4 @@ public class Post extends BaseEntity{
         this.body = body;
     }
 
-    public void deletePost() {
-        this.deletedAt = Timestamp.valueOf(LocalDateTime.now());
-    }
 }

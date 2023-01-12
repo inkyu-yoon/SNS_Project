@@ -1,5 +1,6 @@
 package likelion.sns.domain.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,5 +23,6 @@ public class BaseEntity {
     @LastModifiedDate
     private Timestamp modifiedAt;
 
+    private Timestamp deletedAt;
 
 }

@@ -36,7 +36,7 @@ public class PostService {
      * 게시글 리스트 조회
      */
     public Page<PostListDto> getPostList(Pageable pageable) throws SQLException {
-        return postRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
+        return postRepository.findByOrderByCreatedAtDesc(pageable).map(post -> new PostListDto(post));
     }
 
     /**
@@ -106,7 +106,8 @@ public class PostService {
         checkAuth(requestUserName, author, requestUserRole);
 
         //soft delete 적용
-        foundPost.deletePost();
+        postRepository.delete(foundPost);
+
     }
 
     /**
@@ -117,7 +118,7 @@ public class PostService {
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
 
-        return postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUser.getId(), pageable).map(post -> new PostListDto(post));
+        return postRepository.findByUser_IdOrderByCreatedAtDesc(requestUser.getId(), pageable).map(post -> new PostListDto(post));
 
     }
 
@@ -126,7 +127,7 @@ public class PostService {
      * 게시글 리스트 조회 (제목으로 검색)
      */
     public Page<PostListDto> getPostsByTitle(String title, Pageable pageable) throws SQLException {
-        return postRepository.findByTitleContainingAndDeletedAtIsNullOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
+        return postRepository.findByTitleContainingOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
     }
 
     /**
@@ -141,7 +142,7 @@ public class PostService {
         if (requestUser != null) {
             Long requestUserId = requestUser.getId();
             log.info("마이 피드 조회 요청 userId : {} ", requestUserId);
-            posts = postRepository.findByUser_IdAndDeletedAtIsNullOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
+            posts = postRepository.findByUser_IdOrderByCreatedAtDesc(requestUserId, pageable).map(post -> new PostListDto(post));
         }
 
         return posts;
@@ -167,7 +168,7 @@ public class PostService {
         //DB에 저장되어 있는 게시글이 없는 경우
         Post foundPost = postRepository.findById(postId)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
-
+        log.info("삭제 날짜 {} ",foundPost.getDeletedAt());
         // deletedAt 에 데이터가 채워져서 삭제 처리가 된 경우
         if (foundPost.getDeletedAt() != null) {
             throw new SNSAppException(ErrorCode.POST_NOT_FOUND);
