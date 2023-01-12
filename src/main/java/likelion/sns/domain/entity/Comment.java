@@ -3,6 +3,8 @@ package likelion.sns.domain.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE comment SET deleted_at = now() WHERE comment_id = ?")
 public class Comment extends BaseEntity {
 
     @Id

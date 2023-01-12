@@ -3,12 +3,16 @@ package likelion.sns.domain.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE alarm SET deleted_at = now() WHERE alarm_id = ?")
 public class Alarm extends BaseEntity {
 
     @Id
