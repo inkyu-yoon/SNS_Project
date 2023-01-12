@@ -105,7 +105,7 @@ public class CommentService {
      * 댓글 수정 (특정 포스트의 특정 댓글)
      */
     @Transactional
-    public void modifyComment(CommentModifyRequestDto requestDto, Long postId, Long commentId, String requestUserName) throws SQLException {
+    public CommentModifyResponseDto modifyComment(CommentModifyRequestDto requestDto, Long postId, Long commentId, String requestUserName) throws SQLException {
 
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
@@ -124,14 +124,9 @@ public class CommentService {
         checkAuth(requestUserName, author, requestUserRole);
 
         foundComment.modifyComment(requestDto.getComment());
-    }
 
-    /**
-     * 댓글 단건 조회 (수정 적용 후, 데이터를 가져오기 위해서 만든 메서드)
-     */
-    public CommentModifyResponseDto getOneComment(Long postId, Long commentId, String requestUserName) {
-        Comment foundComment = commentValid(commentId);
-        return new CommentModifyResponseDto(foundComment, requestUserName, postId);
+        //SaveAndFlush 적용
+        return new CommentModifyResponseDto(commentRepository.saveAndFlush(foundComment), requestUserName, postId);
     }
 
     /**

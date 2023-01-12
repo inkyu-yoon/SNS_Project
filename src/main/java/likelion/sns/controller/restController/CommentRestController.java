@@ -112,10 +112,7 @@ public class CommentRestController {
         log.info("💬댓글 수정 요청자 userName : {}", requestUserName);
 
         // 수정 적용
-        commentService.modifyComment(requestDto, postId, commentId, requestUserName);
-
-        // 수정 날짜가, Transaction이 종료되어야 적용되므로, 수정을 끝낸 후, 가져오는 메서드를 한번더 사용.
-        CommentModifyResponseDto responseDto = commentService.getOneComment(postId, commentId, requestUserName);
+        CommentModifyResponseDto responseDto = commentService.modifyComment(requestDto, postId, commentId, requestUserName);
 
         return ResponseEntity.ok(Response.success(responseDto));
 
