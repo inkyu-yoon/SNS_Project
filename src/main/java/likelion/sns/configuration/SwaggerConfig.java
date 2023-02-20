@@ -34,7 +34,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("Mutsa SNS API Test With Swagger")
                 .version("1.0.0")
-                .description("윤인규 개인프로젝트  |  [UI 구현한 웹사이트 접속](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)")
+                .description("윤인규 개인프로젝트  |  [UI 구현한 웹사이트 접속](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/)")
                 .build();
     }
     private SecurityContext securityContext() {

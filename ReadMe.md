@@ -84,12 +84,13 @@ dependencies {
 
 - [x] Swagger 기능 추가 : API 문서 자동화 용이 및 API 테스트 가능
     - swagger
-      주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
+      주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
 
-- [x] GitLab CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
-    - GitLab Project가 업데이트 되었는지 확인하고 업데이트되어 있는 경우, 현재 컨테이너 제거 후 재 실행할 수 있도록 deploy.sh 작성
+- [x] Git Actions CI&CD pipeline 구축 : 새 버전 소프트웨어 관리 및 테스트 가능
+    - Main 원격 저장소에 push 될 때마다, 현재 컨테이너 제거 후 재 실행할 수 있도록 cicd.yml 작성
     - 미리 작성된 Dockerfile을 통해 build
-    - crontab 기능을 활용하여 정기적으로 deploy.sh를 실행하도록 설정
+
+- [x] Git submodule 적용 : 보안에 민감한 환경변수 스크립트화 관리 및 권한 외 접근 제한
 
 - [x] User 회원가입 및 로그인 기능 구현
     - 회원가입 시, 아이디와 비밀번호를 입력받고, 중복된 아이디의 경우 회원가입 에러 발생
@@ -146,7 +147,7 @@ dependencies {
 
 ## UI 개발 상황
 
-주소 : [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/?)
+주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
 
 - [x] 홈 화면
   - [x] 홈 화면 이동, 게시판 이동, 회원가입 화면, 로그인 화면 으로 이동할 수 있는 상단 바 구현
@@ -833,7 +834,7 @@ javascript의 `console.log()` 메서드도 몰랐었지만, 이미 만들어둔 
 
 프론트 쪽도 경험을 해보니, 프론트에서 활용하기 쉬운 `response Dto` 필드값을 설정하고 효율적인 Controller 로직과 Service layer 메서드를 구현하는 것이 중요하구나 라는 생각이 들었다.
 
-- [http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
+- [배포 URL](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/)
 
 <br>
 
@@ -929,3 +930,17 @@ Controller 에서 `@Valid` 로 바인딩 에러시 예외처리를 해놓은 부
 Service 테스트 코드를 많이 구현하지 못해서, 코드 커버리지 퍼센트가 낮은데, 이 부분을 개선해야겠다.
 
 - [Jacoco 적용으로 테스트 코드 개선하기](https://inkyu-yoon.github.io/docs/Language/SpringBoot/Jacoco)
+
+
+### 6. Git Submodule & Git Actions Ci/CD 적용
+
+<br>
+
+코드를 Main에 push 할 때마다, 새로 업데이트 된 코드 기능이 자동으로 배포되도록
+
+Git Actions 를 이용해 CI/CD 파이프라인을 구축했다.
+
+또한, Git Submodule을 적용해 보안에 민감한 환경변수를 
+
+스크립트로서 관리하여 유지보수성을 향상시켰으며, private한 공간에 저장해두어 보안도 향상시켰다. 
+
