@@ -1,0 +1,3 @@
+[submodule "sns-env"]
+	path = sns-env
+	url = https://github.com/inkyu-yoon/sns-env.git
