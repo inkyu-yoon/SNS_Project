@@ -157,3 +157,7 @@ task copyPrivate(type: Copy) {
         into 'src/main/resources' //복사할 위치
     }
 }
+
+jar {
+    enabled = false
+}
