@@ -39,7 +39,7 @@ jobs:
           NAME: ${{secrets.DOCKER_USER}}
           APP: sns
         run: |
-          docker build -t $NAME/$APP -f ./DockerFile .
+          docker build -t $NAME/$APP -f ./Dockerfile .
           docker push $NAME/$APP:latest
       - name: EC2 Docker Run
         uses: appleboy/ssh-action@master
