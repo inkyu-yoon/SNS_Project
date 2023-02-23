@@ -42,10 +42,10 @@ public class User extends BaseEntity {
     public static User createUser(String userName, String password){
         return new User(userName, password);
     }
-    public void changeRole(String requestRole) {
-        if (requestRole.equalsIgnoreCase("admin")) {
+    public void changeRole() {
+        if (this.role.equals(UserRole.ROLE_USER)) {
             this.role = UserRole.ROLE_ADMIN;
-        } else if (requestRole.equalsIgnoreCase("user")) {
+        } else {
             this.role = UserRole.ROLE_USER;
         }
     }

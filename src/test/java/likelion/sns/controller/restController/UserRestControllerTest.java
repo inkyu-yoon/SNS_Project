@@ -79,7 +79,6 @@ class UserRestControllerTest {
     @DisplayName("회원가입 테스트")
     public class JoinTest {
         String content = gson.toJson(userJoinRequestDto);
-        UserJoinRequestDto nullUserJoinRequestDto = new UserJoinRequestDto("", "password");
 
         /**
          * 회원가입 성공 테스트
@@ -213,7 +212,7 @@ class UserRestControllerTest {
      */
 
     @Nested
-    @DisplayName("로그인 테스트")
+    @DisplayName("등급변경 테스트")
     public class ChangeRoleTest {
 
         UserRoleChangeRequestDto userRoleChangeRequestDto = new UserRoleChangeRequestDto("ADMIN");
@@ -241,7 +240,7 @@ class UserRestControllerTest {
                     .andExpect(jsonPath("$.result.userId").exists())
                     .andExpect(jsonPath("$.result.userId").value(1))
                     .andExpect(jsonPath("$.result.message").exists())
-                    .andExpect(jsonPath("$.result.message").value("1번 아이디의 권한을 ADMIN로 변경하였습니다."));
+                    .andExpect(jsonPath("$.result.message").value("1번 아이디의 권한을 변경하였습니다."));
 
         }
 

@@ -79,14 +79,7 @@ public class UserService {
      * UserRole(권한) 변경
      */
     @Transactional
-    public void changeRole(Long userId, UserRoleChangeRequestDto requestDto) {
-
-        String requestRole = requestDto.getRole();
-
-        // request 로 받은 데이터가 유효한 데이터(admin 혹은 user)가 아닌 경우 에러 처리
-        if (!requestRole.equalsIgnoreCase("admin") || !requestRole.equalsIgnoreCase("user")) {
-            throw new SNSAppException(ErrorCode.BAD_REQUEST);
-        }
+    public void changeRole(Long userId) {
 
         // UserRole(권한) 을 변경할 회원이 DB에 없는 경우 에러 처리
         User found = userRepository.findById(userId)
@@ -94,14 +87,15 @@ public class UserService {
 
         log.info("{}", found);
 
-        found.changeRole(requestRole);
+        found.changeRole();
     }
 
     /**
      * JwtTokenFilter 에서 사용하기 위해 만든 메서드
      */
     public UserRole findRoleByUserName(String userName) {
-        return userRepository.findByUserName(userName).get().getRole();
+        User foundUser = userValid(userName);
+        return foundUser.getRole();
     }
 
     /**

@@ -321,7 +321,7 @@ class CommentRestControllerTest {
         @DisplayName("댓글 수정 성공 테스트")
         public void commentModifySuccess() throws Exception {
 
-            when(commentService.getOneComment(any(), any(), any()))
+            when(commentService.modifyComment(any(),any(), any(), any()))
                     .thenReturn(new CommentModifyResponseDto(commentId, "new comment", "userName", postId, "created time", "modified time"));
 
             mockMvc.perform(put("/api/v1/posts/" + postId + "/comments/" + commentId)

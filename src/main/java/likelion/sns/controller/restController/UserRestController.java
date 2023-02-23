@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import likelion.sns.Exception.ExceptionManager;
 import likelion.sns.domain.Response;
-import likelion.sns.domain.dto.user.changeRole.UserRoleChangeRequestDto;
 import likelion.sns.domain.dto.user.changeRole.UserRoleChangeResponseDto;
 import likelion.sns.domain.dto.user.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.user.join.UserJoinResponseDto;
@@ -78,18 +77,14 @@ public class UserRestController {
      **/
     @ApiOperation(value = "회원 권한 변경", notes = "(유효한 jwt Token 필요) 회원 권한이 ADMIN 인 사용자만 할 수 있으며, 요청할 때, role은 USER 혹은 ADMIN 만 입력가능")
     @PostMapping("/{userId}/role/change")
-    public ResponseEntity changeRole(@PathVariable(name = "userId") Long userId, @Validated @RequestBody UserRoleChangeRequestDto requestDto, BindingResult br) {
-        log.info("🎉 관리자가 등급을 변경할 회원 id : {} ||  requestDto : {}", userId, requestDto);
+    public ResponseEntity changeRole(@PathVariable(name = "userId") Long userId) {
+        log.info("🎉 관리자가 등급을 변경할 회원 id : {} ", userId);
 
-        //바인딩 에러 처리
-        if (br.hasErrors()) {
-            ExceptionManager.ifNullAndBlank();
-        }
 
         //회원 등급 변경
-        userService.changeRole(userId, requestDto);
+        userService.changeRole(userId);
 
-        UserRoleChangeResponseDto responseDto = new UserRoleChangeResponseDto(userId, userId + "번 아이디의 권한을 " + requestDto.getRole().toUpperCase() + "로 변경하였습니다.");
+        UserRoleChangeResponseDto responseDto = new UserRoleChangeResponseDto(userId, userId + "번 아이디의 권한을 변경하였습니다.");
 
         return ResponseEntity.ok(Response.success(responseDto));
     }

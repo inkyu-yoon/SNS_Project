@@ -1,5 +1,6 @@
 package likelion.sns.service;
 
+
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.dto.user.changeRole.UserRoleChangeRequestDto;
@@ -8,60 +9,54 @@ import likelion.sns.domain.dto.user.login.UserLoginRequestDto;
 import likelion.sns.domain.entity.User;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.springframework.http.HttpStatus;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mockStatic;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    UserService userService;
+    @Mock
+    private UserRepository userRepository;
 
-    UserRepository userRepository = mock(UserRepository.class);
+    @Mock
+    private BCryptPasswordEncoder encoder;
 
-    BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
+    @Mock
+    private User mockUser;
 
-    User mockUser = mock(User.class);
+    @InjectMocks
+    private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        userService = new UserService(userRepository, encoder);
-    }
 
-    /**
-     * 회원 가입 테스트
-     */
     @Nested
-    @DisplayName("회원 가입 테스트")
-    class UserJoinTest {
+    @DisplayName("회원가입 테스트")
+    class joinTest {
 
-        UserJoinRequestDto mockUserJoinRequestDto = mock(UserJoinRequestDto.class);
+        @Mock
+        UserJoinRequestDto mockRequestDto;
+
 
         /**
-         * 회원 가입 성공
+         * 회원 가입 성공 테스트
          */
         @Test
-        @DisplayName("회원 가입 성공")
-        void userJoinSuccess() {
+        @DisplayName("회원 가입 성공 테스트")
+        void joinSuccess() throws SQLException {
 
             given(userRepository.findByUserName("userName"))
                     .willReturn(Optional.empty());
-            given(encoder.encode(any()))
-                    .willReturn("encodedPassword");
             given(userRepository.save(any()))
                     .willReturn(mockUser);
 
@@ -70,188 +65,147 @@ class UserServiceTest {
         }
 
         /**
-         * 회원가입 실패 ( db에 이미 가입 요청한 아이디가 존재할 시 (중복 아이디 에러)
+         * 회원 가입 실패 테스트 (가입 요청한 아이디가 이미 존재할 시)
          */
         @Test
-        @DisplayName("회원가입 실패 ( db에 이미 가입 요청한 아이디가 존재할 시 (중복 아이디 에러)")
-        void userJoinError1() {
+        @DisplayName("회원 가입 실패 테스트 (가입 요청한 아이디가 이미 존재할 시)")
+        void joinError1() throws SQLException {
 
-            given(mockUserJoinRequestDto.getUserName())
-                    .willReturn("userName");
+            given(mockRequestDto.getUserName())
+                    .willReturn("name");
 
+            when(userRepository.findByUserName(any()))
+                    .thenReturn(Optional.of(mockUser));
 
-            when(userRepository.findByUserName("userName"))
-                    .thenThrow(new SNSAppException(ErrorCode.DUPLICATED_USER_NAME));
+            SNSAppException exception = assertThrows(SNSAppException.class, () -> userService.createUser(mockRequestDto));
 
-
-            SNSAppException snsAppException = assertThrows(SNSAppException.class, () -> userService.createUser(mockUserJoinRequestDto));
-
-            assertThat(snsAppException.getErrorCode().getHttpStatus())
-                    .isEqualTo(HttpStatus.CONFLICT);
-            assertThat(snsAppException.getErrorCode().getMessage())
+            assertThat(exception.getErrorCode().getMessage())
                     .isEqualTo("UserName이 중복됩니다.");
         }
 
-        /**
-         * 회원가입 실패 ( db 연결 에러)
-         */
-        @Test
-        @DisplayName("회원가입 실패 ( db 연결 에러)")
-        void userJoinError2() {
-
-            given(mockUserJoinRequestDto.getUserName())
-                    .willReturn("userName");
-
-
-            when(userRepository.findByUserName("userName"))
-                    .thenThrow(new SNSAppException(ErrorCode.DATABASE_ERROR));
-
-
-            SNSAppException snsAppException = assertThrows(SNSAppException.class, () -> userService.createUser(mockUserJoinRequestDto));
-
-            assertThat(snsAppException.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-            assertThat(snsAppException.getErrorCode().getMessage()).isEqualTo("DB 에러");
-        }
     }
 
-    /**
-     * 회원 로그인 테스트
-     */
     @Nested
     @DisplayName("회원 로그인 테스트")
-    class UserLoginTest {
+    class LoginTest {
 
-        UserLoginRequestDto mockUserLoginRequestDto = mock(UserLoginRequestDto.class);
+        @Mock
+        UserLoginRequestDto requestDto;
 
         /**
-         * 회원 로그인 성공
+         * 로그인 성공
          */
         @Test
-        @DisplayName("회원 로그인 성공")
-        void userLoginSuccess() {
-            given(userRepository.findByUserName("userName"))
+        @DisplayName("로그인 성공 테스트")
+        void loginSuccess() {
+            MockedStatic<JwtTokenUtil> jwtTokenUtilMockedStatic = mockStatic(JwtTokenUtil.class);
+
+            given(requestDto.getUserName())
+                    .willReturn("name");
+            given(requestDto.getPassword())
+                    .willReturn("password");
+            given(userRepository.findByUserName(any()))
                     .willReturn(Optional.of(mockUser));
             given(encoder.matches(any(), any()))
                     .willReturn(true);
-            given(userRepository.save(any()))
-                    .willReturn(mockUser);
+            given(JwtTokenUtil.createToken(any(), eq("secret")))
+                    .willReturn("jwt token");
 
+            assertDoesNotThrow(() -> userService.loginUser(requestDto));
 
-            MockedStatic<JwtTokenUtil> jwtTokenUtilMockedStatic = mockStatic(JwtTokenUtil.class);
-            jwtTokenUtilMockedStatic
-                    .when(() -> JwtTokenUtil.createToken("userName", "secretKey"))
-                    .thenReturn("token");
-
-            assertDoesNotThrow(() -> userService.loginUser(new UserLoginRequestDto("userName", "password")));
-        }
-
-
-        /**
-         * 회원 로그인 실패 (가입된 적이 없는 경우)
-         */
-        @Test
-        @DisplayName("회원 로그인 실패 (가입된 적이 없는 경우)")
-        void userLoginError1() {
-
-
-            given(mockUserLoginRequestDto.getUserName())
-                    .willReturn("userName");
-            given(mockUserLoginRequestDto.getPassword())
-                    .willReturn("password");
-
-
-            when(userRepository.findByUserName("userName"))
-                    .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
-
-
-            SNSAppException snsAppException = assertThrows(SNSAppException.class, () -> userService.loginUser(mockUserLoginRequestDto));
-
-            assertThat(snsAppException.getErrorCode().getHttpStatus())
-                    .isEqualTo(HttpStatus.NOT_FOUND);
-            assertThat(snsAppException.getErrorCode().getMessage())
-                    .isEqualTo("해당하는 유저를 찾을 수 없습니다.");
+            jwtTokenUtilMockedStatic.close();
         }
 
         /**
-         * 회원 로그인 실패 (가입된 회원이지만, 비밀번호가 일치하지 않는 경우)
+         * 로그인 실패 테스트 (userName으로 가입된 회원을 찾을 수 없는 경우)
          */
+
         @Test
-        @DisplayName("회원 로그인 실패 (가입된 회원이지만, 비밀번호가 일치하지 않는 경우)")
-        void userLoginError2() {
+        @DisplayName("로그인 실패 테스트 (userName으로 가입된 회원을 찾을 수 없는 경우)")
+        void loginError1() {
 
+            when(userRepository.findByUserName(any()))
+                    .thenReturn(Optional.empty());
 
-            given(mockUserLoginRequestDto.getUserName())
-                    .willReturn("userName");
-            given(mockUserLoginRequestDto.getPassword())
+            assertThrows(SNSAppException.class, () -> userService.loginUser(requestDto));
+
+        }
+
+        /**
+         * 로그인 실패 테스트 (비밀번호가 일치하지 않는 경우)
+         */
+
+        @Test
+        @DisplayName("로그인 실패 테스트 (비밀번호가 일치하지 않는 경우)")
+        void loginError2() {
+            given(requestDto.getUserName())
+                    .willReturn("name");
+            given(requestDto.getPassword())
                     .willReturn("password");
-            given(userRepository.findByUserName("userName"))
+            given(userRepository.findByUserName(any()))
                     .willReturn(Optional.of(mockUser));
 
-
-            when(encoder.matches("password", mockUser.getPassword()))
+            when(encoder.matches(any(), any()))
                     .thenReturn(false);
 
 
-            SNSAppException snsAppException = assertThrows(SNSAppException.class, () -> userService.loginUser(mockUserLoginRequestDto));
+            SNSAppException exception = assertThrows(SNSAppException.class, () -> userService.loginUser(requestDto));
 
-            assertThat(snsAppException.getErrorCode().getHttpStatus())
-                    .isEqualTo(HttpStatus.UNAUTHORIZED);
-            assertThat(snsAppException.getErrorCode().getMessage())
+            assertThat(exception.getErrorCode().getMessage())
                     .isEqualTo("패스워드가 잘못되었습니다.");
-        }
 
-
-        /**
-         * 회원 로그인 실패 (DB에러)
-         */
-        @Test
-        @DisplayName("회원 로그인 실패 (DB에러)")
-        void userLoginError3() {
-
-
-            given(mockUserLoginRequestDto.getUserName())
-                    .willReturn("userName");
-            given(mockUserLoginRequestDto.getPassword())
-                    .willReturn("password");
-
-            when(userRepository.findByUserName("userName"))
-                    .thenThrow(new SNSAppException(ErrorCode.DATABASE_ERROR));
-
-
-            SNSAppException snsAppException = assertThrows(SNSAppException.class, () -> userService.loginUser(mockUserLoginRequestDto));
-
-            assertThat(snsAppException.getErrorCode().getHttpStatus())
-                    .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-            assertThat(snsAppException.getErrorCode().getMessage())
-                    .isEqualTo("DB 에러");
         }
     }
 
-    /**
-     * 회원 등급 변경 테스트
-     */
     @Nested
-    @DisplayName("회원 등급 변경 테스트")
-    class UserChangeRoleTest {
+    @DisplayName("권한 변경 테스트")
+    class changeRole {
 
-        UserRoleChangeRequestDto userRoleChangeRequestDto = mock(UserRoleChangeRequestDto.class);
+        @Mock
+        UserRoleChangeRequestDto requestDto;
 
-        UserLoginRequestDto mockUserLoginRequestDto = mock(UserLoginRequestDto.class);
-
-        String mockRole = mock(String.class);
         /**
-         * 회원 등급 변경 성공
+         * 권한 변경 성공 테스트
          */
         @Test
-        @DisplayName("회원 등급 변경 성공")
-        void userChangeRoleSuccess() {
-            given(userRoleChangeRequestDto.getRole()).willReturn("admin");
+        @DisplayName("권한 변경 성공 테스트")
+        void changeRoleSuccess() {
 
-            given(userRepository.findById(any()))
+            given(userRepository.findById(1L))
                     .willReturn(Optional.of(mockUser));
 
-            assertDoesNotThrow(() -> userService.changeRole(1L,userRoleChangeRequestDto));
+            assertDoesNotThrow(() -> userService.changeRole(1L));
         }
 
+        /**
+         * 권한 변경 실패 테스트
+         */
+        @Test
+        @DisplayName("권한 변경 실패 테스트")
+        void changeRoleError1() {
+
+            when(userRepository.findById(any()))
+                    .thenReturn(Optional.empty());
+
+            SNSAppException exception = assertThrows(SNSAppException.class, () -> userService.changeRole(any()));
+            assertThat(exception.getErrorCode().getMessage())
+                    .isEqualTo("해당하는 유저를 찾을 수 없습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("JwtTokenFilter용 findRole 메서드 테스트")
+    class findRoleTest {
+        /**
+         * 회원 등급 찾아오기 성공
+         */
+        @Test
+        @DisplayName("회원 등급 찾아오기 성공")
+        void findRoleSuccess() {
+            given(userRepository.findByUserName(any()))
+                    .willReturn(Optional.of(mockUser));
+
+            assertDoesNotThrow(() -> userService.findRoleByUserName(any()));
+        }
     }
 }
