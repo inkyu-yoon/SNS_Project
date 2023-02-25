@@ -31,34 +31,45 @@
 
 ```groovy
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-    compileOnly 'org.projectlombok:lombok'
 
-    // DB
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+  implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
+
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor 'org.projectlombok:lombok'
+  compileOnly 'org.projectlombok:lombok'
+
+  // DB
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  runtimeOnly 'com.mysql:mysql-connector-j'
 
 
-    // template 엔진
-    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+  // template 엔진
+  implementation 'org.springframework.boot:spring-boot-starter-mustache'
 
-    //Swagger
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+  //Swagger
+  implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+  implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
-    //테스트에 사용 (객체 JSON 화)
-    implementation 'com.google.code.gson:gson:2.10'
+  //테스트에 사용 (객체 JSON 화)
+  implementation 'com.google.code.gson:gson:2.10'
 
-    //security 관련 라이브러리
-    implementation 'org.springframework.security:spring-security-test'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
+  //security 관련 라이브러리
+  implementation 'org.springframework.security:spring-security-test'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.7.5'
 
-    // request dto 필드 유효성 검사
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+  // request dto 필드 유효성 검사
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+  //static method 테스트 코드에 사용
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.8.1'
+
+  //Querydsl
+  implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+  implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
 }
 ```
 
@@ -129,7 +140,7 @@ dependencies {
 
 - [x] Alarm 조회(요청자에게 온 알림 모아보기), 삭제 기능 구현
     - 알림 조회 및 삭제를 요청한 회원의 jwt 토큰을 확인한 뒤 가능, 토큰이 유효하지 않은 경우 · 만료된 경우 · 토큰이 없는 경우 에러 발생
-    - 20개씩 페이징되며, 최신에 생성된 알림 순으로 조회 가능
+    - 최신에 생성된 알림 순으로 조회 가능
     - 특정 알림 삭제 가능 (soft delete)
 
 - [x] Rest Controller 에서 `request dto` @Valid 유효성 검사 후 예외 처리 
@@ -734,82 +745,15 @@ dependencies {
 
 <br>
 
-| ***User Rest Controller***    |                                                       |
-|-------------------------------|-------------------------------------------------------|
-| 회원 가입 `성공` 테스트                | -                                                     |
-| 회원 가입 `에러` 테스트                | 중복 회원이 이미 존재하는 경우                                     |
-| 로그인 `성공` 테스트                  | -                                                     |
-| 로그인 `에러` 테스트                  | 로그인 요청한 회원명이 가입되어 있지 않는 경우(DB에 존재하지 않는 경우)            |
-|                               | 로그인 요청한 비밀번호가 DB에 저장되어 있는 비밀번호와 일치하지 않는 경우            |
-| 회원 등급 변경 `성공` 테스트             | 등급 변경 요청한 회원이 관리자 등급인 경우                        |
-| 회원 등급 변경 `에러` 테스트             | 등급 변경 요청한 회원이 관리자 등급이 아닌 경우                           |
-|                               | 토큰 없이 요청하는 경우                                         |
-| ***Post Rest Controller***    |                                                       |
-| 포스트 리스트 조회 `성공` 테스트           | -                                                     |
-| 포스트 단건 조회 `성공` 테스트            | -                                                     |
-| 포스트 작성 `성공` 테스트               | -                                                     |
-| 포스트 작성 `에러` 테스트               | Jwt 토큰이 아닌 다른 토큰을 담아서 요청하는 경우                         |
-|                               | 토큰 없이 요청하는 경우                                         |
-| 포스트 수정 `성공` 테스트               | -                                                     |
-| 포스트 수정 `에러` 테스트               | Jwt 토큰이 아닌 다른 토큰을 담아서 요청하는 경우                         |
-|                               | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 수정 요청자와 포스트 작성자가 일치하지 않는 경우             |
-|                               | DB 관련 문제가 발생한 경우                                      |
-| 포스트 삭제 `성공` 테스트               | -                                                     |
-| 포스트 삭제 `에러` 테스트               | Jwt 토큰이 아닌 다른 토큰을 담아서 요청하는 경우                         |
-|                               | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 삭제 요청자와 포스트 작성자가 일치하지 않는 경우             |
-|                               | DB 관련 문제가 발생한 경우                                      |
-| 마이 피드 조회 `성공` 테스트             | -                                                     |
-| 마이 피드 조회 `에러` 테스트             | 토큰 없이 요청하는 경우                                         |
-| ***Comment Rest Controller*** |                                                       |
-| 댓글 리스트 조회 `성공` 테스트            | -                                                     |
-| 댓글 작성 `성공` 테스트                | -                                                     |
-| 댓글 작성 `에러` 테스트                | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 포스트가 존재하지 않는데, 댓글 작성 요청한 경우             |
-| 댓글의 댓글 작성 `성공` 테스트            | -                                                     |
-| 댓글의 댓글 작성 `에러` 테스트            | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 포스트가 존재하지 않는데, 댓글 작성 요청한 경우             |
-|                               | 토큰 검증은 통과했고, 포스트가 존재하지만, 부모 댓글이 없는데 댓글의 댓글을 작성 요청한 경우 |
-| 댓글 수정 `성공` 테스트                | -                                                     |
-| 댓글 수정 `에러` 테스트                | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 댓글이 존재하지 않는데, 댓글 수정 요청한 경우              |
-|                               | 토큰 검증은 통과했지만, 댓글 작성자와 수정 요청자가 일치하지 않는 경우              |
-|                               | DB 관련 문제가 발생한 경우                                      |
-| 댓글 삭제 `성공` 테스트                | -                                                     |
-| 댓글 삭제 `에러` 테스트                | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 댓글이 존재하지 않는데, 댓글 삭제 요청한 경우              |
-|                               | 토큰 검증은 통과했지만, 댓글 작성자와 삭제 요청자가 일치하지 않는 경우              |
-|                               | DB 관련 문제가 발생한 경우                                      |
-| ***Like Rest Controller***    |                                                       |
-| 좋아요 입력 `성공` 테스트               | -                                                     |
-| 좋아요 입력 `에러` 테스트               | 토큰 없이 요청하는 경우                                         |
-|                               | 토큰 검증은 통과했지만, 좋아요를 입력할 게시글이 존재하지 않는 경우                |
-|                               | 토큰 검증은 통과했지만, 이미 좋아요를 입력한 상태인 경우                      |
-| 좋아요 개수 카운트 `성공` 테스트           | -                                                     |
-| ***Alarm Rest Controller***   |                                                       |
-| 알림 리스트 조회 `성공` 테스트            | -                                                     |
-| 알림 리스트 조회 `에러` 테스트            | 토큰 없이 요청하는 경우                                         |
-| 알림 단건 삭제 `성공` 테스트             | -                                                     |
-| 알림 단건 삭제 `에러` 테스트             | 토큰 없이 요청하는 경우                                         |
-| ***Post Service Test***       |                                                       |
-| 포스트 등록 `성공` 테스트               | -                                                     |
-| 포스트 등록 `실패` 테스트               | 등록을 요청한 회원이 DB에 저장(회원 가입) 되어 있지 않는 경우                 |
-| 포스트 수정 `실패` 테스트               | 수정을 요청한 회원과 포스트 작성자가 일치하지 않는 경우                       |
-|                               | 등록을 요청한 회원이 DB에 저장(회원 가입) 되어 있지 않는 경우                 |
-|                               | 수정 요청한 포스트가 존재하지 않는 경우                                |
-| 포스트 삭제 `실패` 테스트               | 수정을 요청한 회원과 포스트 작성자가 일치하지 않는 경우                       |
-|                               | 등록을 요청한 회원이 DB에 저장(회원 가입) 되어 있지 않는 경우                 |
-|                               | 수정 요청한 포스트가 존재하지 않는 경우                                |
+총 129개 케이스 테스트 코드를 작성했고, RestController와 Service 테스트 코드 커버리지 100% 달성
+
+테스트 코드 리포트 : [https://inkyu-yoon-sns-test-code.netlify.app/](https://inkyu-yoon-sns-test-code.netlify.app/)
 
 <br>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230110173510398.png" alt="image-20230110173510398" style="zoom: 50%;" />
+<img src="https://raw.githubusercontent.com/buinq/imageServer/main/img/image-20230226013603547.png" alt="image-20230226013603547" style="zoom:50%;" />
 </p>
-
-- Controller test 라인 커버리지
-
 
 
 ---
@@ -929,6 +873,10 @@ Controller 에서 `@Valid` 로 바인딩 에러시 예외처리를 해놓은 부
 
 Service 테스트 코드를 많이 구현하지 못해서, 코드 커버리지 퍼센트가 낮은데, 이 부분을 개선해야겠다.
 
+-> 😎 2월 26일 Rest Controller & Service 테스트 코드 커버리지 100% 달성했다.
+
+숫자가 중요한 것은 아니지만, 테스트 코드를 짜는 연습을 할 수 있었고, Mockito를 능숙하게 사용할 수 있게 되었다.
+
 - [Jacoco 적용으로 테스트 코드 개선하기](https://inkyu-yoon.github.io/docs/Language/SpringBoot/Jacoco)
 
 <br>
@@ -945,3 +893,21 @@ Git Actions 를 이용해 CI/CD 파이프라인을 구축했다.
 
 스크립트로서 관리하여 유지보수성을 향상시켰으며, private한 공간에 저장해두어 보안도 향상시켰다. 
 
+- [Git Submodule을 이용해서 안전하고 유지보수하기 쉽게 환경변수 관리하기](https://inkyu-yoon.github.io/docs/Learned/Git/GitSubmodule)
+- [Docker Compose와 Git Actions로 CI/CD 구현하기](https://inkyu-yoon.github.io/docs/Learned/Docker/GitActionsCICD)
+
+<br>
+
+### 7. Querydsl을 사용하여 쿼리 최적화 하기
+
+<br>
+
+핑계일 수 있겠지만, 일단 결과물을 완성시켜야 한다는 생각이 앞서서 쿼리문을 잔뜩 남발했다.
+
+‘쿼리문을 여러개 날려도 원하는 결과만 반환되면 되니까?!’ 라고 생각했었다. 🤔
+
+기존 엉망진창으로 데이터를 합쳐서 반환시켰던 코드를 Querydsl을 사용해서 join 후 가져오는 방식으로 변경하였다.
+
+이번 개선을 통해, 공부했던 Querydsl를 내가 직접 만든 프로젝트에 적용하니 뿌듯했고, 앞으로는 처음부터 적극 활용하여 좋은 성능으로 데이터를 가져와야겠다.
+
+- [QueryDsl를 이용한 쿼리 수와 실행시간 개선 여정기](https://inkyu-yoon.github.io/docs/Language/JPA/UseQuerydsl)
