@@ -1,11 +1,19 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.5'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 
     //jacoco 테스트 커버리지 확인
     id 'jacoco'
 }
+
 
 
 group = 'likelion'
@@ -56,6 +64,10 @@ dependencies {
 
     //static method 테스트 코드에 사용
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.8.1'
+
+    //Querydsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 }
 
@@ -161,3 +173,23 @@ task copyPrivate(type: Copy) {
 jar {
     enabled = false
 }
+
+//제일 아래 빈 공간에 querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets {
+    main.java.srcDir querydslDir
+}
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+//querydsl 추가 끝

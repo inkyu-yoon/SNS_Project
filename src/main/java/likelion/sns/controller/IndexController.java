@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/")
@@ -43,7 +44,7 @@ public class IndexController {
             Object loginUserName = session.getAttribute("userName");
             model.addAttribute("loginUserName", loginUserName);
 
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            List<AlarmListDetailsDto> alarms = alarmService.getAlarms((String) loginUserName, pageable);
             model.addAttribute("alarms", alarms);
         }
     }

@@ -156,7 +156,7 @@ public class PostController {
             model.addAttribute("loginUserName", loginUserName);
 
 
-            Page<AlarmListDetailsDto> alarms = alarmService.getDetailAlarms((String) loginUserName, pageable);
+            List<AlarmListDetailsDto> alarms = alarmService.getAlarms((String) loginUserName, pageable);
             model.addAttribute("alarms", alarms);
         }
     }

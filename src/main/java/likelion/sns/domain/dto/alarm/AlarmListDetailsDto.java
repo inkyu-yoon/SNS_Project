@@ -4,11 +4,13 @@ import likelion.sns.domain.entity.Alarm;
 import likelion.sns.domain.entity.AlarmType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.text.SimpleDateFormat;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @ToString(of = {"alarmId", "fromUserName", "PostName", "postId", "text"})
 public class AlarmListDetailsDto {

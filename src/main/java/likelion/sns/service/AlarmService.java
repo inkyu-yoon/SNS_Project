@@ -3,10 +3,10 @@ package likelion.sns.service;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
-import likelion.sns.domain.dto.alarm.AlarmListDto;
 import likelion.sns.domain.entity.Alarm;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
+import likelion.sns.repository.AlarmCustomRepositoryImpl;
 import likelion.sns.repository.AlarmRepository;
 import likelion.sns.repository.PostRepository;
 import likelion.sns.repository.UserRepository;
@@ -31,48 +31,21 @@ public class AlarmService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
+    private final AlarmCustomRepositoryImpl alarmCustomRepository;
+
     /**
      * 알림 목록 확인
      */
-    public Page<AlarmListDto> getAlarms(String requestUserName, Pageable pageable) {
+    public List<AlarmListDetailsDto> getAlarms(String requestUserName, Pageable pageable) {
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
 
-        return alarmRepository.findByUser_IdOrderByCreatedAtDesc(requestUser.getId(), pageable).map(alarm -> new AlarmListDto(alarm));
+        List<AlarmListDetailsDto> result = alarmCustomRepository.getAlarmListByUserId(requestUser.getId());
+        log.info("🔔알림 조회 끝 userName : {}");
+        return result;
     }
-
     /**
-     * UI 용 메서드
-     * 알림 목록 확인(상세 아이디, 게시글 제목, 알림 형태)
-     */
-    public Page<AlarmListDetailsDto> getDetailAlarms(String requestUserName, Pageable pageable) {
-        //user 유효성 검사하고 찾아오기
-        User requestUser = userValid(requestUserName);
-
-        Page<Alarm> alarms = alarmRepository.findByUser_IdOrderByCreatedAtDesc(requestUser.getId(), pageable);
-        List<AlarmListDetailsDto> alarmsDto = new ArrayList<>();
-
-
-        //post id와 user id가 아닌 post title 과 userName 을 넣기 위해..for Each 사용
-        for (Alarm alarm : alarms) {
-            Long fromUserId = alarm.getFromUserId();
-            Long postId = alarm.getTargetId();
-
-            String fromUserName = userRepository.findById(fromUserId)
-                    .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND)).getUserName();
-
-            String title = postValid(postId).getTitle();
-
-            alarmsDto.add(new AlarmListDetailsDto(alarm, fromUserName, title));
-
-        }
-
-        return new PageImpl<>(alarmsDto);
-    }
-
-
-    /**
-     * UI 용 메서드
+     *
      * 알림 삭제 (헤더에서 ✔확인 체크시)
      */
     @Transactional
