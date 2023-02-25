@@ -36,7 +36,7 @@ public class AlarmService {
     /**
      * 알림 목록 확인
      */
-    public List<AlarmListDetailsDto> getAlarms(String requestUserName, Pageable pageable) {
+    public List<AlarmListDetailsDto> getAlarms(String requestUserName) {
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
 
@@ -79,23 +79,6 @@ public class AlarmService {
     public User userValid(String userName) {
         return userRepository.findByUserName(userName)
                 .orElseThrow(() -> new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
-    }
-
-    /**
-     * 해당하는 게시글이 없을 시, 그리고 deletedAt 데이터가 있을 시(삭제 처리 된 것으로 볼 수 있으므로) 예외 처리
-     */
-    public Post postValid(Long postId) {
-
-        //DB에 저장되어 있는 게시글이 없는 경우
-        Post foundPost = postRepository.findById(postId)
-                .orElseThrow(() -> new SNSAppException(ErrorCode.POST_NOT_FOUND));
-
-        // deletedAt 에 데이터가 채워져서 삭제 처리가 된 경우
-        if (foundPost.getDeletedAt() != null) {
-            throw new SNSAppException(ErrorCode.POST_NOT_FOUND);
-        }
-
-        return foundPost;
     }
 
 }

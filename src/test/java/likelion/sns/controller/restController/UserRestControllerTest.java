@@ -2,8 +2,11 @@ package likelion.sns.controller.restController;
 
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ErrorDto;
+import likelion.sns.Exception.ExceptionManager;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.configuration.SecurityConfig;
+import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.user.changeRole.UserRoleChangeRequestDto;
 import likelion.sns.domain.dto.user.join.UserJoinRequestDto;
 import likelion.sns.domain.dto.user.join.UserJoinResponseDto;
@@ -16,7 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,6 +28,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,6 +36,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.mockStatic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,7 +56,8 @@ class UserRestControllerTest {
     String secretKey;
     @MockBean UserService userService;
 
-    @MockBean BindingResult br;
+    @Mock
+    BindingResult br;
 
     UserJoinRequestDto userJoinRequestDto = new UserJoinRequestDto("윤인규", "password");
     UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto("윤인규", "1234");
@@ -87,9 +96,8 @@ class UserRestControllerTest {
         @DisplayName("회원가입 (join) 성공 테스트")
         void joinSuccess() throws Exception {
 
-
-            Mockito.when(userService.createUser(any()))
-                    .thenReturn(new UserJoinResponseDto(1L, userLoginRequestDto.getUserName()));
+            given(userService.createUser(any()))
+                    .willReturn(new UserJoinResponseDto(1L, userLoginRequestDto.getUserName()));
 
             mockMvc.perform(post("/api/v1/users/join")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +118,7 @@ class UserRestControllerTest {
         @DisplayName("회원가입 중복 에러 테스트")
         void joinError1() throws Exception {
 
-            Mockito.when(userService.createUser(any()))
+            when(userService.createUser(any()))
                     .thenThrow(new SNSAppException(ErrorCode.DUPLICATED_USER_NAME));
 
             mockMvc.perform(post("/api/v1/users/join")
@@ -125,6 +133,43 @@ class UserRestControllerTest {
                     .andExpect(jsonPath("$.result.message").value("UserName이 중복됩니다."));
         }
 
+        /**
+         * 회원가입 에러 테스트 (바인딩 에러 발생)
+         */
+
+        @Test
+        @DisplayName("회원가입 에러 테스트 (바인딩 에러 발생)")
+        void joinError3() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            UserJoinRequestDto requestDto = new UserJoinRequestDto(null, null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(userService.createUser(any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(post("/api/v1/users/join")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .characterEncoding("utf-8")
+                            .content(content))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
+
     }
 
     /**
@@ -137,6 +182,8 @@ class UserRestControllerTest {
 
         String content = gson.toJson(userLoginRequestDto);
 
+        @Mock
+        UserLoginResponseDto responseDto;
         /**
          * 로그인 성공 테스트
          */
@@ -146,8 +193,8 @@ class UserRestControllerTest {
 
             String token = "randomToken";
 
-            Mockito.when(userService.loginUser(any()))
-                    .thenReturn(new UserLoginResponseDto(token));
+            given(userService.loginUser(any()))
+                    .willReturn(new UserLoginResponseDto(token));
 
             mockMvc.perform(post("/api/v1/users/login")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -161,6 +208,7 @@ class UserRestControllerTest {
         }
 
 
+
         /**
          * 로그인 실패 테스트 (저장되어 있는 UserName 없음)
          */
@@ -168,7 +216,7 @@ class UserRestControllerTest {
         @DisplayName("회원 로그인 실패 테스트 (저장되어 있는 UserName 없음)")
         void LoginNotFound() throws Exception {
 
-            Mockito.when(userService.loginUser(any()))
+            when(userService.loginUser(any()))
                     .thenThrow(new SNSAppException(ErrorCode.USERNAME_NOT_FOUND));
 
             mockMvc.perform(post("/api/v1/users/login")
@@ -190,7 +238,7 @@ class UserRestControllerTest {
         @DisplayName("회원 로그인 실패 테스트 (Invalid password)")
         void LoginInValid() throws Exception {
 
-            Mockito.when(userService.loginUser(any()))
+            when(userService.loginUser(any()))
                     .thenThrow(new SNSAppException(ErrorCode.INVALID_PASSWORD));
 
             mockMvc.perform(post("/api/v1/users/login")
@@ -204,6 +252,43 @@ class UserRestControllerTest {
                     .andExpect(jsonPath("$.result.message").value("패스워드가 잘못되었습니다."));
 
         }
+        /**
+         * 로그인 에러 테스트 (바인딩 에러 발생)
+         */
+
+        @Test
+        @DisplayName("로그인 에러 테스트 (바인딩 에러 발생)")
+        void loginError3() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            UserLoginRequestDto requestDto = new UserLoginRequestDto(null, null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(userService.loginUser(any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(post("/api/v1/users/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .characterEncoding("utf-8")
+                            .content(content))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
+
     }
 
 
@@ -228,7 +313,7 @@ class UserRestControllerTest {
         @DisplayName("등급 변경 성공 테스트")
         void changeRoleSuccess() throws Exception {
 
-            Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_ADMIN);
+            when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_ADMIN);
 
             mockMvc.perform(post("/api/v1/users/1/role/change")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -251,7 +336,7 @@ class UserRestControllerTest {
         @DisplayName("등급 변경 실패 테스트 ( USER 등급인 회원이 요청하는 경우)")
         void changeRoleError1() throws Exception {
 
-            Mockito.when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_USER);
+            when(userService.findRoleByUserName(any())).thenReturn(UserRole.ROLE_USER);
 
             mockMvc.perform(post("/api/v1/users/1/role/change")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

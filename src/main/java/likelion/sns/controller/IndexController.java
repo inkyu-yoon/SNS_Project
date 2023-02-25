@@ -44,7 +44,7 @@ public class IndexController {
             Object loginUserName = session.getAttribute("userName");
             model.addAttribute("loginUserName", loginUserName);
 
-            List<AlarmListDetailsDto> alarms = alarmService.getAlarms((String) loginUserName, pageable);
+            List<AlarmListDetailsDto> alarms = alarmService.getAlarms((String) loginUserName);
             model.addAttribute("alarms", alarms);
         }
     }

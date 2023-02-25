@@ -28,13 +28,13 @@ public class AlarmRestController {
      * 요청자에게 온 알림 페이징 조회(최신순으로 정렬)
      */
     @GetMapping
-    @ApiOperation(value = "Alarm 리스트 조회", notes = "발생된 알림을 최신순으로 20개씩 페이징 해서 가져온다.")
+    @ApiOperation(value = "Alarm 리스트 조회", notes = "발생된 알림을 최신순으로 가져온다.")
     public Response showAlarms(@ApiIgnore Authentication authentication, @ApiIgnore Pageable pageable) throws SQLException {
 
         String requestUserName = authentication.getName();
         log.info("🔔알림 조회 요청자 userName : {}", requestUserName);
 
-        return Response.success(alarmService.getAlarms(requestUserName, pageable));
+        return Response.success(alarmService.getAlarms(requestUserName));
     }
 
     /**

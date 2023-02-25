@@ -2,14 +2,18 @@ package likelion.sns.controller.restController;
 
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ErrorDto;
+import likelion.sns.Exception.ExceptionManager;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.configuration.SecurityConfig;
+import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.CommentWriteResponseDto;
 import likelion.sns.domain.dto.comment.write.ReplyCommentWriteRequestDto;
 import likelion.sns.domain.dto.comment.write.ReplyCommentWriteResponseDto;
+import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
 import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.CommentService;
@@ -18,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,17 +31,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = CommentRestController.class)
@@ -52,6 +60,9 @@ class CommentRestControllerTest {
 
     @MockBean
     CommentService commentService;
+
+    @Mock
+    BindingResult br;
 
     @Value("${jwt.token.secret}")
     String secretKey;
@@ -182,6 +193,44 @@ class CommentRestControllerTest {
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result").exists())
                     .andExpect(MockMvcResultMatchers.jsonPath("$.result.message").value("해당 포스트가 없습니다."));
         }
+
+        /**
+         * 댓글 삭제 에러 테스트 (바인딩 에러 발생)
+         */
+        @Test
+        @DisplayName("댓글 삭제 에러 테스트 (바인딩 에러 발생)")
+        void commentWriteError3() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            CommentWriteRequestDto requestDto = new CommentWriteRequestDto(null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(commentService.writeComment(any(), any(), any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(post("/api/v1/posts/"+postId+"/comments")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
+
     }
 
     /**
@@ -300,6 +349,42 @@ class CommentRestControllerTest {
         }
 
 
+        /**
+         * 댓글의 댓글 삭제 에러 테스트 (바인딩 에러 발생)
+         */
+        @Test
+        @DisplayName("댓글의 댓글 삭제 에러 테스트 (바인딩 에러 발생)")
+        void replyCommentWriteError4() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            ReplyCommentWriteRequestDto requestDto = new ReplyCommentWriteRequestDto(null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(commentService.writeReplyComment(any(), any(), any(), any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(post("/api/v1/posts/" + postId + "/comments/" + parentCommentId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
 
     }
 
@@ -418,12 +503,50 @@ class CommentRestControllerTest {
         }
 
         /**
+         * 댓글 수정 에러 테스트 (바인딩 에러 발생)
+         */
+        @Test
+        @DisplayName("댓글 수정 에러 테스트 (바인딩 에러 발생)")
+        void commentModifyError4() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            CommentModifyRequestDto requestDto = new CommentModifyRequestDto(null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(commentService.modifyComment(any(), any(), any(), any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(put("/api/v1/posts/" + postId + "/comments/" + commentId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
+
+
+        /**
          * 댓글 수정 실패 (DB 에러)
          */
 
         @Test
         @DisplayName("댓글 수정 실패 (DB 에러)")
-        public void commentModifyError4() throws Exception {
+        public void commentModifyError5() throws Exception {
 
             doThrow(new SNSAppException(ErrorCode.DATABASE_ERROR))
                     .when(commentService).modifyComment(any(), any(), any(), any());

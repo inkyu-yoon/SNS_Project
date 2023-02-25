@@ -62,12 +62,9 @@ public class UserRestController {
 
         UserLoginResponseDto responseDto = userService.loginUser(requestDto);
 
-        // 토큰이 제대로 생성됐을 시(null이 아닐 시), 세션에 회원명 저장
-        if (responseDto.getJwt() != null) {
-            HttpSession session = request.getSession(true);
-            session.setAttribute("userName", requestDto.getUserName());
+        HttpSession session = request.getSession(true);
+        session.setAttribute("userName", requestDto.getUserName());
 
-        }
 
         return ResponseEntity.ok(Response.success(responseDto));
     }

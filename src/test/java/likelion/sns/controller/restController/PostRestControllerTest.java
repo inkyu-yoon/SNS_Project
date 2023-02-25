@@ -2,14 +2,18 @@ package likelion.sns.controller.restController;
 
 import com.google.gson.Gson;
 import likelion.sns.Exception.ErrorCode;
+import likelion.sns.Exception.ErrorDto;
+import likelion.sns.Exception.ExceptionManager;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.configuration.SecurityConfig;
+import likelion.sns.domain.Response;
 import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
 import likelion.sns.domain.dto.post.modify.PostModifyResponseDto;
 import likelion.sns.domain.dto.post.read.PostDetailDto;
 import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.dto.post.write.PostWriteResponseDto;
+import likelion.sns.domain.dto.user.join.UserJoinRequestDto;
 import likelion.sns.domain.entity.UserRole;
 import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.AlarmService;
@@ -19,6 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +36,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.sql.SQLException;
@@ -44,6 +53,7 @@ import java.util.List;
 import static java.lang.System.currentTimeMillis;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -65,6 +75,8 @@ class PostRestControllerTest {
     UserService userService;
     @MockBean
     AlarmService alarmService;
+    @Mock
+    BindingResult br;
     @Value("${jwt.token.secret}")
     String secretKey;
 
@@ -179,7 +191,8 @@ class PostRestControllerTest {
         @DisplayName("게시글 작성 테스트")
         void postWriteSuccess() throws Exception {
 
-            Mockito.when(postService.writePost(any(), any())).thenReturn(new PostWriteResponseDto("포스트 등록 완료", 1L));
+            given(postService.writePost(any(), any()))
+                    .willReturn(new PostWriteResponseDto("포스트 등록 완료", 1L));
 
             mockMvc.perform(post("/api/v1/posts")
                             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -232,6 +245,43 @@ class PostRestControllerTest {
                     .andExpect(jsonPath("$.result.message").value("토큰이 존재하지 않습니다."));
         }
 
+
+        /**
+         * 포스트 작성 에러 테스트 (바인딩 에러 발생)
+         */
+        @Test
+        @DisplayName("포스트 작성 에러 테스트 (바인딩 에러 발생)")
+        void postWriteError3() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            PostWriteRequestDto requestDto = new PostWriteRequestDto(null, null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            when(postService.writePost(any(),any()))
+                    .thenThrow(new SNSAppException(e));
+
+            mockMvc.perform(post("/api/v1/posts")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
+        }
     }
 
     /**
@@ -334,6 +384,43 @@ class PostRestControllerTest {
                     .andExpect(jsonPath("$.result").exists())
                     .andExpect(jsonPath("$.result.errorCode").value("USER_NOT_MATCH"))
                     .andExpect(jsonPath("$.result.message").value("작성자와 요청자가 일치하지 않습니다."));
+        }
+
+        /**
+         * 포스트 수정 에러 테스트 (바인딩 에러 발생)
+         */
+        @Test
+        @DisplayName("포스트 수정 에러 테스트 (바인딩 에러 발생)")
+        void postModifyError4() throws Exception {
+
+            MockedStatic<ExceptionManager> exceptionManagerMockedStatic = mockStatic(ExceptionManager.class);
+            ErrorCode e = ErrorCode.BLANK_NOT_ALLOWED;
+            PostModifyRequestDto requestDto = new PostModifyRequestDto(null, null);
+            String content = gson.toJson(requestDto);
+
+            when(br.hasErrors())
+                    .thenReturn(true);
+
+            when(ExceptionManager.ifNullAndBlank())
+                    .thenReturn(ResponseEntity.status(e.getHttpStatus()).body(Response.error(new ErrorDto(e))));
+
+            doThrow(new SNSAppException(e))
+                    .when(postService).modifyPost(any(), any(), any());
+
+            mockMvc.perform(put("/api/v1/posts/"+postId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                            .characterEncoding("utf-8")
+                            .content(content)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.resultCode").value("ERROR"))
+                    .andExpect(jsonPath("$.result").exists())
+                    .andExpect(jsonPath("$.result.errorCode").value("BLANK_NOT_ALLOWED"))
+                    .andExpect(jsonPath("$.result.message").value("공백 또는 null 을 입력할 수 없습니다."));
+
+            exceptionManagerMockedStatic.close();
+
         }
 
         /**
