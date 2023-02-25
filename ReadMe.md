@@ -6,6 +6,11 @@
 
 회원 가입 후 게시글 작성 · 조회 · 수정 · 삭제 · 댓글 · 좋아요 버튼 등을 할 수 있는 SNS 웹 페이지 구현
 
+배포 주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
+
+스웨거 주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
+
+
 <br>
 
 ## 목차
@@ -33,7 +38,7 @@
 - **Build** : Gradle 7.5.1
 - **Framework** : Springboot 2.7.5
 - **Database** : MySQL 8.0
-- **CI & CD** : GitLab
+- **CI & CD** : Git Actions
 - **Server** : AWS EC2
 - **Deploy** : Docker
 - **IDE** : IntelliJ
