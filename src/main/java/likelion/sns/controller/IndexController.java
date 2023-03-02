@@ -4,8 +4,9 @@ package likelion.sns.controller;
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
 import likelion.sns.service.AlarmService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +16,10 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
+@Slf4j
 @RequestMapping("/")
 @RequiredArgsConstructor
 @ApiIgnore
@@ -25,10 +28,10 @@ public class IndexController {
     private final AlarmService alarmService;
 
     @GetMapping("")
-    public String index(Model model, HttpServletRequest request, Pageable pageable) {
+    public String index(Model model, HttpServletRequest request) {
 
         // 로그인 시, 화면에 로그인 회원명, 알림 표시
-        showLoginUserNameAndAlarm(request, model, pageable);
+        showLoginUserNameAndAlarm(request, model);
         return "index";
     }
 
@@ -37,7 +40,7 @@ public class IndexController {
      * 로그인 여부는 세션에 회원명이 저장되어 있는지로 확인
      * 서비스는 토큰 존재 여부, 만료 여부 등 유효성으로 체크
      */
-    public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model,Pageable pageable) {
+    public void showLoginUserNameAndAlarm(HttpServletRequest request, Model model) {
         HttpSession session = request.getSession(true);
 
         if (session.getAttribute("userName") != null) {

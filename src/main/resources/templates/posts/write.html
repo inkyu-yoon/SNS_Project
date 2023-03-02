@@ -1,4 +1,8 @@
-{{>layouts/header}}
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
 <form class="container">
 
     <div class="mb-3">
@@ -12,7 +16,6 @@
     </div>
     <div align="center">
 
-        {{! 게시글 등록 버튼!! 클릭 시 postCreate 함수 실행}}
         <button type="button" class="btn btn-primary" id="post-write-btn" onclick="post.postCreate()"
                 style="width:120px;height:40px;font-size: 15px">게시글 작성
         </button>

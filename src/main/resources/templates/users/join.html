@@ -1,6 +1,10 @@
-{{>layouts/header}}
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<br><br><br>
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+<br>
 
 <div class="form-group" align="center">
     <h3>Welcome 🤗</h3>
@@ -24,7 +28,6 @@
     </div>
 
     <br>
-    {{! 회원 등록 버튼!! 클릭 시 userCreate 함수 실행}}
     <button type="button" class="btn btn-primary btn-lg" id="user-create-btn" onclick="user.userCreate()">회원가입</button>
 </div>
 

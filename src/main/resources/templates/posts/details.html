@@ -1,178 +1,187 @@
-{{>layouts/header}}
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
 <div>
-{{#post}}
+
+    <form class="container">
+        <ul class="list-group">
+            <li class="list-group-item active" aria-current="true"
+                style="font-size: 30px;font-weight: bold" th:text="${post.title}">{{title}}
+            </li>
+
+            <th:block th:if="${post.isModified != null}">
+                <li class="list-group-item">
+                        <span>
+                    <span style="font-size: 20px;font-weight: bold;" th:text="${post.userName}">{{userName}}</span>
+                    <span style="font-size:10px" th:text="|${post.lastModifiedAt} ${post.isModified}|"> {{lastModifiedAt}} {{isModified}}</span>
+                </span>
+                </li>
+            </th:block>
+            <th:block th:if="${post.isModified == null}">
+                <li class="list-group-item">
+                        <span>
+                    <span style="font-size: 20px;font-weight: bold;" th:text="${post.userName}">{{userName}}</span>
+                    <span style="font-size:10px" th:text="${post.createdAt}">{{createdAt}}</span>
+                </span>
+                </li>
+            </th:block>
+
+            <li class="list-group-item" style="height: 500px;white-space: pre" th:text="${post.body}"> {{body}}</li>
+            <br>
+        </ul>
+        </tbody>
+        </table>
+    </form>
+
+    <div align="center">
         <form class="container">
-            <ul class="list-group">
-                <li class="list-group-item active" aria-current="true"
-                    style="font-size: 30px;font-weight: bold">{{title}}</li>
-
-                {{! 게시글 수정 할 시, (수정됨) 이라고 표시됨}}
-                {{#isModified}}
-                    <li class="list-group-item">
-                        <span>
-                    <span style="font-size: 20px;font-weight: bold;">{{userName}}</span>
-                    <span style="font-size:10px"> {{lastModifiedAt}} {{isModified}}</span>
-                </span>
-                    </li>
-                {{/isModified}}
-                {{^isModified}}
-                    <li class="list-group-item">
-                        <span>
-                    <span style="font-size: 20px;font-weight: bold;">{{userName}}</span>
-                    <span style="font-size:10px">{{createdAt}}</span>
-                </span>
-                    </li>
-                {{/isModified}}
-                {{!}}
-
-                <li class="list-group-item" style="height: 500px;white-space: pre">  {{body}}</li>
-                <br>
-            </ul>
-            </tbody>
-            </table>
+            <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn"
+                    th:onclick="|main.likeCreate(${post.id})|"
+                    style="width:60px;height:50px;font-size: 20px">❤
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg"
+                    style="width:60px;height:50px;font-size: 20px" th:text="${post.likeNum}">{{likeNum}}
+            </button>
         </form>
+    </div>
 
-        <div align="center">
-            <form class="container">
-                {{! 좋아요 입력 버튼!! 클릭 시 likeCreate 함수 파라미터에 post id를 전달하고 함수 실행}}
-                <button type="button" class="btn btn-outline-secondary btn-lg" id="like-btn"
-                        onclick="main.likeCreate({{id}})"
-                        style="width:60px;height:50px;font-size: 20px">❤
-                </button>
-                <button type="button" class="btn btn-secondary btn-lg"
-                        style="width:60px;height:50px;font-size: 20px">{{likeNum}}
+    <br>
+
+    <div align="center">
+
+        <div style="display: inline-block">
+            <form class="container" th:action="@{/posts/modify/{postId}(postId=${post.id})}" th:method="get">
+                <button type="submit" class="btn btn-primary btn-lg"
+                        style="width:120px;height:40px;font-size: 15px">게시글 수정
                 </button>
             </form>
         </div>
 
-        <br>
 
-        <div align="center">
-
-            <div style="display: inline-block">
-                {{! 게시글 수정 버튼!! 클릭 시 수정 페이지로 이동}}
-                <form class="container" form action="/posts/modify/{{id}}" method="get">
-                    <button type="submit" class="btn btn-primary btn-lg"
-                            style="width:120px;height:40px;font-size: 15px">게시글 수정
-                    </button>
-                </form>
-            </div>
-
-
-            <div style="display: inline-block">
-                <form class="container">
-                    {{! 게시글 삭제 버튼!! 클릭 시 postDelete 함수 파라미터에 post id를 전달하고 함수 실행}}
-                    <button type="button" class="btn btn-danger btn-lg" id="post-delete-btn"
-                            onclick="main.postDelete({{id}})"
-                            style="width:120px;height:40px;font-size: 15px">게시글 삭제
-                    </button>
-                </form>
-            </div>
-
-            <div style="display: inline-block">
-                <form class="container" form action="/posts" method="get">
-                    <button class="btn btn-success btn-lg" type="submit"
-                            style="width:120px;height:40px;font-size: 15px">게시글 목록
-                    </button>
-                </form>
-            </div>
+        <div style="display: inline-block">
+            <form class="container">
+                <button type="button" class="btn btn-danger btn-lg" id="post-delete-btn"
+                        th:onclick="|main.postDelete(${post.id})|"
+                        style="width:120px;height:40px;font-size: 15px">게시글 삭제
+                </button>
+            </form>
         </div>
 
+        <div style="display: inline-block">
+            <form class="container" form action="/posts" method="get">
+                <button class="btn btn-success btn-lg" type="submit"
+                        style="width:120px;height:40px;font-size: 15px">게시글 목록
+                </button>
+            </form>
+        </div>
     </div>
-{{/post}}
+
+</div>
+
 
 <br>
 <hr>
 <div class="container">
     <div class="card border-primary mb-3">
-        <div class="card-header bi bi-chat-dots"> {{#comments.size}}{{comments.numberOfElements}}{{/comments.size}}
+        <div class="card-header bi bi-chat-dots" th:text="|${comments.numberOfElements} Comments|">
+            {{#comments.size}}{{comments.numberOfElements}}{{/comments.size}}
             Comments
         </div>
 
         <ul class="list-group-flush">
-            {{#comments}}
-                <li id="comments-{{id}}" class="list-group-item">
+            <th:block th:each="comment : ${comments}">
+                <li th:id="|comments-${comment.id}|" class="list-group-item">
                 <span>
-                    <span style="font-size: 15px;font-weight: bold;">{{userName}}</span>
-                    {{^isModified}}
-                        <span style="font-size: xx-small;">{{createdAt}}</span>
-                    {{/isModified}}
-                    {{#isModified}}
-                        <span style="font-size: xx-small;">{{lastModifiedAt}} {{isModified}}</span>
-                    {{/isModified}}
-
+                    <span style="font-size: 15px;font-weight: bold;" th:text="${comment.userName}">
+                        {{userName}}
+                    </span>
+                     <th:block th:if="${post.isModified == null}">
+                        <span style="font-size: xx-small;" th:text="${comment.createdAt}">{{createdAt}}
                         </span>
+                     </th:block>
 
-                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
+                    <th:block th:if="${post.isModified != null}">
+                        <span style="font-size: xx-small;">{{lastModifiedAt}} {{isModified}}
+                        </span>
+                    </th:block>
+
+
+
                     <a type="button" class="comment-edit-btn" data-toggle="collapse"
-                       data-target=".multi-collapse-{{id}}" style="font-size: xx-small;">수정</a>
+                       th:attr="data-target='.multi-collapse-'+${comment.id}"
+                       style="font-size: xx-small;">수정</a>
 
-                    {{! 댓글 삭제 버튼!! 클릭 시 commentDelete 함수에 위 해당 댓글의 id와 postId를 전달한다.}}
                     <a class="accordion-button collapsed" type="button" style="font-size: xx-small;color: darkred;"
-                       onclick="main.commentDelete({{postId}},{{id}})">
+                       th:onclick="|main.commentDelete(${post.id},${comment.id})|">
                         삭제
                     </a>
 
-                    <div>{{comment}}</div>
+                    <div th:text="${comment.comment}">{{comment}}</div>
 
-                    {{! 댓글 수정 버튼!! 클릭 시 collapse 되어 있는 multi-collapse-id form 을 열어준다.}}
 
                     <a type="button" class="comment-reply-btn" data-toggle="collapse"
-                       data-target="#multi-collapse-reply-{{id}}" style="font-size: xx-small;">▼ 댓글의 댓글 {{replysSize}}
+                       th:attr="data-target='#multi-collapse-reply-'+${comment.id}" style="font-size: xx-small;"
+                       th:text="'▼'+| 댓글의 댓글 ${comment.replysSize}|">▼ 댓글의 댓글 {{replysSize}}
                         개</a>
 
 
-                    {{! 대댓글}}
                     <div class="collapse-group">
-                        <form class="collapse" id="multi-collapse-reply-{{id}}">
+                        <form class="collapse" th:id="|multi-collapse-reply-${comment.id}|">
                             <ul class="list-group-flush">
-                                {{#replys}}
-                                    <li id="reply-comments-{{id}}" class="list-group-item">
+                             <th:block th:each="reply : ${comment.replys}">
+                                <li th:id="|reply-comments-${comment.id}|" class="list-group-item">
+
                 <span>
-                    <span style="font-size: 15px;font-weight: bold;">{{userName}}</span>
-                    {{^isModified}}
-                        <span style="font-size: xx-small;">{{createdAt}}</span>
-                    {{/isModified}}
-                    {{#isModified}}
-                        <span style="font-size: xx-small;">{{lastModifiedAt}} {{isModified}}</span>
-                    {{/isModified}}
+
+                    <span style="font-size: 15px;font-weight: bold;" th:text="${reply.userName}">{{userName}}</span>
+                           <th:block th:if="${post.isModified == null}">
+
+                        <span style="font-size: xx-small;" th:text="${reply.createdAt}">{{createdAt}}</span>
+                           </th:block>
+                                 <th:block th:if="${post.isModified != null}">
+
+                        <span style="font-size: xx-small;" th:text="|${reply.lastModifiedAt} ${reply.isModified}|">{{lastModifiedAt}} {{isModified}}</span>
+                           </th:block>
 
                         </span>
 
-                                        <a type="button" class="comment-reply-edit-btn" data-toggle="collapse"
-                                           data-target="#multi-collapse-reply-edit-{{id}}" style="font-size: xx-small;">수정</a>
+                                    <a type="button" class="comment-reply-edit-btn" data-toggle="collapse"
+                                       th:attr="data-target='#multi-collapse-reply-edit-'+${reply.id}"
+                                       style="font-size: xx-small;">수정</a>
 
-                                        <a class="accordion-button collapsed" type="button"
-                                           style="font-size: xx-small;color: darkred;"
-                                           onclick="main.commentDelete({{postId}},{{id}})">
-                                            삭제
-                                        </a>
+                                    <a class="accordion-button collapsed" type="button"
+                                       style="font-size: xx-small;color: darkred;"
+                                       th:onclick="|main.commentDelete(${post.id},${reply.id})|">
+                                        삭제
+                                    </a>
 
-                                        <div>{{comment}}</div>
-                                        <div class="collapse" id="multi-collapse-reply-edit-{{id}}">
-                                            <form>
-                                                <textarea class="form-control" id="comment-content"
+                                    <div th:text="${reply.comment}">{{comment}}</div>
+                                    <div class="collapse" th:id="|multi-collapse-reply-edit-${reply.id}|">
+                                        <form>
+                                                <textarea class="form-control" id="comment-content" th:text="${reply.comment}"
                                                           rows="1">{{comment}}</textarea>
-                                                <input type="hidden" id="comment-id" value="{{id}}">
-                                                <input type="hidden" id="post-id" value="{{postId}}">
-                                                <div align="right">
-                                                    <button type="button" class="btn btn-warning" id="comment-update-btn">
-                                                        수정 완료
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </li>
-                                {{/replys}}
+                                            <input type="hidden" th:id="comment-id" th:value="${reply.id}">
+                                            <input type="hidden" th:id="post-id" th:value="${post.id}">
+                                            <div align="right">
+                                                <button type="button" class="btn btn-warning" id="comment-update-btn">
+                                                    수정 완료
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </li>
+                               </th:block>
                             </ul>
 
 
-                            <form class="collapse" id="multi-collapse-reply-{{id}}">
+                            <form class="collapse" th:id="|multi-collapse-reply-${comment.id}|">
                                 <div class="mb-3">
                                     <textarea class="form-control" id="comment-reply-content" rows="1"></textarea>
                                 </div>
-                                <input type="hidden" id="comment-id" value="{{id}}">
-                                <input type="hidden" id="post-id" value="{{postId}}">
+                                <input type="hidden" id="comment-id" th:value="${comment.id}">
+                        <input type="hidden" id="post-id" th:value="${post.id}">
                                 <div align="right">
                                     <button type="button" class="btn btn-info" id="comment-reply-btn">댓글 등록</button>
 
@@ -181,45 +190,34 @@
                             </form>
                         </form>
                     </div>
-                    {{! 대댓글 END}}
 
 
-
-
-                    <form class="collapse multi-collapse-{{id}}">
+                    <form th:class="|collapse multi-collapse-${comment.id}|">
                         <div class="form-group">
-                            {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-content 내용 전달 }}
-                            <textarea class="form-control" id="comment-content" rows="1">{{comment}}</textarea>
+                            <textarea class="form-control" id="comment-content" rows="1" th:text="${comment.comment}">{{comment}}</textarea>
                         </div>
-                        {{! 댓글 수정 버튼!! 클릭 시, id 가 comment-id 로 댓글 번호를 전달 }}
-                        <input type="hidden" id="comment-id" value="{{id}}">
-                        {{! 댓글 수정 버튼!! 클릭 시, id 가 post-id 포스트 번호 전달 }}
-                        <input type="hidden" id="post-id" value="{{postId}}">
+                        <input type="hidden" id="comment-id" th:value="${comment.id}">
+                        <input type="hidden" id="post-id" th:value="${post.id}">
                         <div align="right">
-                            {{! 댓글 수정 버튼!! 클릭 시 위 id가 comment-content 인 textarea 내용을 form 형태로 전달하여 수정}}
                             <button type="button" class="btn btn-warning" id="comment-update-btn">수정 완료</button>
                         </div>
                     </form>
 
                 </li>
-            {{/comments}}
+            </th:block>
         </ul>
     </div>
 </div>
 
 <form class="container">
     <div class="mb-3">
-        {{! 댓글 등록 버튼!! 클릭 시, id 가 input-write-comment 내용 전달 }}
         <input class="form-control" id="input-write-comment" rows="1" name="comment" placeholder="댓글 입력">
     </div>
-    {{#post}}
-        <div align="right">
-            {{! 댓글 등록 버튼!! 클릭 시 commentWrite 함수 파라미터에 post id를 전달하고 함수 실행}}
-            <button type="button" class="btn btn-primary btn-lg" id="comment-write-btn"
-                    onclick="main.commentWrite({{id}})">댓글 등록
-            </button>
-        </div>
-    {{/post}}
+    <div align="right">
+        <button type="button" class="btn btn-primary btn-lg" id="comment-write-btn"
+                th:onclick="|main.commentWrite(${post.id})|">댓글 등록
+        </button>
+    </div>
 </form>
 
 
@@ -258,16 +256,16 @@
 
             if (con_check === true) {
                 axios.delete("/api/v1/posts/" + postId, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
-                            console.log(response);
-                            alert("게시글이 삭제되었습니다.")
-                            window.location.href = '/posts';
-                        }
+                        console.log(response);
+                        alert("게시글이 삭제되었습니다.")
+                        window.location.href = '/posts';
+                    }
                 ).catch((error) => {
                     console.log(error.response.data.result);
                     if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
@@ -302,12 +300,12 @@
 
             if (con_check === true) {
                 axios.post("/api/v1/posts/" + postId + "/comments",
-                        JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                    JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
                     alert("댓글 작성이 완료되었습니다.");
                     window.location.href = '/posts/' + postId;
@@ -346,12 +344,12 @@
 
             if (con_check === true) {
                 axios.post("/api/v1/posts/" + postId + "/comments/" + commentId,
-                        JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                    JSON.stringify(data), { // dto 처럼 만든 객체 data를 stringify 함수로 JSON 형식으로 만든다.
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
                     alert("댓글 작성이 완료되었습니다.");
                     window.location.href = '/posts/' + postId;
@@ -393,17 +391,17 @@
 
             if (con_check === true) {
                 axios.put(url,
-                        JSON.stringify(data), {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                    JSON.stringify(data), {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
-                            console.log(response);
-                            alert("댓글이 수정되었습니다.")
-                            window.location.href = '/posts/' + postId;
-                        }
+                        console.log(response);
+                        alert("댓글이 수정되었습니다.")
+                        window.location.href = '/posts/' + postId;
+                    }
                 ).catch((error) => {
                     console.log(error.response.data.result);
                     if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
@@ -437,16 +435,16 @@
             if (con_check === true) {
 
                 axios.delete(url, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
-                            console.log(response);
-                            alert("댓글이 삭제되었습니다.")
-                            window.location.href = '/posts/' + postId;
-                        }
+                        console.log(response);
+                        alert("댓글이 삭제되었습니다.")
+                        window.location.href = '/posts/' + postId;
+                    }
                 ).catch((error) => {
                     console.log(error.response.data.result);
                     if (error.response.data.result["errorCode"] == "EXPIRED_TOKEN") {
@@ -477,16 +475,16 @@
 
             if (con_check === true) {
                 axios.post(url, data, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${localStorage.getItem("token")}`
-                            }
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
+                    }
                 ).then((response) => {
-                            console.log(response);
-                            alert("💖")
-                            window.location.href = '/posts/' + postId;
-                        }
+                        console.log(response);
+                        alert("💖")
+                        window.location.href = '/posts/' + postId;
+                    }
                 ).catch((error) => {
                     console.log(error.response.data.result);
                     console.log(error.response)

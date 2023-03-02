@@ -6,7 +6,7 @@
 
 회원 가입 후 게시글 작성 · 조회 · 수정 · 삭제 · 댓글 · 좋아요 버튼 등을 할 수 있는 SNS 웹 페이지 구현
 
-배포 주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
+배포 주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/)
 
 스웨거 주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/swagger-ui/)
 
@@ -167,7 +167,7 @@ dependencies {
 
 ## UI 개발 상황
 
-주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-54-248-132-84.ap-northeast-1.compute.amazonaws.com:8080/)
+주소 : [http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/](http://ec2-13-231-48-116.ap-northeast-1.compute.amazonaws.com:8080/)
 
 - [x] 홈 화면
   - [x] 홈 화면 이동, 게시판 이동, 회원가입 화면, 로그인 화면 으로 이동할 수 있는 상단 바 구현

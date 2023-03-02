@@ -12,21 +12,21 @@ import java.text.SimpleDateFormat;
 @Getter
 @Setter
 @AllArgsConstructor
-@ToString(of = {"alarmId", "fromUserName", "PostName", "postId", "text"})
+@ToString(of = {"alarmId", "fromUserName", "postName", "postId", "text"})
 public class AlarmListDetailsDto {
 
     private Long alarmId;
     private String fromUserName;
-    private String PostName;
+    private String postName;
     private Long postId;
     private String text;
 
     private String createdAt;
 
-    public AlarmListDetailsDto(Alarm alarm, String fromUserName, String PostName) {
+    public AlarmListDetailsDto(Alarm alarm, String fromUserName, String postName) {
         this.alarmId = alarm.getId();
         this.fromUserName = fromUserName;
-        this.PostName = PostName;
+        this.postName = postName;
         this.postId = alarm.getTargetId();
 
         if (alarm.getAlarmType().equals(AlarmType.NEW_LIKE_ON_POST)) {

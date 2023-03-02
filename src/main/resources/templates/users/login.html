@@ -1,20 +1,24 @@
-{{>layouts/header}}
-<br><br><br>
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+<br>
 
 <div class="form-group" align="center">
     <h3>💂🏻‍♀️ 로그인 💂🏻‍♂️</h3>
     <br>
     <div class="form-floating mb-3">
-        <label for="floatingInput"><strong>회원 명</strong></label>
+        <label ><strong>회원 명</strong></label>
         <input name="userName" type="text" class="form-control" id="input-userName" placeholder="회원명을 입력하세요" style="width:300px;height:50px;">
     </div>
     <div class="form-floating">
-        <label for="floatingPassword"><strong>비밀번호</strong></label>
+        <label ><strong>비밀번호</strong></label>
         <input type ="password" name="password" class="form-control" id="input-password" placeholder="비밀번호를 입력하세요" style="width:300px;height:50px;">
     </div>
 
     <br>
-    {{! 회원 로그인 버튼!! 클릭 시 userLogin 함수 실행}}
     <button type="button" class="btn btn-primary" id="user-login-btn" onclick="user.userLogin()">로그인</button>
 </div>
 

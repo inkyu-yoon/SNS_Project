@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+    <div class = "container" align="center">
+        <h2>✍🏻 내가 작성한 게시글</h2>
+    </div>
+    <br>
+<div class="container" style="display: flex;justify-content: space-between;flex-wrap: wrap ">
+    <th:block th:each="myPost : ${myPosts}">
+        <div class="card border-primary mb-3" style="width: 30%;height: 100% ;">
+
+            <div class="card-body">
+                <h4 class="card-title"><a th:href="'/posts/'+${myPost.id}" th:text="|${myPost.id}. ${myPost.title}|">{{id}}. {{title}}   </a></h4>
+                <h6 class="card-subtitle" th:text="${myPost.createdAt}"> {{createdAt}} </h6>
+                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
+                <br>
+                <p class="card-text" style="background-color: #fff9ec"><a th:href="'/posts/'+${myPost.id}" th:text="${myPost.body}">{{body}}</a></p>
+                <hr style="border-top: 1px solid #bbb; border-bottom: 1px solid #fff">
+
+                <p style="float: left;color: darkred" th:text="|💖 : ${myPost.likeNum}|">   </p>
+                <p style="float: right;color: #78C2AD" th:text="|💬 : ${myPost.commentNum}|"> 💬 : {{commentNum}}</p>
+
+            </div>
+        </div>
+        <br>
+    </th:block>
+</div>
+<div class = "container" align="center">
+    <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link"
+                                 th:href="@{/posts/my(page=${previous})}">←</a>
+        <li class="page-item"><a class="page-link"
+                                 th:href="@{/posts/my(page=${next})}">→</a>
+    </ul>
+</div>

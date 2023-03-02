@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!-- header -->
+<th:block th:replace="layout/header :: headerFragment"></th:block>
+
+<div class="container">
+    <table class="table table-striped table-hover" style="border: 0.5px solid #78C2AD"  >
+        <thead class="table-primary">
+        <tr >
+            <th scope="col" style="width: 60%;text-align: center">제목</th>
+            <th scope="col" style="width: 15%;text-align: center">회원 이름</th>
+            <th scope="col" style="width: 20%;text-align: center">작성 날짜</th>
+            <th scope="col" style="width: 5%;font-size: 15px">💬</th>
+            <th scope="col" style="width: 5%;font-size: 15px">❤</th>
+        </tr>
+        </thead>
+        <tbody >
+
+        <tr th:each="post : ${posts}" >
+            <td style="text-align: center"><a th:href="|/posts/${post.id}|" th:text="${post.title}">{{title}}</a></td>
+            <th scope="row" style="text-align: center" th:text="${post.userName}">{{userName}}</th>
+            <th scope="row" style="text-align: center" th:text="${post.createdAt}">{{createdAt}}</th>
+            <th scope="row" style="text-align: center" th:text="${post.commentNum}">{{commentNum}}</th>
+            <th scope="row" style="text-align: center" th:text="${post.likeNum}">{{likeNum}}</th>
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<ul class="pagination justify-content-center">
+    <th:block th:if="${condition != null}">
+
+        <th:block th:if="${keyword != null}">
+        <li class="page-item"><a class="page-link"
+                                 th:href="@{/posts(condition=${condition},keyword=${keyword},page=${previous})}">Previous</a>
+
+        </li>
+            <li class="page-item"><a class="page-link"
+                                     th:href="@{/posts(condition=${condition},keyword=${keyword},page=${next})}">Next</a>
+        </li>
+        </th:block>
+    </th:block>
+    <th:block th:if="${condition == null}">
+
+        <th:block th:if="${keyword == null}">
+            <li class="page-item"><a class="page-link"
+                                     th:href="@{/posts(page=${previous})}">Previous</a>
+            <li class="page-item"><a class="page-link"
+                                     th:href="@{/posts(page=${next})}">Next</a>
+        </th:block>
+    </th:block>
+</ul>
+
+
+<!--게시글 작성 버튼 -->
+
+<form class="container justify-content-center " form action="/posts/write" method="get">
+    <div align="right">
+        <button class="btn btn-primary" type="submit">게시글 작성</button>
+    </div>
+</form>
+
+
+<br>
+
+<!--검색-->
+
+
+<form class="form-inline w-100 justify-content-center " action="/posts" method="get">
+    <th:block th:if="${condition != null}">
+
+        <th:block th:if="${titleCon != null}">
+
+    <div class="selectBox">
+        <select name="condition" class="select">
+            <option value="제목 검색">제목 검색</option>
+            <option value="회원명 검색">회원명 검색</option>
+        </select>
+    </div>
+        </th:block>
+        <th:block th:if="${userNameCon != null}">
+
+    <div class="selectBox">
+        <select name="condition" class="select">
+            <option value="회원명 검색">회원명 검색</option>
+            <option value="제목 검색">제목 검색</option>
+        </select>
+    </div>
+        </th:block>
+    </th:block>
+
+    <th:block th:if="${condition == null}">
+
+    <div class="selectBox">
+        <select name="condition" class="select">
+            <option value="제목 검색">제목 검색</option>
+            <option value="회원명 검색">회원명 검색</option>
+        </select>
+    </div>
+    </th:block>
+
+    <th:block th:if="${keyword != null}">
+
+    <input class="form-control me-sm-2" type="text" name="keyword" th:value="${keyword}" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
+    </th:block>
+    <th:block th:if="${keyword == null}">
+
+    <input class="form-control me-sm-2" name="keyword" type="search" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
+    </th:block>
+    <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
+</form>
+

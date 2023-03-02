@@ -47,6 +47,9 @@ dependencies {
 
     // template 엔진
     implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-devtools'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
     //Swagger
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
