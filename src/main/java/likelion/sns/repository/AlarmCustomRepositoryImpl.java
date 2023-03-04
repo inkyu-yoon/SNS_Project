@@ -4,6 +4,7 @@ import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,14 +14,10 @@ import static likelion.sns.domain.entity.QPost.post;
 import static likelion.sns.domain.entity.QUser.user;
 
 @Repository
+@RequiredArgsConstructor
 public class AlarmCustomRepositoryImpl implements AlarmCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    public AlarmCustomRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
-        this.jpaQueryFactory = jpaQueryFactory;
-    }
-
 
     @Override
     public List<AlarmListDetailsDto> getAlarmListByUserId(Long userId) {

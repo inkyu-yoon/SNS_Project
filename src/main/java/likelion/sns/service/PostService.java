@@ -126,8 +126,8 @@ public class PostService {
      * UI 용 메서드 (게시글 검색)
      * 게시글 리스트 조회 (제목으로 검색)
      */
-    public Page<PostListDto> getPostsByTitle(String title, Pageable pageable) throws SQLException {
-        return postRepository.findByTitleContainingOrderByCreatedAtDesc(title, pageable).map(post -> new PostListDto(post));
+    public Page<PostListDto> getPosts(String condition,String keyword, Pageable pageable) throws SQLException {
+        return postRepository.getPostLists(condition,keyword, pageable);
     }
 
     /**

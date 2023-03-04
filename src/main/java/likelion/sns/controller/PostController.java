@@ -39,24 +39,10 @@ public class PostController {
      * 게시글 리스트 (페이지)
      **/
     @GetMapping("")
-    public String searchList(@RequestParam(required = false) String keyword, @RequestParam(required = false) String condition, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
+    public String searchList(@RequestParam(required = false) String keyword, @RequestParam(required = false,defaultValue = "조건없음") String condition, Model model, Pageable pageable, HttpServletRequest request) throws SQLException {
         log.info("🔍검색 조건 : {} || 검색 키워드 : {}", condition, keyword);
-        Page<PostListDto> posts = null;
 
-
-        // 검색 키워드가 있으면, 키워드로 page 구성, 검색 키워드가 없으면 전체 페이지
-        if (condition != null) {
-            if (condition.equals("제목 검색")) {
-                posts = postService.getPostsByTitle(keyword, pageable);
-                model.addAttribute("titleCon", "제목 검색");
-            } else if (condition.equals("회원명 검색")) {
-                posts = postService.getPostsByUserName(keyword, pageable);
-                model.addAttribute("userNameCon", "회원명 검색");
-            }
-        } else {
-            posts = postService.getPostList(pageable);
-        }
-
+        Page<PostListDto> posts = postService.getPosts(condition,keyword,pageable);
 
         // 로그인 시, 화면에 로그인 회원명, 알림 전달
         showLoginUserNameAndAlarm(request, model, pageable);

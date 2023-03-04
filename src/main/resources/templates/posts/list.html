@@ -30,19 +30,19 @@
 </div>
 
 <ul class="pagination justify-content-center">
-    <th:block th:if="${condition != null}">
+    <th:block th:if="${condition != '조건없음'}">
 
         <th:block th:if="${keyword != null}">
-        <li class="page-item"><a class="page-link"
-                                 th:href="@{/posts(condition=${condition},keyword=${keyword},page=${previous})}">Previous</a>
+            <li class="page-item"><a class="page-link"
+                                     th:href="@{/posts(condition=${condition},keyword=${keyword},page=${previous})}">Previous</a>
 
-        </li>
+            </li>
             <li class="page-item"><a class="page-link"
                                      th:href="@{/posts(condition=${condition},keyword=${keyword},page=${next})}">Next</a>
-        </li>
+            </li>
         </th:block>
     </th:block>
-    <th:block th:if="${condition == null}">
+    <th:block th:if="${condition == '조건없음'}">
 
         <th:block th:if="${keyword == null}">
             <li class="page-item"><a class="page-link"
@@ -69,45 +69,43 @@
 
 
 <form class="form-inline w-100 justify-content-center " action="/posts" method="get">
-    <th:block th:if="${condition != null}">
 
-        <th:block th:if="${titleCon != null}">
+    <th:block th:if="${condition == '제목 검색'}">
 
-    <div class="selectBox">
-        <select name="condition" class="select">
-            <option value="제목 검색">제목 검색</option>
-            <option value="회원명 검색">회원명 검색</option>
-        </select>
-    </div>
-        </th:block>
-        <th:block th:if="${userNameCon != null}">
+        <div class="selectBox">
+            <select name="condition" class="select">
+                <option value="제목 검색">제목 검색</option>
+                <option value="회원명 검색">회원명 검색</option>
+            </select>
+        </div>
+    </th:block>
+    <th:block th:if="${condition == '회원명 검색'}">
 
-    <div class="selectBox">
-        <select name="condition" class="select">
-            <option value="회원명 검색">회원명 검색</option>
-            <option value="제목 검색">제목 검색</option>
-        </select>
-    </div>
-        </th:block>
+        <div class="selectBox">
+            <select name="condition" class="select">
+                <option value="회원명 검색">회원명 검색</option>
+                <option value="제목 검색">제목 검색</option>
+            </select>
+        </div>
     </th:block>
 
-    <th:block th:if="${condition == null}">
+    <th:block th:if="${condition == '조건없음'}">
 
-    <div class="selectBox">
-        <select name="condition" class="select">
-            <option value="제목 검색">제목 검색</option>
-            <option value="회원명 검색">회원명 검색</option>
-        </select>
-    </div>
+        <div class="selectBox">
+            <select name="condition" class="select">
+                <option value="제목 검색">제목 검색</option>
+                <option value="회원명 검색">회원명 검색</option>
+            </select>
+        </div>
     </th:block>
 
     <th:block th:if="${keyword != null}">
 
-    <input class="form-control me-sm-2" type="text" name="keyword" th:value="${keyword}" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
+        <input class="form-control me-sm-2" type="text" name="keyword" th:value="${keyword}" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
     </th:block>
     <th:block th:if="${keyword == null}">
 
-    <input class="form-control me-sm-2" name="keyword" type="search" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
+        <input class="form-control me-sm-2" name="keyword" type="search" placeholder="검색" style="margin-left: 10px;margin-right: 5px; border: 1px solid #78C2AD;">
     </th:block>
     <button class="btn btn-light my-2 my-sm-0" type="submit">검색</button>
 </form>
