@@ -57,6 +57,7 @@ public class PostController {
             posts = postService.getPostList(pageable);
         }
 
+
         // 로그인 시, 화면에 로그인 회원명, 알림 전달
         showLoginUserNameAndAlarm(request, model, pageable);
 

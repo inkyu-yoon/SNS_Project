@@ -4,7 +4,6 @@ import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
-import likelion.sns.repository.custom.AlarmCustomRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

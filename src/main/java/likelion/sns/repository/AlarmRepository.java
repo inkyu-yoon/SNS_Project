@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AlarmRepository extends JpaRepository<Alarm, Long> {
+public interface AlarmRepository extends JpaRepository<Alarm, Long>, AlarmCustomRepository {
     Page<Alarm> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
     @Modifying

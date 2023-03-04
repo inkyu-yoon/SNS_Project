@@ -1,4 +1,4 @@
-package likelion.sns.repository.custom;
+package likelion.sns.repository;
 
 import likelion.sns.domain.dto.alarm.AlarmListDetailsDto;
 import likelion.sns.domain.entity.Alarm;

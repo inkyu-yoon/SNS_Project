@@ -31,7 +31,6 @@ public class AlarmService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    private final AlarmCustomRepositoryImpl alarmCustomRepository;
 
     /**
      * 알림 목록 확인
@@ -40,7 +39,7 @@ public class AlarmService {
         //user 유효성 검사하고 찾아오기
         User requestUser = userValid(requestUserName);
 
-        List<AlarmListDetailsDto> result = alarmCustomRepository.getAlarmListByUserId(requestUser.getId());
+        List<AlarmListDetailsDto> result = alarmRepository.getAlarmListByUserId(requestUser.getId());
         log.info("🔔알림 조회 끝 userName : {}");
         return result;
     }

@@ -66,7 +66,7 @@ class AlarmServiceTest {
         void getAlarmSuccess(){
             given(userRepository.findByUserName("userName"))
                     .willReturn(Optional.of(mockUser));
-            given(alarmCustomRepository.getAlarmListByUserId(any()))
+            given(alarmRepository.getAlarmListByUserId(any()))
                     .willReturn(List.of(mockDetailAlarm));
 
             assertDoesNotThrow(()->alarmService.getAlarms("userName"));
