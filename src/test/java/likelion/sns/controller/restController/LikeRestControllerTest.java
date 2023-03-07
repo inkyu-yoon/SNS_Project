@@ -70,7 +70,7 @@ class LikeRestControllerTest {
     @Nested
     @DisplayName("좋아요 입력 테스트")
     class LikeTest {
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
 
         /**
          * 좋아요 입력 성공 테스트

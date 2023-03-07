@@ -68,7 +68,7 @@ class AlarmRestControllerTest {
     @DisplayName("알림 테스트")
     class AlarmTest {
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
 
         /**
          * 알림 목록 조회 성공 테스트
@@ -112,7 +112,7 @@ class AlarmRestControllerTest {
     @DisplayName("알림 삭제 테스트")
     class AlarmDeleteTest {
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
 
         Long alarmId = 1L;
         /**

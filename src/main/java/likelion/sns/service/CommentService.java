@@ -2,6 +2,7 @@ package likelion.sns.service;
 
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
+import likelion.sns.controller.SseController;
 import likelion.sns.domain.dto.comment.modify.CommentModifyRequestDto;
 import likelion.sns.domain.dto.comment.modify.CommentModifyResponseDto;
 import likelion.sns.domain.dto.comment.read.CommentListDto;
@@ -20,8 +21,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static likelion.sns.controller.SseController.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -202,11 +209,24 @@ public class CommentService {
 
         // 알림을 발생시킨(좋아요를 입력한) user id
         Long fromUserId = requestUser.getId();
-        log.info("게시글 id : {} 댓글 작성자 id : {} 알림이 도착할 사용자 id:{}", targetId, fromUserId, postAuthor);
+        log.info("게시글 id : {} 댓글 작성자 id : {} 알림이 도착할 사용자 id:{}", targetId, fromUserId, postAuthor.getId());
 
         //만약 게시글 주인과 알림을 발생시킨 아이디가 같다면, 알림을 저장하지 않음
         if (!(postAuthor.getId() == fromUserId)) {
             alarmRepository.save(Alarm.createAlarm(postAuthor, AlarmType.NEW_COMMENT_ON_POST, fromUserId, targetId));
+        }
+        if (sseEmitters.containsKey(postAuthor.getId())) {
+            log.info("댓글 단 user id {} || 알림을 받을 user id {}", fromUserId, postAuthor.getId());
+            SseEmitter sseEmitter = sseEmitters.get(postAuthor.getId());
+            try {
+                sseEmitter.send(SseEmitter.event().name("addComment").data("댓글이 달렸습니다."));
+            } catch (IOException e) {
+                sseEmitters.remove(postAuthor.getId());
+            }
+            log.info("sse 전달 성공");
+        } else {
+            log.info("sse 전달 못함");
+
         }
     }
 

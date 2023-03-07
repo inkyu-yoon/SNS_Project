@@ -108,7 +108,7 @@ class UserServiceTest {
                     .willReturn(Optional.of(mockUser));
             given(encoder.matches(any(), any()))
                     .willReturn(true);
-            given(JwtTokenUtil.createToken(any(), eq("secret")))
+            given(JwtTokenUtil.createToken(any(),any(), eq("secret")))
                     .willReturn("jwt token");
 
             assertDoesNotThrow(() -> userService.loginUser(requestDto));

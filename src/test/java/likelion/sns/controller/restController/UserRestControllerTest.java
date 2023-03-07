@@ -303,7 +303,7 @@ class UserRestControllerTest {
         UserRoleChangeRequestDto userRoleChangeRequestDto = new UserRoleChangeRequestDto("ADMIN");
         String content = gson.toJson(userRoleChangeRequestDto);
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
 
 
         /**

@@ -195,19 +195,20 @@
             <thead class="table-light">
 
 
-                <tr th:each="alarm : ${alarms}">
-                    <th scope="row" style="text-align: center;font-size: xx-small;">
-                        <a th:href="'/posts/'+${alarm.postId}"
-                           th:text="|${alarm.fromUserName} 님이 ${alarm.postName} 게시글에 ${alarm.text} ${alarm.createdAt}|">
-                            【{{fromUserName}}】님이 【{{PostName}}】 게시글에 {{text}} {{createdAt}}</th>
+            <tr th:each="alarm : ${alarms}">
+                <th scope="row" style="text-align: center;font-size: xx-small;">
+                    <a th:href="'/posts/'+${alarm.postId}"
+                       th:text="|${alarm.fromUserName} 님이 ${alarm.postName} 게시글에 ${alarm.text} ${alarm.createdAt}|">
+                        【{{fromUserName}}】님이 【{{PostName}}】 게시글에 {{text}} {{createdAt}}
                     </a>
-                    <th scope="row" style="text-align: center;font-size: xx-small;">
-                        <button type="button" class="btn btn-primary btn-sm"
-                                th:onclick="|alarm.alarmDelete(${alarm.alarmId})|">
-                            ✔
-                        </button>
-                    </th>
-                </tr>
+                </th>
+                <th scope="row" style="text-align: center;font-size: xx-small;">
+                    <button type="button" class="btn btn-primary btn-sm"
+                            th:onclick="|alarm.alarmDelete(${alarm.alarmId})|">
+                        ✔
+                    </button>
+                </th>
+            </tr>
 
             </thead>
             </tbody>
@@ -265,5 +266,24 @@
         alarm.init();
 
     </script>
+    <script>
+        let subscribeUrl = "http://localhost:8080/sub";
 
+        $(document).ready(function() {
+            if (localStorage.getItem("token") != null) {
+                let token = localStorage.getItem("token");
+                let eventSource = new EventSource(subscribeUrl + "?token=" + token);
+
+                eventSource.addEventListener("addComment", function(event) {
+                    let message = event.data;
+                    alert(message);
+                })
+
+                eventSource.addEventListener("error", function(event) {
+                    eventSource.close()
+                })
+            }
+        })
+
+    </script>
 </th:block>

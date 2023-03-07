@@ -70,7 +70,7 @@ public class UserService {
         }
 
         // 로그인에 성공할 시, token을 create 하고 반환
-        return new UserLoginResponseDto(JwtTokenUtil.createToken(requestUserName, secretKey));
+        return new UserLoginResponseDto(JwtTokenUtil.createToken(requestUserName,found.getId(), secretKey));
     }
 
 

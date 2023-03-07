@@ -3,6 +3,7 @@ package likelion.sns.service;
 import likelion.sns.Exception.ErrorCode;
 import likelion.sns.Exception.SNSAppException;
 import likelion.sns.domain.dto.post.modify.PostModifyRequestDto;
+import likelion.sns.domain.dto.post.read.PostListDto;
 import likelion.sns.domain.dto.post.write.PostWriteRequestDto;
 import likelion.sns.domain.entity.Post;
 import likelion.sns.domain.entity.User;
@@ -461,20 +462,17 @@ class PostServiceTest {
 
         PageRequest pageable = PageRequest.of(0, 20, Sort.Direction.DESC, "createdAt");
 
+        PostListDto mockPostList = mock(PostListDto.class);
         /**
          * 성공 테스트
          */
         @Test
         @DisplayName("게시글 제목으로 검색 시 리스트 조회 성공 테스트")
         void getPostsByTitleSuccess() {
-            given(postRepository.findByTitleContainingOrderByCreatedAtDesc("title", pageable))
-                    .willReturn(new PageImpl<>(List.of(mockPost)));
-            given(mockPost.getUser())
-                    .willReturn(mockUser);
-            given(mockPost.getCreatedAt())
-                    .willReturn(Timestamp.valueOf(LocalDateTime.now()));
+            given(postRepository.getPostLists("condition","keyword", pageable))
+                    .willReturn(new PageImpl<>(List.of(mockPostList)));
 
-            assertDoesNotThrow(() -> postService.getPostsByTitle("title", pageable));
+            assertDoesNotThrow(() -> postService.getPosts("condition","keyword", pageable));
 
         }
     }

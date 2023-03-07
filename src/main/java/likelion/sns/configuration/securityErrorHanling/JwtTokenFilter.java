@@ -2,6 +2,7 @@ package likelion.sns.configuration.securityErrorHanling;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import likelion.sns.jwt.JwtTokenUtil;
 import likelion.sns.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +43,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String token = authorization.split(" ")[1];
 
         // 만료된 토큰인지 확인하고, 만료되었다면 권한을 부여하지 않는다.
-        if (JwtTokenFilter.isExpired(token, secretKey)) {
+        if (JwtTokenUtil.isExpired(token, secretKey)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // 토큰을 생성할 때, 입력해둔 userName 정보를 추출한다.
-        String userName = extractClaims(token, secretKey).get("userName").toString();
+        String userName = JwtTokenUtil.extractClaims(token, secretKey).get("userName").toString();
 
         // 권한을 줄지 안줄지 결정하는 메서드
         String userRole = userService.findRoleByUserName(userName).name();
@@ -64,20 +65,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    /**
-     * 토큰이 만료되었는지 확인
-     */
-    public static boolean isExpired(String token, String secretKey) {
-        Date expiredDate = extractClaims(token, secretKey).getExpiration();
-        return expiredDate.before(new Date());
-    }
 
-    /**
-     * 암호화된 토큰을 해독하는 역할
-     */
-    private static Claims extractClaims(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
-    }
 
 
 }

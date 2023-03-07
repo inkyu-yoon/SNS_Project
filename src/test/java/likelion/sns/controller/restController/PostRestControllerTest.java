@@ -181,7 +181,7 @@ class PostRestControllerTest {
     class PostWriteTest {
         PostWriteRequestDto postWriteRequestDto = new PostWriteRequestDto("title", "body");
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
         String content = gson.toJson(postWriteRequestDto);
 
         /**
@@ -294,7 +294,7 @@ class PostRestControllerTest {
 
         PostModifyRequestDto PostModifyRequestDto = new PostModifyRequestDto("수정 제목", "수정 내용");
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName", 1L,secretKey);
 
         String content = gson.toJson(PostModifyRequestDto);
         Long postId = 1L;
@@ -453,7 +453,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 삭제 테스트")
     class PostDeleteTest {
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
         Long postId = 1L;
 
         /**
@@ -568,7 +568,7 @@ class PostRestControllerTest {
     @DisplayName("포스트 마이피드 테스트")
     class PostMyFeedTest {
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName", 1L,secretKey);
 
         /**
          * 마이 피드 조회 성공 테스트

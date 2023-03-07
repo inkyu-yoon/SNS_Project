@@ -116,7 +116,7 @@ class CommentRestControllerTest {
     class CommentWriteTest {
 
         CommentWriteRequestDto commentWriteRequestDto = new CommentWriteRequestDto("comment");
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
         String content = gson.toJson(commentWriteRequestDto);
 
         /**
@@ -241,7 +241,7 @@ class CommentRestControllerTest {
     class ReplyCommentWriteTest {
 
         ReplyCommentWriteRequestDto replyCommentWriteTest = new ReplyCommentWriteRequestDto("reply comment");
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
         String content = gson.toJson(replyCommentWriteTest);
         Long parentCommentId = 1L;
 
@@ -396,7 +396,7 @@ class CommentRestControllerTest {
     class CommentModifyTest {
 
         CommentModifyRequestDto commentModifyRequestDto = new CommentModifyRequestDto("new comment");
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
         String content = gson.toJson(commentModifyRequestDto);
 
         /**
@@ -575,7 +575,7 @@ class CommentRestControllerTest {
     @DisplayName("댓글 삭제 테스트")
     class CommentDeleteTest {
 
-        String token = JwtTokenUtil.createToken("userName", secretKey);
+        String token = JwtTokenUtil.createToken("userName",1L, secretKey);
 
         /**
          * 댓글 삭제 성공 테스트
